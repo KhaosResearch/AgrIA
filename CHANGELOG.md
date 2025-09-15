@@ -1,3 +1,41 @@
+# 📝 Changelog – Version 1.2 (September 2025)
+
+### 🚀 New Features
+- **Enhanced Parcel Locator:** Introduced advanced search logic, including coordinate-based search and optimized parcel lookup modules.
+- **Integrated Finder & Drawer:** Improved workflow for parcel discovery and custom geometry drawing, with data sharing between components.
+- **UI Enhancements:** New tabbed layout for parcel tools, improved validation, and better state handling across forms.
+- **Server Enrichment:** Backend now supports geometry + SIGPAC metadata parsing, with improved error handling and enriched responses.
+
+---
+
+### 🛠 Fixes & Improvements
+- Debug outputs removed and logging cleaned up.
+- Progress indicators now more accurate during parcel processing.
+- Refined error messages across UI and Server.
+- Additional validation and input handling improvements.
+
+---
+
+### 📦 Enhancements
+- Auto-display of last searched parcel in chat assistant.
+- Improved tile providers for better map rendering.
+- Documentation updates and minor code refactors.
+
+---
+
+## 📁 UI-Specific Changes
+- Extracted components for reusability (displayer, address search).
+- Implemented polygon drawing with `leaflet-draw`.
+- New form reset options and field locking logic.
+- Style and folder structure refinements.
+
+---
+
+## 🖥️ Server-Specific Changes
+- New routes for enriched parcel geometry + SIGPAC handling.
+- Extended validation pipeline with more detailed error feedback.
+- Integrated LLM-based description enrichment into server responses.
+
 # 📝 Changelog – Version 1.1 (July 2025)
 
 ### 🚀 New Features
