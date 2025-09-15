@@ -5,6 +5,7 @@
 - **Integrated Finder & Drawer:** Improved workflow for parcel discovery and custom geometry drawing, with data sharing between components.
 - **UI Enhancements:** New tabbed layout for parcel tools, improved validation, and better state handling across forms.
 - **Server Enrichment:** Backend now supports geometry + SIGPAC metadata parsing, with improved error handling and enriched responses.
+- **Image Super-Resolution:** Sentinel 10m images are now improved and displayed at 5m resolution after procesisng.
 
 ---
 
@@ -32,10 +33,11 @@
 ---
 
 ## 🖥️ Server-Specific Changes
+- Implemented SR module into image retrieval pipeline.
 - New routes for enriched parcel geometry + SIGPAC handling.
 - Extended validation pipeline with more detailed error feedback.
 - Integrated LLM-based description enrichment into server responses.
-
+ 
 # 📝 Changelog – Version 1.1 (July 2025)
 
 ### 🚀 New Features
