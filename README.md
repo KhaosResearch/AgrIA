@@ -71,7 +71,7 @@ The following diagram details AgrIA`s parcel finding pipeline when both image an
 
 3. A crop containing the parcel geometry is made out of the downloaded Sentinel tiles and the SuperRes4Sentinel implementation uses the pre-trained module to upscale it to a better resolution (10m/px --> 5m/px). See example:
 
-![](https://raw.githubusercontent.com/MiguelPadillaR/AgrIA/assets/examples/01.png)
+![](https://raw.githubusercontent.com/KhaosResearch/AgrIA/refs/heads/main/assets/examples/01.png)
 
 4. Both the formatted SIGPAC crop classification and the super-resolved image are passed in a single prompt to the model.
     - The model leverages the provided text info with the visual data.
