@@ -1,0 +1,175 @@
+<div id="parcel-drawer">
+    <div class="content">
+        <div class="form-title">
+            <h2>{{ 'parcelDrawer.title' | translate }}</h2>
+        </div>
+        <div class="form-description">
+            <p>
+                {{ "parcelDrawer.description.intro" | translate }}
+            </p>
+            <h3>{{ "parcelDrawer.description.header1" | translate }}</h3>
+            <p>
+                <span style="font-weight: bold;">{{ "parcelDrawer.description.bold0" | translate }}</span>{{ "parcelDrawer.description.normal0" | translate }}
+            </p>
+            <h3>{{ "parcelDrawer.description.header2" | translate }}</h3>
+            <p>
+                <span style="font-weight: bold;">{{ "parcelDrawer.description.bold1" | translate }}</span> 
+                {{ "parcelDrawer.description.normal1" | translate }}
+                <span style="font-weight: bold;">{{ "parcelDrawer.description.bold2" | translate}}</span>
+                {{ "parcelDrawer.description.normal2" | translate}}
+            </p>
+            <p>
+                {{ "parcelDrawer.description.normal3" | translate }}
+                <span style="font-weight: bold;">{{ "parcelDrawer.description.bold3" | translate}}</span>
+                {{ "parcelDrawer.description.normal4" | translate}}
+            </p>
+        </div>
+        <div class="coordinates-container">
+            <label class="coordinates-label"> {{ 'parcelDrawer.coordinates.label' | translate }} <span style="font-style: italic;">(lat, lon): </span>
+                <input
+                    class="form-input"
+                    type="text"
+                    name="coordinates"
+                    [(ngModel)]="coordinates"
+                    placeholder="{{ 'parcelDrawer.coordinates.placeholder' | translate }}"
+                >
+            </label>
+            <div class="date-field">
+                <label class="form-label">
+                    {{ 'parcelFinder.selectDate' | translate }}:
+                    <input 
+                    class="form-input"
+                    type="date"
+                    placeholder="{{ 'parcelFinder.datePlaceholder' | translate }}"
+                    [(ngModel)]="selectedDate"
+                    [max]="today"
+                    />
+                </label>
+            </div>
+            <div class="coordinate-buttons">
+                <button
+                    class="input-button"
+                    (click)="centerMapOnCoordinates()"
+                >
+                    {{ 'parcelDrawer.coordinates.search-button' | translate }}
+                </button>
+                <button
+                    class="clear-info-button"
+                    (click)="resetMapAndCoordinates()"
+                >
+                    {{ 'parcelDrawer.coordinates.clear-button' | translate }}
+                </button>
+            </div>
+        </div>
+        <div class="map-container">
+            <div class="map-frame">
+                <div id="map"></div>
+            </div>
+        </div>
+        @if(!coordsInZone() || parcelGeometry != null){
+            <div class="crop-classification-container">
+                <h2 class="form-title">{{ "parcelDrawer.sigpacForm.title" | translate}}</h2>
+                <div class="form-description">
+                    <p>
+                        <span style="font-weight: bold;">{{"parcelDrawer.sigpacForm.description.bold1" | translate}}</span>{{"parcelDrawer.sigpacForm.description.normal1" | translate}}
+                    </p>
+                </div>
+                <form class="form">
+                    <div class="crop-classification-tree">
+                        @for (type of (objectKeys(groupedCropClassification)); track type) {
+                        <details class="type-group">
+                            <summary class="type-title">{{ type }}</summary>
+
+                            @for (subtype of (objectKeys(groupedCropClassification[type])); track subtype) {
+                                <details class="subtype-group">
+                                <summary class="subtype-title">{{ subtype }}</summary>
+
+                                <div class="checkbox-grid">
+                                    @for (item of groupedCropClassification[type][subtype]; track item.class) {
+                                    <label class="crop-checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            [value]="item.class"
+                                            class="crop-checkbox"
+                                            (click)="toggleSelectedClassification(item)"
+                                            [checked]="isSelected(item)"
+                                        />
+                                        {{ item.class }} - {{ item.name }}
+                                    </label>
+                                    }
+                                </div>
+                                </details>
+                            }
+                            </details>
+                        }
+                    </div>
+                </form>
+                @if (selectedClassifications.length > 0) {
+                    <div class="form-description">
+                    <p>
+                        <span style="font-weight: bold;">{{"parcelDrawer.sigpacForm.description.bold2" | translate}}</span>{{"parcelDrawer.sigpacForm.description.normal2" | translate}}
+                    </p>
+
+                    </div>
+                    <div class="selected-crops-table">
+                        <h3>{{ "parcelDrawer.sigpac-table.title" | translate}}</h3>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>{{ "parcelDrawer.sigpac-table.header1" | translate}}</th>
+                                <th>{{ "parcelDrawer.sigpac-table.header2" | translate}}</th>
+                                <th>{{ "parcelDrawer.sigpac-table.header3" | translate}}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @for (item of selectedClassifications; track trackClassification(item)) {
+                                <tr>
+                                <td>{{ item.classification.class }} - {{ item.classification.name }}</td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        class="table-input"
+                                        [(ngModel)]="item.surface"
+                                        [name]="'surface-' + item.classification.class"
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        class="table-input"
+                                        [(ngModel)]="item.irrigation"
+                                        [name]="'irrigation-' + item.classification.class"
+                                        (ngModelChange)="item.irrigation = item.irrigation ?? 0"
+                                    />
+                                </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+        <div class="form-buttons">
+            <button
+                class="input-button"
+                [style.cursor]="isLoading() ? 'progress' : 'pointer'"
+                [disabled]="isLoading()"
+                (click)="sendParcelDrawerInfo()"
+            >
+                {{ isLoading() ? ('parcelDrawer.button.loading' | translate) : ('parcelDrawer.button.send' | translate) }}
+            </button>
+            @if(selectedClassifications == [] || parcelGeometry != null) {
+                <button
+                    class="clear-info-button"
+                    (click)="resetForm()"
+                >
+                    {{ 'parcelDrawer.button.reset' | translate }}
+                </button>
+            }
+
+        </div>
+</div>

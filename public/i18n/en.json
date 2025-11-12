@@ -1,0 +1,255 @@
+{
+  "nav": {
+    "home": "Home",
+    "parcel": "Parcel finder",
+    "chat": "Chat"
+  },
+  "home": {
+    "hero": {
+      "title": "Optimize your crops with Artificial Intelligence",
+      "description": "AgrIA helps you meet CAP subsidy eco-schemes requirements by analyzing your satellite images.",
+      "button": "Discover More",
+      "imageAlt": "Satellite image of cultivated fields"
+    },
+    "about": {
+      "title": "About AgrIA",
+      "paragraph1Bold1": "The Agricultural Image Assistant (AgrIA)",
+      "paragraph1Part2": "is an integrated image analysis and intelligent chat tool,",
+      "paragraph1Bold2": "specializing in agricultural satellite image classification",
+      "paragraph1Part3": "Designed for farmers and landowners, it facilitates crop valuation and",
+      "paragraph1Bold3": "provides a report that helps them qualify for various European Union eco-scheme aids within the framework of the Common Agricultural Policy (CAP).",
+      "paragraph2Part1": "To get started,",
+      "paragraph2Bold1": "open the Parcel Finder, enter the cadastral reference, and confirm the displayed property.",
+      "paragraph2Part2": "AgrIA will open the chat and provide an image analysis, along with recommendations to comply with CAP eco-scheme eligibility regulations. You can also",
+      "paragraph2Bold2": "upload your own image from the chat, but AgrIA will not have access to the SIGPAC information obtained by using the cadastral reference"
+    },
+    "features": {
+      "title": "Main Features",
+      "parcelLocation": {
+        "title": "Parcel Location",
+        "description": "Automatically find your parcel by simply using its cadastral reference, address or locating it on the map."
+      },
+      "imageSuperRes": {
+        "title": "Image Super-Resolution",
+        "description": "Get and improved 10m/px image resolution up to 5m/px thanks to self-supervised AI models."
+      },
+      "satelliteImageAnalysis": {
+        "title": "Satellite Image Analysis",
+        "description": "Get an accurate description of your fields from Sentinel satellite images for a detailed view of the terrain."
+      },
+      "resourceAnalysis": {
+        "title": "Resource Analysis",
+        "description": "Receive personalized recommendations for efficient space utilization, crop species, and other resources."
+      },
+      "pacAdvisory": {
+        "title": "CAP Advisory",
+        "description": "Get expert guidance to meet Common Agricultural Policy subsidy criteria for eco-schemes status."
+      },
+      "interactiveSupport": {
+        "title": "Interactive Support",
+        "description": "Interact with AgrIA through chat and receive updated answers about your crops."
+      }
+    },
+    "quickstart" : {
+      "title": "Get Started with AgrIA: Parcel Finder",
+      "paragraph1": "In order to exploit AgrIA's full potential, ",
+      "paragraphBold": "you will need to access the Parcel Finder. ",
+      "paragraph2": "Here's how to use it:",
+      "steps": {
+        "1": "Go to the 'Parcel Finder' view.",
+        "2": "Introduce the cadastral reference code of your parcel or state.",
+        "3": "Select the date you want the image from.",
+        "4": "Press 'Find Parcel' and wait for the system to retrieve your parcel image.",
+        "5": "Confirm your parcel image to pass it to AgrIA's chat along with the SIGPAC classification information."
+      },
+      "exampleTitle": "Example of Parcel Finder view."
+    },
+    "howToUse": {
+      "title": "Interact with AgrIA: The Chat",
+      "exampleTitle": "Example of AgrIA chat interaction"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "Do you have any questions or need more information? Feel free to contact us.",
+      "namePlaceholder": "Your Name",
+      "emailPlaceholder": "Your Email",
+      "messagePlaceholder": "Your Message",
+      "sendButton": "Send Message"
+    },
+    "footer": {
+      "copyright": "© 2025 AgrIA. All rights reserved.",
+      "facebookAlt": "Facebook",
+      "twitterAlt": "Twitter",
+      "linkedinAlt": "LinkedIn"
+    }
+  },
+  "parcelFinder": {
+    "cadastralData": "Cadastral Data",
+    "description1": "Enter the cadastral reference code of the parcel you want to query. If you don't know it, you can search for it on the cadastre website or related property documents.",
+    "description2": "Make sure the code has 20 characters.",
+    "description3Bold": "Urban cadastral reference codes will not be accepted. If you have difficulty finding your parcel, search it via coordinates / drawing parcel limits.",
+    "description3": "",
+    "cadastralReference": "Cadastral reference code:",
+    "cadastralPlaceholder": "Cadastral Ref. Code",
+    "selectDate": "Select approximate date",
+    "datePlaceholder": "Date",
+    "loading": "Loading…",
+    "findParcel": "Find Parcel",
+    "clearForm": "Clear Form",
+    "selectedParcel": "Selected Parcel",
+    "previewAlt": "Parcel Image",
+    "uploadImageAlt": "Upload image",
+    "detailedDescription": "Detailed description.",
+    "confirmParcel": "Confirm Parcel",
+    "tab": {
+      "finder": "Search by cadastral reference.",
+      "locator": "Search by state's parcel / industrial park.",
+      "drawer": "Search by coordinates / drawing parcel limits."
+    }
+  },
+  "parcel-locator": {
+    "title": "Location Data",
+    "province": {
+      "name": "Province:", 
+      "placeholder": "Select province", 
+      "error": "Error: Province not valid. Please, select valid province."
+    },
+    "municipality": {
+      "name": "Municipality:", 
+      "placeholder": "Select municipality", 
+      "error": "Error: Municipality not valid. Please, select valid municipality."
+    },
+    "polygon": {
+      "name": "Industrial Park:", 
+      "placeholder": "000", 
+      "error": "Error: Industrial Park not valid. Please, select valid identifier (3 digits max)."
+    },
+    "parcel-id": {
+      "name": "Parcel:",
+      "placeholder": "00000",
+      "error": "Error: Parcel not valid. Please, select valid identifier (5 digits max)."
+    }
+  },
+  "parcelDrawer": {
+    "title": "Geographical Data",
+    "description": {
+      "intro":"In this module, you may use one of the two options available to find your parcel. In both, the date will be used to extract the image.",
+      "header1": "Coordinates Search (Spain only):",
+      "header2": "Parcel Drawing Search (resto of the world):",
+      "bold0":"Click/tap on the map over your parcel or introduce a set of coordinates (latitude, longitude) that are within your state's limits ",
+      "normal0":" as per the property's cadastral data in order to find it.",
+      "normal00":"Introduce the parcel's location data, sepcifying each one of these fields: Province, Municipality, Industrial's Park numeric ID, and Parcel's numeric ID",
+      "normal01": "This options allows the ",
+      "bold01": "automatic extraction of the SIPAC classification",
+      "normal02": " of your parcel's crops.",
+      "bold1": "Use the '\u2B54' button and draw your parcel's limits over the map.",
+      "normal1": "When you are done marking your parcel, ",
+      "bold2": "press again on the initial node to finish ",
+      "normal2": "drawing.",
+      "normal3": "In order to get a better evaluation and classification from AgrIA, ",
+      "bold3": "make sure you provide your parcel's crop classifcation.",
+      "normal4": "For that, you may use the SIGAPC classification form below the map."
+    },
+    "coordinates": {
+      "label": "Parcel's coordinates",
+      "placeholder": "Ex: 40.4165, -3.70256 ...",
+      "invalid": "Invalid coordinates format. Please use the 'latitude, longitude' format.\nInput coordinates:",
+      "search-button": "Search coordinates",
+      "clear-button": "Reset map and coordinates"
+    },
+    "sigpacForm": {
+      "title": "SIGPAC Classification",
+      "description": {
+        "bold1": "Use the following form to indicate all of your states's crop types. ",
+        "normal1": "These follow SIGPAC classification. Pertinent information should be available at SIGPAC's website or property-related documents.",
+        "bold2": "Use the following table to indicate the total surface taken by each crop type, ",
+        "normal2": "even if it may be shared among different parcels."
+      }
+    },
+    "sigpac-table": {
+      "title": "Selected Crops",
+      "header1": "SIGPAC Type",
+      "header2": "Surface (ha)",
+      "header3": "Irrigation Coef. (%)"
+    },
+    "button": {
+      "send": "Find Parcel",
+      "reset": "Reset selection",
+      "loading": "Loading..."
+    }
+  },
+  "chat": {
+    "uploadImage": {
+      "title": "Image",
+      "imageAlt": "Example satellite image",
+      "description": "Here will be displayed the description generated by AgrIA from the uploaded satellite image.",
+      "imageName": "Image Name"
+    },
+    "chatWithAgria": {
+      "title": "Chat with AgrIA",
+      "agriaMessage1": "Hello! I'm your Agricultural Image Assistant, but you can call me AgrIA! My purpose here is to analyze satellite images of cultivated fields to assist you...",
+      "userMessage1": "Hello AgrIA, I have uploaded an image of my field in parcel 34. Could you analyze water usage?",
+      "agriaMessage2": "Of course, I have analyzed the image of parcel 34. It seems there are areas with a low vegetation index that could indicate inefficient water use. I suggest...",
+      "inputPlaceholder": "Write your question or comment here...",
+      "sendButton": "Send",
+      "getSuggestionButton": "Get suggestion"
+    },
+    "chatInput": {
+      "placeholder": "Type here...",
+      "sendButton": "Send",
+      "sendButtonTitle": "Send prompt.",
+      "getSuggestionButton": "Get Suggestion",
+      "getSuggestionButtonTitle": "Get a suggested prompt from the reply.",
+      "detailedImageDescription": "Detailed image description."
+    },
+    "navigationButton": {
+      "title": "Navigate to parcel finder view.",
+      "text": "Return to parcel finder"
+    }
+  },
+  "progressBar": {
+    "completed": "Process can sometimes take up to 1 minute aprox..."
+  },
+    "notifications": {
+      "parcel-finder": {
+        "searching": "Searching for parcel image...",
+        "success": "Parcel found!",
+        "error": "Error when searching for parcel:"
+      },
+      "parcel-drawer": {
+        "coordinates": {
+          "invalid": "Invalid coordinates format. Please use the 'lat, lon' format.\nInput coordinates:",
+          "new-coordinates": "Updated coordinates: ",
+          "new-coordinates-error": "Error when updating coordinates: "
+        },
+        "sigpac-table": {
+          "error": "Error when loading crop classifications:\n"
+        },
+        "missing": {
+          "parcel-drawing":"Error: No parcel's polygon or coordinate marker detected on the map. Draw a polygon (states out of Spain) or use a coordinate marker (within Spain).",
+          "parcel-out":"Error: Territory outside of Spain detected. Draw a polygon of your state to continue.",
+          "crop-classification": "Error: No crop type selected. Please select at least one crop type.",
+          "surface": "Error: Missing surface. Please provide a surface for all selected crop classification."
+        }
+      },
+      "parcel-locator": {
+        "missing": {
+          "province": "Error: Missing value for 'Province'. Please, select province.",
+          "municipality": "Error: Missing value for 'Municipality'. Please, select municipality.",
+          "polygon": "Error: Missing value for 'Industrial Park'. Please, select identifier (3 digits max).",
+          "parcel-id": "Error: Missing value for 'Parcel'. Please, select entifier (5 digits max)."
+        }
+      },
+      "chat": {
+        "load-parcel-finder-data-info": "Getting parcel finder data...",
+        "load-parcel-finder-data-error": "Error while getting parcel finder data:\n",
+        "load-parcel-finder-data-success": "Loaded parcel data successfully!",
+        "suggestion-info": "Getting suggested input...",
+        "suggestion-error": "Error when getting suggestion:",
+        "suggestion-success": "Suggestion loaded successfully!"
+      },
+      "chat-assistant": {
+        "assistant-error": "Error while getting a response:\n"
+      }
+  }
+}

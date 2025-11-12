@@ -1,0 +1,87 @@
+<div id="chat">
+    <div class="content">
+        <div class="top-section">
+            <div id="image">
+                <div class="image-header">
+                    <h2>{{ 'chat.uploadImage.title' | translate }}</h2>
+                </div>
+                <div class="image-preview">
+                    @if(imagePreviewUrl){
+                        <img [src]="imagePreviewUrl" alt="{{ 'parcelFinder.previewAlt' | translate }}" />
+                    } @else {
+                        <img class="image-icon" src="img/image-icon.png" alt="{{ 'parcelFinder.uploadImageAlt' | translate }}" />
+                    }
+                </div>
+                @if (imagePreviewUrl) {
+                    <div class="image-desc">
+                        <p>{{ 'chat.uploadImage.imageName' | translate }}: {{ displayImageName }}</p>
+                        <p>{{ parcelImageInfo }}</p>
+                    </div>
+                }
+            </div>
+            <div id="chat-box">
+                <div class="chat-header">
+                    <h2>AgrIA</h2>
+                </div>
+                <div class="chat-content" #chatContent>
+                    <app-chat-assistant></app-chat-assistant>
+                </div>
+            </div>
+        </div>
+
+        <div id="input">
+            <label class="custom-file-upload">
+              <img src="img/upload-icon1.png" alt="{{ 'parcelFinder.uploadImageAlt' | translate }}" title="{{ 'parcelFinder.uploadImageAlt' | translate }}"/>
+              <input 
+                type="file" 
+                accept="image/*"
+                (change)="onFileSelected($event)"
+                />
+            </label>
+          
+            <textarea 
+                id="user-input" 
+                (keydown.enter)="sendUserInput()"
+                (keyup.enter)="clearUserInput()"
+                placeholder="{{ 'chat.chatInput.placeholder' | translate }}" 
+                [(ngModel)]="userInput"
+            >
+            </textarea>
+        <div class="input-actions-wrapper">
+            <div class="input-buttons-wrapper">
+                <button 
+                    class="input-button"
+                    (click)="sendUserInput()"
+                    title="{{ 'chat.chatInput.sendButtonTitle' | translate }}"
+                >
+                    {{ 'chat.chatInput.sendButton' | translate }}
+                </button>
+                <button
+                    class="input-button"
+                    [style.cursor]="isLoading() ? 'progress' : 'pointer'"
+                    (click)="getInputSuggestion()"
+                    title="{{ 'chat.chatInput.getSuggestionButtonTitle' | translate }}"
+                >
+                    {{ !isLoading() ? ('chat.chatInput.getSuggestionButton' | translate) : ('parcelFinder.loading' | translate) }}
+                </button>
+            </div>
+
+            <label class="detailed-description-checkbox">
+                <input 
+                    type="checkbox"
+                    class="description-length"
+                    [(ngModel)]="isDetailedDescription"
+                >
+                {{ 'chat.chatInput.detailedImageDescription' | translate }}
+            </label>
+        </div>
+        </div>
+        <button
+            class="navigation-button"
+            (click)="goToParcelFinderView()"
+            title="{{ 'chat.navigationButton.title' | translate }}"
+        >
+            {{ 'chat.navigationButton.text' | translate }}
+        </button>
+    </div>
+</div>

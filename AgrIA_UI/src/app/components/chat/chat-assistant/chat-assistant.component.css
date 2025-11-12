@@ -1,0 +1,79 @@
+.chat-window {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-height: 635px;
+    overflow-y: auto;
+    padding: 1rem;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    scroll-behavior: smooth;
+  }
+  
+  /* Ensures messages are aligned left/right overall */
+  .message {
+    display: flex;
+    width: 100%;
+  }
+  
+  /* User message aligned right */
+  .message.user {
+    justify-content: flex-end;
+    .bubble {
+      --r: 1rem;  /* the radius */
+      --t: 1rem; /* the size of the tail */
+      border-inline: var(--t) solid #08e90000;
+      mask: 
+      radial-gradient(100% 100% at var(--_p) 0,#0000 99%,#000 102%) 
+        var(--_p) 100%/var(--t) var(--t) no-repeat,
+      linear-gradient(#000 0 0) padding-box;  
+      --_p: 100%;
+      border-bottom-right-radius: 0 0;
+      place-self: end;
+      background-color: #4CAF50;
+      color: white;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+  }
+  
+  /* Assistant message aligned left */
+  .message.model {
+    justify-content: flex-start;
+    .bubble {
+      border-left: 3px solid rgb(139, 88, 88);
+      border-radius: 5px;
+      max-width: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+  }
+  
+  /* Common bubble styling */
+  .bubble {
+    padding: 0.5rem 1rem;
+    border-radius: 1.5rem;
+    max-width: 80%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    text-align: left;
+  }
+
+  .typing-icon {
+    width: 40px;
+    height: 40px;
+    animation: pop-in-out 1s ease-in-out infinite alternate;
+    display: block;
+    margin: 0 auto;
+    filter: contrast(80%);  
+  }
+  
+  @keyframes pop-in-out {
+    0% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
+  

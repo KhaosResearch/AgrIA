@@ -1,0 +1,220 @@
+﻿[
+  {
+    "class": "AG",
+    "name": "Corrientes y superficies de agua",
+    "type": "SUPERFICIE NO AGRÍCOLA",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "CA",
+    "name": "Viales",
+    "type": "SUPERFICIE NO AGRÍCOLA",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "CF",
+    "name": "Cítricos-Frutal",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Frutales y sus asociaciones",
+    "subtype2": "Cítricos y sus asociaciones"
+  },
+  {
+    "class": "CI",
+    "name": "Cítricos",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Cítricos y sus asociaciones",
+    "subtype2": ""
+  },
+  {
+    "class": "CS",
+    "name": "Cítricos-Frutal de cáscara",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Frutos secos y sus asociaciones",
+    "subtype2": "Cítricos y sus asociaciones"
+  },
+  {
+    "class": "CV",
+    "name": "Cítricos-Viñedo",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Viñedo y sus asociaciones",
+    "subtype2": "Cítricos y sus asociaciones"
+  },
+  {
+    "class": "ED",
+    "name": "Edificaciones",
+    "type": "SUPERFICIE NO AGRÍCOLA",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "EP",
+    "name": "Elemento del Paisaje",
+    "type": "SUPERFICIE NO AGRÍCOLA",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "FF",
+    "name": "Frutal de Cáscara-Frutal",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Frutales y sus asociaciones",
+    "subtype2": "Frutos secos y sus asociaciones"
+  },
+  {
+    "class": "FL",
+    "name": "Frutal de Cáscara-Olivar",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Olivar y sus asociaciones",
+    "subtype2": "Frutos secos y sus asociaciones"
+  },
+  {
+    "class": "FO",
+    "name": "Forestal",
+    "type": "FORESTAL",
+    "subtype1": "",
+    "subtype2": ""
+  },
+    {
+    "class": "MT",
+    "name": "Matorral",
+    "type": "FORESTAL",
+    "subtype1": "",
+    "subtype2": ""
+  },
+
+  {
+    "class": "FS",
+    "name": "Frutal de Cáscara",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Frutos secos y sus asociaciones",
+    "subtype2": ""
+  },
+  {
+    "class": "FV",
+    "name": "Frutal de Cáscara-Viñedo",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Frutos secos y sus asociaciones",
+    "subtype2": ""
+  },
+  {
+    "class": "FY",
+    "name": "Frutal",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Viñedo y sus asociaciones",
+    "subtype2": "Frutales y sus asociaciones"
+  },
+  {
+    "class": "IM",
+    "name": "Improductivo",
+    "type": "SUPERFICIE NO AGRÍCOLA",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "IV",
+    "name": "Invernaderos y cultivos bajo plástico",
+    "type": "TIERRAS DE CULTIVO",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "OC",
+    "name": "Olivar-Cítricos",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Olivar y sus asociaciones",
+    "subtype2": "Cítricos y sus asociaciones"
+  },
+  {
+    "class": "OF",
+    "name": "Olivar-Frutal",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Olivar y sus asociaciones",
+    "subtype2": "Frutales y sus asociaciones"
+  },
+  {
+    "class": "OV",
+    "name": "Olivar",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Olivar y sus asociaciones",
+    "subtype2": ""
+  },
+  {
+    "class": "PA",
+    "name": "Pasto arbolado",
+    "type": "PASTOS",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "PR",
+    "name": "Pasto arbustivo",
+    "type": "PASTOS",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "PS",
+    "name": "Pastizal",
+    "type": "PASTOS",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "TA",
+    "name": "Tierra arable",
+    "type": "TIERRAS DE CULTIVO",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "TH",
+    "name": "Huerta",
+    "type": "TIERRAS DE CULTIVO",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "VF",
+    "name": "Frutal-Viñedo",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Viñedo y sus asociaciones",
+    "subtype2": "Frutales y sus asociaciones"
+  },
+  {
+    "class": "VI",
+    "name": "Viñedo",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Viñedo y sus asociaciones",
+    "subtype2": ""
+  },
+  {
+    "class": "VO",
+    "name": "Olivar-Viñedo",
+    "type": "CULTIVOS PERMANENTES",
+    "subtype1": "Viñedo y sus asociaciones",
+    "subtype2": "Olivar y sus asociaciones"
+  },
+  {
+    "class": "ZC",
+    "name": "Zona concentrada",
+    "type": "OTROS",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "ZU",
+    "name": "Zona urbana",
+    "type": "SUPERFICIE NO AGRÍCOLA",
+    "subtype1": "",
+    "subtype2": ""
+  },
+  {
+    "class": "ZV",
+    "name": "Zona censurada",
+    "type": "OTROS",
+    "subtype1": "",
+    "subtype2": ""
+  }
+]
