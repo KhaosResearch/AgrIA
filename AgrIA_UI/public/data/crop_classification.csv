@@ -1,0 +1,31 @@
+﻿Class;Name;Type;Subtype1;Subtype2
+AG;Corrientes y superficies de agua;SUPERFICIE NO AGRÍCOLA;;
+CA;Viales;SUPERFICIE NO AGRÍCOLA;;
+CF;Cítricos-Frutal;CULTIVOS PERMANENTES;Frutales y sus asociaciones;Cítricos y sus asociaciones
+CI;Cítricos;CULTIVOS PERMANENTES;Cítricos y sus asociaciones;
+CS;Cítricos-Frutal de cáscara;CULTIVOS PERMANENTES;Frutos secos y sus asociaciones;Cítricos y sus asociaciones
+CV;Cítricos-Viñedo;CULTIVOS PERMANENTES;Viñedo y sus asociaciones;Cítricos y sus asociaciones
+ED;Edificaciones;SUPERFICIE NO AGRÍCOLA;;
+EP;Elemento del Paisaje;SUPERFICIE NO AGRÍCOLA;;
+FF;Frutal de Cáscara-Frutal;CULTIVOS PERMANENTES;Frutales y sus asociaciones;Frutos secos y sus asociaciones
+FL;Frutal de Cáscara-Olivar;CULTIVOS PERMANENTES;Olivar y sus asociaciones;Frutos secos y sus asociaciones
+FO;Forestal;FORESTAL;;
+FS;Frutal de Cáscara;CULTIVOS PERMANENTES;Frutos secos y sus asociaciones;
+FV;Frutal de Cáscara-Viñedo;CULTIVOS PERMANENTES;Frutos secos y sus asociaciones;
+FY;Frutal;CULTIVOS PERMANENTES;Viñedo y sus asociaciones;Frutales y sus asociaciones
+IM;Improductivo;SUPERFICIE NO AGRÍCOLA;;
+IV;Invernaderos y cultivos bajo plástico;TIERRAS DE CULTIVO;;
+OC;Olivar-Cítricos;CULTIVOS PERMANENTES;Olivar y sus asociaciones;Cítricos y sus asociaciones
+OF;Olivar-Frutal;CULTIVOS PERMANENTES;Olivar y sus asociaciones;Frutales y sus asociaciones
+OV;Olivar;CULTIVOS PERMANENTES;Olivar y sus asociaciones;
+PA;Pasto arbolado;PASTOS;;
+PR;Pasto arbustivo;PASTOS;;
+PS;Pastizal;PASTOS;;
+TA;Tierra arable;TIERRAS DE CULTIVO;;
+TH;Huerta;TIERRAS DE CULTIVO;;
+VF;Frutal-Viñedo;CULTIVOS PERMANENTES;Viñedo y sus asociaciones;Frutales y sus asociaciones
+VI;Viñedo;CULTIVOS PERMANENTES;Viñedo y sus asociaciones;
+VO;Olivar-Viñedo;CULTIVOS PERMANENTES;Viñedo y sus asociaciones;Olivar y sus asociaciones
+ZC;Zona concentrada;OTROS;;
+ZU;Zona urbana;SUPERFICIE NO AGRÍCOLA;;
+ZV;Zona censurada;OTROS;;

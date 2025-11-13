@@ -1,0 +1,259 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "parcel": "Buscador de Parcelas",
+    "chat": "Chat"
+  },
+  "home": {
+    "hero": {
+      "title": "Optimiza tus cultivos con Inteligencia Artificial",
+      "description": "AgrIA te ayuda a cumplir con los requisitos de las subvenciones de ecorregíemenes de la PAC analizando tus imágenes satelitales.",
+      "button": "Descubre Más",
+      "imageAlt": "Imagen de satélite de campos de cultivo"
+    },
+    "about": {
+      "title": "Acerca de AgrIA",
+      "paragraph1Bold1": "El Asistente de Imágenes Agrícolas (AgrIA)",
+      "paragraph1Part2": "es una herramienta de análisis de imágenes y chat inteligente integrado,",
+      "paragraph1Bold2": "especializada en clasificación de imágenes satelitales agrícolas",
+      "paragraph1Part3": "Diseñada para agricultores y propietarios de tierras, facilita la valoración de sus cultivos y",
+      "paragraph1Bold3": "proporciona un informe que les ayuda a calificar para distintas ayudas de la Unión Europea de ecorregímenes dentro del marco de la Política Agraria Común (PAC).",
+      "paragraph2Part1": "Para empezar,",
+      "paragraph2Bold1": "abre el Buscador de Parcelas, introduce la referencia catastral y confirma la finca mostrada.",
+      "paragraph2Part2": "AgrIA abrirá el chat y te dará un análisis de la imagen, junto con recomendaciones para cumplir con normativas de eligibilidad de ecorregímenes de la PAC. También puedes",
+      "paragraph2Bold2": "subir tu propia imagen desde el chat, pero AgrIA no tendrá acceso a la información del SIGPAC que se consigue al usar la referencia catastral"
+    },
+    "features": {
+      "title": "Características Principales",
+      "parcelLocation": {
+        "title": "Localización de Parcela",
+        "description": "Encuentra tu parcela de forma automática usando simplemente su referencia catastral, dirección o localizándola en el mapa."
+      },
+      "imageSuperRes": {
+        "title": "Super-resolución de Imagen",
+        "description": "Consigue y mejora la resolución de imágenes de 10m/px a 5m/px gracias a modelos de IA de auto-supervisión."
+      },
+      "satelliteImageAnalysis": {
+        "title": "Análisis de Imagen Satelital",
+        "description": "Obtén una descripción precisa de tus campos a partir de imágenes satelitales de Sentinel para una visión detallada del terreno."
+      },
+      "resourceAnalysis": {
+        "title": "Análisis de Recursos",
+        "description": "Recibe recomendaciones personalizadas para un uso eficiente del espacio, especies de cultivos y otros recursos."
+      },
+      "pacAdvisory": {
+        "title": "Asesoramiento PAC",
+        "description": "Consigue guía experta para cumplir con los criterios de subvención de la Política Agrícola Común para estados de ecorrégimen."
+      },
+      "interactiveSupport": {
+        "title": "Soporte Interactivo",
+        "description": "Interactúa con AgrIA a través del chat y recibe respuestas actualizadas sobre tus cultivos."
+      }
+    },
+      "quickstart" : {
+      "title": "Empezar a Usar AgrIA: Buscador de Parcelas",
+      "paragraph1": "Para poder aprovechar AgrIA al máximo, ",
+      "paragraphBold": "necesitarás acceder al Buscador de Parcelas. ",
+      "paragraph2": "Así es cómo se usa:",
+      "steps": {
+        "1": "Ve a la ventana de 'Buscador de Parcelas'.",
+        "2": "Introduce el código de referncia catastral de tu parcela o finca.",
+        "3": "Selecciona la fecha de la que quieres conseguir la imagen.",
+        "4": "Pulsa 'Buscar Parcela' y espere a que el sistema obtenga la imagen de su parcela.",
+        "5": "Confirme la imagen de su aprcela par apasarla al char de AgrIA junto con la información de clasificación SIGPAC."
+      },
+      "exampleTitle": "Ejemplo de ventana de Buscador de Parcelas."
+    },
+    "howToUse": {
+      "title": "Cómo Interactuar con AgrIA: El Chat",
+      "exampleTitle": "Ejemplo de interacción por chat de AgrIA"
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "description": "¿Tienes alguna pregunta o necesitas más información? No dudes en ponerte en contacto con nosotros.",
+      "namePlaceholder": "Tu Nombre",
+      "emailPlaceholder": "Tu Correo Electrónico",
+      "messagePlaceholder": "Tu Mensaje",
+      "sendButton": "Enviar Mensaje"
+    },
+    "footer": {
+      "copyright": "© 2025 AgrIA. Todos los derechos reservados.",
+      "facebookAlt": "Facebook",
+      "twitterAlt": "Twitter",
+      "linkedinAlt": "LinkedIn"
+    }
+  },
+  "parcelFinder": {
+    "cadastralData": "Datos Catastrales",
+    "description1": "Introduzca el código de referencia catastral de la parcela que desea consultar. Si no lo conoce, puede buscarlo en el sitio web del catastro o en documentos relacionados con la propiedad.",
+    "description2": "Asegúrese de que el código tenga 20 caracteres.",
+    "description3Bold": "No se admitirán códigos de referencia catastral urbanos. Si tiene dificultades para encontrar su parcela, búsquela por coordenadas / dibujando sus límites.",
+    "description3": "",
+    "cadastralReference": "Código de referencia catastral:",
+    "cadastralPlaceholder": "Referencia catastral",
+    "selectDate": "Seleccione fecha aproximada",
+    "datePlaceholder": "Fecha",
+    "loading": "Cargando…",
+    "findParcel": "Buscar Parcela",
+    "clearForm": "Borrar Datos",
+    "selectedParcel": "Parcela Seleccionada",
+    "previewAlt": "Vista previa",
+    "uploadImageAlt": "Subir imagen",
+    "detailedDescription": "Descripción detallada",
+    "confirmParcel": "Confirmar Parcela",
+    "tab": {
+      "finder": "Buscar por referencia catastral.",
+      "locator": "Buscar por parcela / polígono.",
+      "drawer": "Buscar por coordenadas / dibujando los límites."
+    }
+
+  },
+  "parcel-locator": {
+    "title": "Datos de Localización",
+    "province": {
+      "name": "Provincia:", 
+      "placeholder": "Seleccione provincia", 
+      "error": "Error: Provincia no válida. Por favor, seleccione una provincia válida."
+    },
+    "municipality": {
+      "name": "Municipio:", 
+      "placeholder": "Seleccione municipio", 
+      "error": "Error: Municipio no válido. Por favor, seleccione un municipio válido."
+    },
+    "polygon": {
+      "name": "Polígono:", 
+      "placeholder": "000", 
+      "error": "Error: Polígono no válido. Por favor, introduzca un identificador válido (máximo 3 cifras)."
+    },
+    "parcel-id": {
+      "name": "Parcela:",
+      "placeholder": "00000",
+      "error": "Error: Parcela no válido. Por favor, introduzca un identificador válido (máximo 5 cifras)."
+    }
+  },
+  "parcelDrawer": {
+    "title": "Datos Geográficos",
+    "description": {
+      "intro":"En este módulo, puede usar una de las siguientes opciones para encontrar su parcela. En ambos, se utlizará la fecha para extraer la imagen.",
+      "header1": "Búsqueda por coordenadas (sólo en España):",
+      "header2": "Búsqueda por delimitación de parcela (resto del mundo):",
+      "bold0":"Pinche/pulse en el mapa sobre su parcela o utilice un conjunto de coordenadas (latitud, longitud) que se ubiquen en el interior de los límites de su finca ",
+      "normal0":"de acuerdo con los datos catastrales de la propiedad para poder encontrarla.",
+      "normal00":"Introduzca la localización de su parcela espeficando con cada uno de los siguientes campos: Provincia, Municipio, identificador numérico del polígono e identificador numérico de la parcela. ",
+      "normal01": "Esta opción permite la ",
+      "bold01": "extracción automática de la clasificación SIGPAC",
+      "normal02": " de los cultivos de la parcela.",
+      "bold1": "Utilice el botón de '\u2B54' y dibuje los límites de su parcela sobre el mapa.",
+      "normal1": "Cuando haya terminado de delimitar la parcela, ",
+      "bold2": "vuelva a pulsar sobre el vértice inicial para terminar",
+      "normal2": "de dibujar.",
+      "normal3": "Para una mejor evaluación y clasificación por AgrIA, ",
+      "bold3": "asegúrese de proveer la clasificación de los cultivos de su parcela.",
+      "normal4": "Para ello, puede disponer del formulario de clasificación SIGPAC debajo del mapa."
+    },
+    "coordinates": {
+      "label": "Coordenadas de la Parcela",
+      "placeholder": "Ej: 40.4165, -3.70256 ...",
+      "search-button": "Buscar Coordenadas",
+      "clear-button": "Reiniciar mapa y coordenadas"
+    },
+    "sigpacForm": {
+      "title": "Clasificación SIGPAC ",
+      "description": {
+        "bold1": "Use el siguiente formulario para indicar todos los tipos de cultivo en su finca. ",
+        "normal1": "Estos tipos siguen la clasificación SIGPAC. La información al resepcto debería estar disponible en la web de SIGPAC o en documentos relacionados con la propiedad.",
+        "bold2": "Use la tabla a continuación para indicar la superficie total ocupada por cada tipo de cultivo, ",
+        "normal2": "incluso si se encuentra repartida entre varias parcelas."
+      }
+    },
+      "sigpac-table": {
+      "title": "Cultivos seleccionados",
+      "header1": "Tipo SIGPAC",
+      "header2": "Superficie (ha)",
+      "header3": "Coef. Regadío (%)"
+    },
+    "button": {
+      "send": "Buscar Parcela",
+      "reset": "Borrar selección",
+      "loading": "Cargando..."
+    }
+
+  },
+  "chat": {
+    "uploadImage": {
+      "title": "Imagen",
+      "imageAlt": "Ejemplo de imagen satelital",
+      "description": "Aquí se mostrará la descripción generada por AgrIA de la imagen satelital subida.",
+      "imageName": "Nombre Imagen"
+    },
+    "chatWithAgria": {
+      "title": "Chat con AgrIA",
+      "agriaMessage1": "¡Hola! Soy tu Asistente de Imágenes Agrícolas, ¡pero puedes llamarme AgrIA! Mi propósito aquí es analizar imágenes satelitales de campos de cultivo para asistirte...",
+      "userMessage1": "Hola AgrIA, he subido una imagen de mi campo en la parcela 34. ¿Podrías analizar el uso del agua?",
+      "agriaMessage2": "Claro, he analizado la imagen de la parcela 34. Parece que hay áreas con bajo índice de vegetación que podrían indicar un uso ineficiente del agua. Te sugiero...",
+      "inputPlaceholder": "Escribe tu pregunta o comentario aquí...",
+      "sendButton": "Enviar",
+      "getSuggestionButton": "Obtener sugerencia"
+    },
+
+    "chatInput": {
+      "placeholder": "Escribe aquí...",
+      "sendButton": "Enviar",
+      "sendButtonTitle": "Enviar mensaje.",
+      "getSuggestionButton": "Obtener Sugerencia",
+      "getSuggestionButtonTitle": "Obtener una sugerencia de la respuesta.",
+      "detailedImageDescription": "Descripción detallada de imagen."
+    },
+    "navigationButton": {
+      "title": "Volver a la vista del buscador de parcelas.",
+      "text": "Volver al buscador de parcelas"
+    }
+  },
+  "progressBar": {
+    "completed": "El proceso a veces puede tardar hasta 1 minuto aprox..."
+  },
+  "notifications": {
+    "parcel-finder": {
+      "searching": "Buscando imagen de las parcelas...",
+      "success": "¡Parcela encontrada!",
+      "error": "Fallo al buscar la parcela:"
+    },
+    "parcel-drawer": {
+      "coordinates": {
+        "invalid": "Formato de coordenadas inválido. Por favor, use el formato 'lat, lon'.\nCoordenadas introducidas:",
+        "new-coordinates": "Coordenadas actualizadas: ",
+        "new-coordinates-error": "Error al actualizar coordenadas: "
+
+        },
+        "sigpac-table": {
+          "error": "Error al cargar la clasificación de cultivos:\n"
+        },
+        "missing": {
+          "parcel-drawing":"Error: Nigún polígono de parcela ni marcador de coordenadas detectado en el mapa. Dibuje un polígono (si el terreno está fuera de España) o use un marcador de coordenadas (dentro de España) para continuar.",
+          "parcel-out":"Error: Territorio fuera de España detectado. Dibuje un polígono de su parcela para continuar.",
+          "crop-classification": "Error: Nigún tipo de cultivo seleccionado. Por favor, seleccione al menos un tipo de cultivo.",
+          "surface": "Error: Superficie faltante. Por favor, indique las superficies de todos los tipos de cultivo seleccionados."
+        }
+
+    },
+    "parcel-locator": {
+      "missing": {
+        "province": "Error: Falta el valor 'Provincia'. Por favor, seleccione una provincia.",
+        "municipality": "Error: Falta el valor 'Municipio'. Por favor, seleccione un municipio.",
+        "polygon": "Error: Falta el valor 'Polígono'. Por favor, introduzca un identificador (máximo 3 cifras).",
+        "parcel-id": "Error: Falta el valor 'Parcela'. Por favor, introduzca un identificador (máximo 5 cifras)."
+      }
+    },
+    "chat": {
+      "load-parcel-finder-data-info": "Cargando datos del Buscador de Parcelas...",
+      "load-parcel-finder-data-error": "Fallo al cargar datos del Buscador de Parcelas:\n",
+      "load-parcel-finder-data-success": "¡Datos de la Parcela cargados con éxito!",
+      "suggestion-info": "Obteniendo respuesta de sugerencia...",
+      "suggestion-error": "Fallo al obtener sugerencia:",
+      "suggestion-success": "¡Sugerencia obtenida con éxito!"
+    },
+    "chat-assistant": {
+      "assistant-error": "Fallo al intentar consguir una respuesta:\n"
+    }
+  }
+}

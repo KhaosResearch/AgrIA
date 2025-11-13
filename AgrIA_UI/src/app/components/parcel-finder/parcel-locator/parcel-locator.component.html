@@ -1,0 +1,95 @@
+<div id="parcel-cadastral">
+    <div class="content">
+        <div class="form-title">
+            <h2>{{ 'parcel-locator.title' | translate }}</h2>
+        </div>
+        <div class="form-description">
+            <p>
+                {{ "parcelDrawer.description.normal00" | translate }}
+            </p>
+            <p>
+                {{ "parcelDrawer.description.normal01" | translate }} <span style="font-weight: bold;">{{ "parcelDrawer.description.bold01" | translate }}</span>{{ "parcelDrawer.description.normal02" | translate }}
+            </p>
+        </div>
+        <div class="form">
+            <div class="form-field">
+                <label class="form-label">
+                    {{ 'parcel-locator.province.name' | translate }}
+                </label>
+                <ng-select
+                class="form-input"
+                [items]="provinces"
+                bindLabel="province"
+                placeholder="{{ 'parcel-locator.province.placeholder' | translate }}"
+                [(ngModel)]="province"
+                (ngModelChange)="onProvinceChange($event)">
+                </ng-select>
+            </div>
+            <div class="form-field">
+                <label class="form-label">
+                    {{ 'parcel-locator.municipality.name' | translate }}
+                </label>
+                <ng-select
+                class="form-input"
+                [items]="municipalities"
+                placeholder="{{ 'parcel-locator.municipality.placeholder' | translate }}"
+                [(ngModel)]="municipality"
+                [disabled]="!province">
+                </ng-select>
+
+            </div>
+            <div class="form-field">
+                <label class="form-label">
+                    {{ 'parcel-locator.polygon.name' | translate }}
+                    <input 
+                    class="form-input"
+                    type="number"
+                    placeholder="{{ 'parcel-locator.polygon.placeholder' | translate }}"
+                    [(ngModel)]="polygon"
+                    maxlength=3
+                    />
+                </label>
+            </div>
+            <div class="form-field">
+                <label class="form-label">
+                    {{ 'parcel-locator.parcel-id.name' | translate }}
+                    <input class="form-input"
+                    type="text"
+                    placeholder="{{ 'parcel-locator.parcel-id.placeholder' | translate }}"
+                    class="form-input"
+                    [(ngModel)]="parcelId"
+                    maxlength=5
+                    />
+                </label>
+            </div>
+            <div class="date-field">
+                <label class="form-label">
+                    {{ 'parcelFinder.selectDate' | translate }}:
+                    <input class="form-input"
+                    type="date"
+                    placeholder="{{ 'parcelFinder.datePlaceholder' | translate }}"
+                    [(ngModel)]="selectedDate"
+                    [max]="today"
+                    />
+                </label>
+            </div>
+            <div class="parcel-cadastral-buttons">
+                <button 
+                    class="input-button"
+                    [style.cursor]="isLoading() ? 'progress' : 'pointer'"
+                    [disabled]="isLoading()"
+                    (click)="findParcel()"
+                >
+                {{ isLoading() ? ('parcelFinder.loading' | translate) : ('parcelFinder.findParcel' | translate) }}
+                </button>
+                <button
+                    class="clear-info-button"
+                    (click)="clearForm()"
+                    >
+                    {{ 'parcelFinder.clearForm' | translate }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

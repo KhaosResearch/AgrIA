@@ -1,0 +1,89 @@
+/* Variables for easy theme customization (consistent with previous component) */
+:host {
+  --primary-color: #4CAF50; /* Green */
+  --secondary-color: #607D8B; /* Greyish blue */
+  --tertiary-color: #FFC107; /* Amber for suggestions (not used directly here, but for consistency) */
+  --red-button-color: #dc3545; /* Red for Clear Form */
+  --blue-button-color: #22a7ff; /* Blue to Send Form */
+  --bg-color: #f0f2f5; /* Light grey background */
+  --card-bg-color: #ffffff; /* White for cards */
+  --border-color: #ddd; /* Light grey border */
+  --text-color-dark: #333;
+  --text-color-light: #666;
+  --header-bg: #e0e0e0; /* Light grey for headers */
+  --input-bg: #f9f9f9; /* Slightly off-white for input */
+  --shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  --border-radius: 8px;
+  --padding-unit: 1.5rem;
+  --max-width: 1000px; /* Consistent max width for content */
+}
+
+/* Basic Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif; /* Consistent font */
+}
+
+/* Main Parcel Finder Container */
+#parcel-finder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; /* Align to start, as it's not a full-height chat */
+  min-height: 100vh; /* Minimum height for full screen */
+  background-color: var(--bg-color);
+  padding: var(--padding-unit); /* Overall padding */
+}
+
+.custom-tabs {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  margin-top: 5rem;
+}
+
+.custom-tab {
+  padding: 0.4rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: var(--bg-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  width: 100%; /* Full width for tabs */
+}
+
+.custom-tab:hover {
+  background-color: var(--bg-color);
+}
+
+.custom-tab.active {
+  background-color: var(--secondary-color);
+  color: white;
+  border-color: var(--blue-button-color);
+}
+
+.tab-pane {
+  animation: fadeIn 0.2s ease-in-out;
+  padding: 0 0.5rem;
+  font-size: 0.96rem;
+  /* Optional: max-width if you want to align with content */
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
+@media (max-width: 768px) {
+  #parcel-finder {
+    padding: 0.5rem; /* Less padding on small screens */
+  }
+}

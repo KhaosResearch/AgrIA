@@ -1,0 +1,13 @@
+@if (isProcessing) {
+    <div class="progress-container">
+        <div class="progress-bar" [style.width.%]="progress"></div>
+        <div class="progress-text">
+            <span class="elapsed-time">{{ formattedTime }}</span>
+            <span class="separator">/</span>
+            <span class="max-time">{{ formatTime(durationInSeconds) }}</span>
+            @if (progress >= 100 && elapsedTime >= durationInSeconds) {
+                <span class="status-text"> ({{ 'progressBar.completed' | translate }})</span>
+            }
+        </div>
+    </div>
+}

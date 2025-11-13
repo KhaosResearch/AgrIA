@@ -1,6 +1,0 @@
-[submodule "AgrIA_UI"]
-	path = AgrIA_UI
-	url = https://github.com/MiguelPadillaR/AgrIA_UI.git
-[submodule "AgrIA_server"]
-	path = AgrIA_server
-	url = https://github.com/MiguelPadillaR/AgrIA_server.git
