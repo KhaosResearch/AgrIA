@@ -1,56 +1,30 @@
-# 📝 Changelog – Version 1.2 (September 2025)
+# 📝 Changelog – Version 1.3 (September - November 2025)
 
-### 🚀 New Features
-- **Parcel Locator Enhancements:**
-  - Added ability to find parcels by address and cadastral reference.
-  - Implemented coordinates-based parcel search with marker placement on the map.
-- **UI Component Refactor:**
-  - Extracted parcel displayer and locator logic into separate reusable components.
-  - Enabled data sharing between child components (cadastral, drawer, displayer).
-- **Map Improvements:**
-  - Added support for multiple marker options when searching by coordinates.
-  - Updated Leaflet integration with new drawing and display features.
+This release unifies our codebase into a single repository and introduces major enhancements to our data processing, image super-resolution capabilities, and the core Eco-scheme classification engine.
 
 ---
 
-### 🛠 Fixes & Improvements
-- Fixed parcel info caching issues and minor typos in UI.
-- Refined input validation and improved error handling in search workflows.
-- Added JSDoc documentation for components and services.
-- Updated Angular dependencies and adjusted build configuration.
-- Minor style fixes and UI consistency updates (logos, folder organization).
+### 🚀 New Features & User Experience
+
+* **Custom SIGPAC Tools (Internal Rework):** The parcel drawing tool now uses our **newly developed and updated in-house SIGPAC tools** to automatically retrieve and process parcel metadata within Spanish territory. This update replaces previous reliance on external SIGPAC API packages, improving control and reliability.
+* **Precision Eco-scheme Engine:** Implemented a new **server-side algorithm** designed for **high-precision Eco-scheme classification**. This engine correctly determines not only the *assignment* of Eco-schemes but also the **rate calculation precision** based on factors like irrigation and slope coefficients (Backend).
+* **Enhanced Multilingual Support:** Enhanced language consistency and fixed various UI elements (e.g., Navbar) to ensure **proper English/Spanish language switching** across the application, especially for crop classification data (Frontend/Backend).
+* **Improved Image Quality (SEN2SR):** Integrated the **SEN2SR Super-Resolution pipeline** to significantly improve the resolution and clarity of Sentinel-2 satellite imagery provided for parcel analysis (Backend).
+* **Improved Chat Security:** Added **security against Markdown/HTML injection** in chat replies for a safer user experience (Frontend/Backend).
 
 ---
 
-## 📁 UI-Specific Changes
-- Completed implementation of parcel-locator interface with parent/child logic separation.
-- Optimized search logic by extracting it into independent modules.
-- Introduced address-based search flow integrated with parcel finder.
-- Restructured public folder and grouped related UI components together.
-- Improved translation files and updated multilingual support.
+### 🛠 Fixes & Stability Improvements
 
-# 📝 Changelog – Version 1.1 (July 2025)
-
-### 🚀 New Features
-- **Parcel Drawer:** Users can now draw custom parcel geometries directly on the map. The system captures, stores, and processes this geometry.
-- **Combined Parcel Finder & Drawer View:** The two tools are now integrated on the same page using tabs for seamless switching.
-- **Detailed Descriptions:** Added the option to toggle between TL;DR and detailed LLM-enriched parcel descriptions.
-- **SIGPAC Info Display:** New table columns for classification and crop types, with updated form to support SIGPAC data entry.
-- **Multilingual Content:** Full description examples and TL;DR summaries now include both Spanish and English versions.
+* **Parcel Drawing Updates:** Parcel geometry updates are now properly reflected across the application after changes are made in the drawer (Frontend).
+* **Image Pipeline Stability:** Implemented logic for **auto-retrying data retrieval** for cloudless images and resolved various CRS (Coordinate Reference System) and color correction issues for high-quality image processing (Backend).
+* **General UI Fixes:** Fixed minor issues, including proper window height for tall images and general formatting bugs (Frontend).
 
 ---
 
-### 🛠 Fixes & Improvements
-- Improved error handling across UI and backend.
-- Refined notification messages (Angular Material snackbars).
-- Reset buttons added for form clearing and UI control.
-- Minor fixes in UI styling, folder structure, and input validation.
+### ⚙️ Developer & Backend Enhancements
 
----
-
-## 📁 UI-Specific Changes
-- Installed `leaflet-draw` for polygon drawing.
-- Cleaned up public folder structure.
-- Introduced tabbed layout for Parcel Finder & Drawer.
-- Implemented component-based architecture for Parcel Drawer.
-- UI form includes validation and field locking based on system state.
+* **Monorepo Migration:** **Successfully merged the Front-end and Back-end repositories** into this single repository. This simplifies development, tooling, and contribution for all future work.
+* **Advanced Super-Resolution (SR) Benchmarking:** Introduced a comprehensive **VLM (Vision-Language Model) benchmarking pipeline**, which now includes an **SR Benchmark** to test the performance of the new **SEN2SR** integration against the project's previous iteration, **SuperRes4Sentinel (SR4S)** (Backend).
+* **Modular Architecture:** Refactored core LLM and image processing functions into more modular components, improving code reuse and maintainability (Backend).
+* **Automated PR Workflow:** Added a GitHub Action to **automatically append a bulleted list of commits** to the end of every Pull Request description, standardizing contribution transparency (General).
