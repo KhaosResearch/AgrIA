@@ -31,7 +31,7 @@
       },
       "imageSuperRes": {
         "title": "Image Super-Resolution",
-        "description": "Get and improved 10m/px image resolution up to 5m/px thanks to self-supervised AI models."
+        "description": "Get and improve 10m/px image resolution up to 5m/px thanks to self-supervised AI models."
       },
       "satelliteImageAnalysis": {
         "title": "Satellite Image Analysis",
