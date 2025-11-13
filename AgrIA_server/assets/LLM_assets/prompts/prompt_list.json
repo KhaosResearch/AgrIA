@@ -1,0 +1,28 @@
+{
+    "description": "Initial setup prompts for the Gemini model",
+    "long":{
+        "name": "long",
+        "prompt_filepath": "LLM-full_desc_prompt.txt",
+        "examples": "LLM-full_desc_examples"
+    },
+    "short": {
+        "name": "short",
+        "prompt_filepath": "LLM-tldr_desc_prompt.txt",
+        "examples": "LLM-tldr_desc_examples"
+    },
+    "role": {
+        "name": "role",
+        "prompt_filepath": "LLM-role_prompt.txt"
+    },
+    "classification": {
+        "name": "classification",
+        "prompt_filepath": "classification.json"
+    },
+    "examples": {
+        "name": "examples",
+        "prompt_filepath": "",
+        "examples": "examples"
+    }
+
+
+}

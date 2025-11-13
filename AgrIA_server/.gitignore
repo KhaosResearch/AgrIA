@@ -1,0 +1,14 @@
+.env
+*temp*
+.venv
+*__pycache__/
+*.kml
+*.png
+*.tif*
+*.tsv
+*assets/.scripts
+*model*
+*data*
+*res*
+*out*
+server/benchmark/vlm/**/*.json
