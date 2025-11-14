@@ -74,10 +74,6 @@ def calculate_ecoscheme_payment_exclusive(input_data_str: str, lang: str=LANG, r
 
 # Process final payments for each group
     # logger.debug(f"eligible_schemes_by_land_use\t{eligible_schemes_by_land_use}")
-    logger.debug(f"land_use_blocks\t{land_use_blocks}")
-    logger.debug(f"land_use_assignments\t{land_use_assignments}")
-    logger.debug(f"final_scheme_results\t{final_scheme_results}")
-    logger.debug(f"sorted_keys\t{sorted_keys}")
     for key in sorted_keys:
         res = final_scheme_results[key]
         area = res["Total_Area_ha"]
@@ -132,17 +128,6 @@ def calculate_ecoscheme_payment_exclusive(input_data_str: str, lang: str=LANG, r
     # -------------------------------------------------------------
     # --- 5. FINAL RESULTS SUMMARY (Reporting Peninsular Only) ---
     # -------------------------------------------------------------
-    
-    pluriannuality_bonus_total = total_aid_with_pluriannuality - total_aid_no_pluriannuality
-    
-    # Simple clarifications based on the new explicit requirement
-    clarifications = [
-         f"The Exclusive Eco-scheme choice for each Land Use (LU) was determined ONLY by the highest possible payment/ha using the **Peninsular** rates.",
-         f"The final summary totals (Total_Aid) reflect the calculation using **Peninsular** rates, as this is the predominant national territory type.",
-         f"The total pluriannuality bonus of {pluriannuality_bonus_total.quantize(ROUNDING_PAYMENT, rounding=ROUND_HALF_UP)} EUR is applied to the {pluri_area.quantize(ROUNDING_PAYMENT, rounding=ROUND_HALF_UP)} ha of eligible land (calculated using Peninsular rates).",
-    ]
-
-    # clarifications = []
 
     final_results = {
         "Applicable_Ecoschemes": sorted(list(set(applicable_ecoschemes))),
@@ -189,7 +174,7 @@ def get_ecoscheme_rules_data(rules_data_list) -> dict:
         rates = rule['Rates']
         threshold_ha = str(rates['Threshold_ha'])
         threshold = Decimal(threshold_ha) if threshold_ha.replace('.', '', 1).isdigit() else None
-        pluri_applicable = rates['Pluriannuality'] == 'Applicable'
+        pluri_applicable = rates['Pluriannuality'] != 'N/A'
         
         base_rate_details = get_base_rate_details(rates, threshold)
 
@@ -394,7 +379,7 @@ def calculate_payments_for_rate_type(area: Decimal, rate_details: dict, pluri_ap
     current_rate = current_rate if "/" not in str(current_rate) else Decimal(str("0"))
     base_payment = area * current_rate
     payment_with_pluri = base_payment
-    
+
     if pluri_applicable:
         payment_with_pluri = area * (current_rate + PLURIANNUALITY_BONUS_PER_HA)
     

@@ -71,12 +71,9 @@ export class ChatAssistantComponent {
     let sanitized_history = response.slice(index);
 
     // Remove image descriptions requests data
-    for(let msg of sanitized_history){
-      if (msg.content.includes('###DESCRIBE')) {
-        const descMsg = msg.content.split('###');
-        msg.content = '```' + descMsg[descMsg.length - 1] + '```';
-      }
-    }
+    sanitized_history = sanitized_history.filter(
+      msg => !msg.content.includes('###DESCRIBE')
+    );
     return sanitized_history
   }
 

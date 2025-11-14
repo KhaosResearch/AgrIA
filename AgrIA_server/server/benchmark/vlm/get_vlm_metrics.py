@@ -309,8 +309,6 @@ def demo():
         logger.info(f"TIMES:\n{dict(times)}")
         times_filepath = BM_JSON_DIR / "times.json"
         with open(times_filepath, 'w') as f:
-            json.depath = BM_JSON_DIR / "times1.json"
-        with open(times_filepath, 'w') as f:
-            f.write(str(times))
+            json.dump(dict(times), f, indent=4)
 
-# demo()
+demo()
