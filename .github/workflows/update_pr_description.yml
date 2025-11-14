@@ -23,7 +23,7 @@ jobs:
         id: commit_list
         run: |
           # 1. Get the list of commits
-          COMMIT_LIST=$(git log --pretty=format:"* %s" ${{ github.event.pull_request.base.sha }}..HEAD)
+          COMMIT_LIST=$(git log --pretty=format:"* %s (%an, %ad)" ${{ github.event.pull_request.base.sha }}..HEAD)
           
           # 2. Format the final output string, including the header
           FORMATTED_LIST="## 📦 Commits Included in this PR:\n\n${COMMIT_LIST}"
