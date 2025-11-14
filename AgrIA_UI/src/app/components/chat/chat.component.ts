@@ -24,7 +24,7 @@ export class ChatComponent {
   // Image file
   public imageFile: File | null = null;
   // Image URL/path for the preview module
-  public imagePreviewUrl: string | null = "img/image-icon.png";
+  public imagePreviewUrl: string | null = null;
   // Parcel's image information
   public parcelImageInfo: string =  "..."
   // User's chat input
@@ -70,14 +70,14 @@ export class ChatComponent {
             this.imagePreviewUrl = parcel.imagePath;
 
             this.loadParcelDescription();
-            
+    
             if (!parcel.hasBeenDescribed) {
               this.sendParcelInfoToChat(parcel);
             }
           }, 500);
         }
       });
-    }
+  }
 
   private loadParcelDescription() {
     const formData = new FormData();
