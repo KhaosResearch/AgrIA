@@ -6,6 +6,10 @@ from server.services.chat_service import *
 logger = structlog.get_logger()
 chat_bp = Blueprint('chat', __name__)
 
+@chat_bp.route('/hello-world', methods=['GET'])
+def hello_world():
+    return jsonify({'response': "Hello, World!"})
+
 @chat_bp.route('/send-user-input', methods=['POST'])
 def send_user_input():
     try:
