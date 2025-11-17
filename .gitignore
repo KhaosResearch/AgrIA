@@ -12,7 +12,7 @@
 *.tif*
 *.tsv
 *assets/.scripts
-*model*
+*model/
 *data*
 *res*
 *out*

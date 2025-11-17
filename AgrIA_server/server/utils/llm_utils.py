@@ -1,5 +1,4 @@
-from ..benchmark.vlm.constants import BM_DIR, BM_PROMPT_LIST_FILE
-from ..config.constants import BASE_CONTEXT_PATH, BASE_PROMPTS_PATH, CALCULATIONS_RULE, CONTEXT_DOCUMENTS_FILE, EXCLUSIVITY_RULE, FULL_DESC_TRIGGER, MIME_TYPES, PROMPT_LIST_FILE, SHORT_DESC_TRIGGER
+from ..config.constants import BASE_CONTEXT_PATH, BASE_PROMPTS_PATH, CONTEXT_DOCUMENTS_FILE, FULL_DESC_TRIGGER, MIME_TYPES, PROMPT_LIST_FILE, SHORT_DESC_TRIGGER
 from ..services.llm_services import upload_context_document
 from google.genai.types import Content, Part
 import json
@@ -18,13 +17,13 @@ def generate_system_instructions(prompt_json_path: str=PROMPT_LIST_FILE):
     # Upload files and read role and description files
     role_prompt = load_prompt_from_json(prompt_json_path)
     classification_data = load_prompt_from_json(prompt_json_path, 'classification')
-    short_description_prompt = load_prompt_from_json(prompt_json_path,'short', True)
-    full_description_prompt = load_prompt_from_json(prompt_json_path, 'long', True)
+    # short_description_prompt = load_prompt_from_json(prompt_json_path,'short', True)
+    # full_description_prompt = load_prompt_from_json(prompt_json_path, 'long', True)
     examples_data = load_prompt_from_json(prompt_json_path, 'examples', True).replace("}{", "}\n\n{")
 
     # Compose system instructions from files' URI and role text data
-    short_description_instruction = f"""\n\nThese are the description instructions, format and example for the short image description. You will use these to describe and classify a parcel whenever you are prompted with an image and the tokens {SHORT_DESC_TRIGGER} and date and crop info:\n\n{short_description_prompt}\n\nNotice how if a land use is eligible for more than one ES, you must only take the most long-term benefitial option and indicate so using the `Applicable` column as specified by the **MUTUALLY EXCLUSIVE** rule."""
-    long_description_instruction = "\n\nThese are the description instructions, format and example for the long image description. You will use these to describe and classify a parcel whenever you are prompted with an image and the tokens '" + FULL_DESC_TRIGGER +"' and date and crop info:\n\n" + full_description_prompt
+    # short_description_instruction = f"""\n\nThese are the description instructions, format and example for the short image description. You will use these to describe and classify a parcel whenever you are prompted with an image and the tokens {SHORT_DESC_TRIGGER} and date and crop info:\n\n{short_description_prompt}\n\nNotice how if a land use is eligible for more than one ES, you must only take the most long-term benefitial option and indicate so using the `Applicable` column as specified by the **MUTUALLY EXCLUSIVE** rule."""
+    # long_description_instruction = "\n\nThese are the description instructions, format and example for the long image description. You will use these to describe and classify a parcel whenever you are prompted with an image and the tokens '" + FULL_DESC_TRIGGER +"' and date and crop info:\n\n" + full_description_prompt
     classification_instruction = "\n\nThese is the Eco-schemes classification data for each possible land use. There is an English and Spanish version. Use these to fill out the table data whenever you are prompted to describe a parcel:\n\n" + classification_data
 
     examples_instructions=f"""\n\n

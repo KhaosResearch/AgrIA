@@ -68,7 +68,7 @@ The following diagram details AgrIA`s parcel finding pipeline when both image an
     - The geometry is used to locate the parcel and dowload the Sentinel tiles available for the selected date.
     - The metadata contains the SIGPAC crop classification that is formatted into a prompt recognisible for the AgrIA LLM.
 
-3. A crop containing the parcel geometry is made out of the downloaded Sentinel tiles and the SEN2SR implementation uses the model to upscale it to a better resolution (10m/px --> 2.5m/px). See example:
+3. A crop containing the parcel geometry is made out of the downloaded Sentinel tiles and the SEN2SR implementation uses the model to upscale it to a better resolution (10m/px --> 2.5m/px). See examples:
 
 <center>
 
@@ -83,3 +83,9 @@ The following diagram details AgrIA`s parcel finding pipeline when both image an
 5. All of the SIGPAC info, super-resolved image and prompt output is then passed to the *Chat* view, where the user can see the final result.
     - Users may also interact with follow-up propmts in the same conversation.
     - Thanks to the context documents on CAP, the Chat is ready for any related topic discussion.
+
+#### Land use manual input (Rest of the world)
+The process is the same, only more manual input is required:
+- User needs to draw the state/parcel's limits on the map and indicate the land uses (SIGPAC format) using the SIGPAC Classification form.
+- After finding  the parcel and the super-resolved cropped image and land use information are confirmed, all data will be sent to the Chat Assistant to assess the parcel.
+- **NOTE: AgrIA will apply rates from the latest Spain's CAP Strategic Plan**. User's will need to provide new data to the Chat in order for AgrIA to update the rates accordingly.
