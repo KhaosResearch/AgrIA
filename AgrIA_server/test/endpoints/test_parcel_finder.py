@@ -1,7 +1,8 @@
 import os
-from flask import send_from_directory, make_response
-from unittest.mock import MagicMock, mock_open
+from unittest.mock import mock_open
 from server.endpoints import parcel_finder 
+
+# --- LOAD PARCEL ---
 
 def test_load_parcel_description_success(client, monkeypatch):
     
@@ -43,12 +44,39 @@ def test_load_parcel_description_success(client, monkeypatch):
     # However, we can assert that the file was opened for reading.
     mock_file_opener.assert_called_once()
 
+def test_load_parcel_description_file_serving_false(client, monkeypatch):
+    
+    # --- ARRANGE ---
+    # Prepare mockups
+    MOCK_RESPONSE = "..."
+    
+    monkeypatch.setattr(os.path, "exists", lambda x: False)
+    
+    # Prepare inputs 
+    data = {
+        "lang": "es" 
+    }
+
+    # --- ACT ---
+
+    response = client.post('/load-parcel-description', data=data)
+    
+    # --- ASSERT ---
+
+    # 1. Check status code (File not found is expected behaviour)
+    assert response.status_code == 200
+    
+    # 2. Check content (which is the mock file content)
+    assert response.get_json()['response'] == MOCK_RESPONSE
+    
+# --- FIND PARCEL ---
+
 def test_find_parcel_success(client, monkeypatch):
     # --- ARRANGE --- #
     
     # Prepare mockups
     monkeypatch.setattr(parcel_finder, "reset_dir", lambda x: None)
-    
+
     MOCK_CADASTRAL_VALUE = "MOCK_REF"
     def mock_check_cadastral_data(*args, **kwargs):
         return MOCK_CADASTRAL_VALUE
@@ -90,7 +118,107 @@ def test_find_parcel_success(client, monkeypatch):
     }
     assert response.get_json()['response'] == MOCK_RESPONSE
 
-def test_is_coord_in_zone_false_success(client, monkeypatch):
+def test_find_parcel_no_selected_date_exception(client, monkeypatch):
+    # --- ARRANGE --- #
+    
+    # Prepare mockups
+    monkeypatch.setattr(parcel_finder, "reset_dir", lambda x: None)
+    MOCK_RESPONSE = "No date provided"
+
+    # Prepare inputs (missing selectedDate)
+    data = {
+        'isFromCadastralReference': 'True', 
+        'cadastralReference': 'A_CAD_REF',
+        "parcelGeometry": "None",
+        "parcelMetadata": "None",
+        "coordinates": "1.0,2.0",
+        "province": "Mock",
+        "municipality": "Mock",
+        "polygon": "Mock",
+        "parcelId": "Mock"
+    }
+    
+    # --- ACT --- #
+
+    response = client.post('/find-parcel', data=data)
+    
+    # --- ASSERT --- #
+
+    assert response.status_code == 400
+    assert response.get_json()['error'] == MOCK_RESPONSE
+
+def test_find_parcel_bad_cadastral_ref_exception(client, monkeypatch):
+    # --- ARRANGE --- #
+    MOCK_RESPONSE = "The cadastral reference must have a length of 20 characters"
+    
+    # Prepare mockups
+    monkeypatch.setattr(parcel_finder, "reset_dir", lambda x: None)
+    # Prepare inputs 
+    data = {
+        'selectedDate': '2024-01-01', 
+        'isFromCadastralReference': 'True', 
+        'cadastralReference': 'A_CAD_REF',
+        "coordinates": "3.0,3.0",
+    }
+    
+    # --- ACT --- #
+
+    response = client.post('/find-parcel', data=data)
+    
+    # --- ASSERT --- #
+
+    assert response.status_code == 500
+    assert response.get_json()['error'] == MOCK_RESPONSE
+
+def test_find_parcel_bad_coordinates_exception(client, monkeypatch):
+    # --- ARRANGE --- #
+    MOCK_RESPONSE = "could not convert string to float:"
+    MOCK_CADASTRAL_VALUE = "MOCK_REF"
+    def mock_check_cadastral_data(*args, **kwargs):
+        return MOCK_CADASTRAL_VALUE
+    monkeypatch.setattr(parcel_finder, "check_cadastral_data", mock_check_cadastral_data)
+
+    # Prepare mockups
+    monkeypatch.setattr(parcel_finder, "reset_dir", lambda x: None)
+    # Prepare inputs 
+    data = {
+        'selectedDate': '2024-01-01',
+        'cadastralReference': MOCK_CADASTRAL_VALUE, 
+        'isFromCadastralReference': 'True', 
+        'cadastralReference': 'A_CAD_REF',
+        "coordinates": "abc",
+    }
+
+    
+    # --- ACT --- #
+
+    response = client.post('/find-parcel', data=data)
+    
+    # --- ASSERT --- #
+
+    assert response.status_code == 500
+    assert MOCK_RESPONSE in response.get_json()['error']
+
+def test_find_parcel_non_iterable_exception(client, monkeypatch):
+    # --- ARRANGE --- #
+    MOCK_RESPONSE = "argument of type 'NoneType' is not iterable"
+    
+    # Prepare mockups
+    monkeypatch.setattr(parcel_finder, "reset_dir", lambda x: None)
+    # Prepare inputs 
+    data = {}
+    
+    # --- ACT --- #
+
+    response = client.post('/find-parcel', data=data)
+    
+    # --- ASSERT --- #
+    assert response.status_code == 500
+    assert response.get_json()['error'] == MOCK_RESPONSE
+
+# --- IS COORD ZONE ---
+
+def test_is_coord_in_zone_success(client, monkeypatch):
     # --- ARRANGE --- #
     
     # Prepare mockups
@@ -113,6 +241,30 @@ def test_is_coord_in_zone_false_success(client, monkeypatch):
 
     assert response.status_code == 200
     assert response.get_json()['response'] == MOCK_RESPONSE
+
+def test_is_coord_in_zone_bad_coordinates_exception(client, monkeypatch):
+    # --- ARRANGE --- #
+    
+    # Prepare mockups
+    MOCK_RESPONSE = "Invalid or missing coordinates"
+    def mock_is_coord_in_zones(lat,lon):
+        return MOCK_RESPONSE
+    monkeypatch.setattr(parcel_finder, "is_coord_in_zones", mock_is_coord_in_zones)
+    
+    # Prepare inputs 
+    data = {
+        "lat": "abc", 
+        "lng": "abc" 
+    }
+
+    # --- ACT --- #
+
+    response = client.post('/is-coord-in-zone', data=data)
+    
+    # --- ASSERT --- #
+
+    assert response.status_code == 400
+    assert response.get_json()['error'] == MOCK_RESPONSE
 
 def test_uploaded_file_success(client, monkeypatch):
     # --- ARRANGE --- #
