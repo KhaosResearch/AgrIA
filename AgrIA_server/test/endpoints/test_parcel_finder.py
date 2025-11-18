@@ -212,15 +212,23 @@ def test_find_parcel_scenarios(
 # --- IS COORD ZONE ---
 
 @pytest.mark.parametrize(
-    "lat_input, lng_input, expected_status, expected_error",
+    "lat_input, lng_input, expected_status, expected_response",
     [
         pytest.param(
-            "1.0",
-            "2.0",
+            "40.400409",
+            "-3.631434",
             200,
             True,
             id= "Success_CoordInZone"
         ), 
+        pytest.param(
+            "-40.400409",
+            "3.631434",
+            200,
+            False,
+            id= "Success_CoordNotInZone"
+        ), 
+
         pytest.param(
             "abc",
             "1.0",
@@ -246,11 +254,11 @@ def test_find_parcel_scenarios(
 )
 
 def test_is_coord_in_zone_scenarios(
-    client, monkeypatch, lat_input, lng_input, expected_status, expected_error
+    client, monkeypatch, lat_input, lng_input, expected_status, expected_response
 ):
     # --- ARRANGE ---
     def mock_is_coord_in_zones(lat, lon):
-        return True # Mock service always returns True (assumes success case)
+        return expected_response
     monkeypatch.setattr(parcel_finder, "is_coord_in_zones", mock_is_coord_in_zones)
     
     data = {"lat": lat_input, "lng": lng_input}
@@ -263,10 +271,10 @@ def test_is_coord_in_zone_scenarios(
     
     if expected_status == 200:
         # Assert the success response structure
-        assert response.get_json()['response'] == expected_error 
+        assert response.get_json()['response'] == expected_response 
     else:
         # Assert the error message structure
-        assert response.get_json()['error'] == expected_error
+        assert response.get_json()['error'] == expected_response
 
 # --- UPLOAD IMAGE FILE ---
 

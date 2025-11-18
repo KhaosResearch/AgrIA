@@ -274,7 +274,7 @@ def test_get_input_suggestion_scenarios(
             "A list of past messages in the chat.",
             200,
             "History loaded correctly!.",
-            id="Success_GotSuggestion"
+            id="Success_HistoryLoaded"
         ),
         pytest.param(
             "Failure: No history available",
