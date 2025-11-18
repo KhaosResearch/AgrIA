@@ -40,7 +40,7 @@ export class ChatAssistantComponent {
           console.error('Error loading chat history:', err);
           this.chatHistory.push({
             role: 'model',
-            content: 'No se pudo cargar el historial de chat. Inténtelo de nuevo más tarde o comience un nuevo chat con esta conversación.'
+            content: 'Error 404: Chat history not found.\nNo se pudo cargar el historial de chat. Inténtelo de nuevo más tarde o comience un nuevo chat con esta conversación.'
           });
           this.scrollToBottom();
         }
