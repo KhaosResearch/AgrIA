@@ -102,8 +102,8 @@ body, html {
 
 /* Placeholder icon for no image */
 .image-preview .image-icon {
-  width: 80px; /* Adjust size for the placeholder icon */
-  height: 80px;
+  width: 120px; /* Adjust size for the placeholder icon */
+  height: 120px;
   opacity: 0.5;
 }
 

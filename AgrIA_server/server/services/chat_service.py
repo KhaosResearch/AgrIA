@@ -3,7 +3,7 @@ import structlog
 from PIL import Image
 from google.genai.types import Content
 
-from ..benchmark.vlm.ecoscheme_classif_algorithm import calculate_ecoscheme_payment_exclusive
+from .ecoscheme_payments.main import calculate_ecoscheme_payment
 from ..config.chat_config import CHAT as chat
 from ..config.constants import FULL_DESC_TRIGGER, SHORT_DESC_TRIGGER, TEMP_DIR
 from ..config.llm_client import client
@@ -53,11 +53,13 @@ def get_parcel_description(image_date, land_uses, query, image_filename, is_deta
     try:
         logger.info("Retrieveing parcel data...")
         image_context_data = generate_image_context_data(image_date, land_uses, query)
-        json_data = calculate_ecoscheme_payment_exclusive(image_context_data[lang], lang)
-        logger.debug(f"JSON DATA:\n{json_data}")
+        json_data = calculate_ecoscheme_payment(image_context_data[lang], lang)
+        with open(TEMP_DIR / "ecoscheme_data.json", "w") as f:
+            import json
+            json.dump(json_data,f,indent=4)
         # Insert image context prompt and read image desc file
         desc_trigger =  FULL_DESC_TRIGGER if is_detailed_description else SHORT_DESC_TRIGGER
-        image_desc_prompt = desc_trigger+"\n"+image_context_data[lang]
+        image_desc_prompt = f"```\n{image_context_data[lang]}\n```"
 
         image_indication_options ={
             'es': "Estas son las características de la parcela cuya imagen te paso. Tenlo en cuenta para tu descripción en español. Comprueba el siguiente prompt para ver si es necesario cambiar el idioma:",
@@ -69,7 +71,7 @@ def get_parcel_description(image_date, land_uses, query, image_filename, is_deta
         image = Image.open(image_path)
 
         response = {
-            "text": chat.send_message([image, image_indication_prompt],).text,
+            "text": chat.send_message([image_indication_prompt, image, image_desc_prompt]).text,
             "imageDesc":image_context_data
         }
 

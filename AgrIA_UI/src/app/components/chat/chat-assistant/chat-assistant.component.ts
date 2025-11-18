@@ -40,7 +40,7 @@ export class ChatAssistantComponent {
           console.error('Error loading chat history:', err);
           this.chatHistory.push({
             role: 'model',
-            content: 'No se pudo cargar el historial de chat. Inténtelo de nuevo más tarde o comience un nuevo chat con esta conversación.'
+            content: 'Error 404: Chat history not found.\nNo se pudo cargar el historial de chat. Inténtelo de nuevo más tarde o comience un nuevo chat con esta conversación.'
           });
           this.scrollToBottom();
         }
@@ -71,12 +71,9 @@ export class ChatAssistantComponent {
     let sanitized_history = response.slice(index);
 
     // Remove image descriptions requests data
-    for(let msg of sanitized_history){
-      if (msg.content.includes('###DESCRIBE')) {
-        const descMsg = msg.content.split('###');
-        msg.content = '```' + descMsg[descMsg.length - 1] + '```';
-      }
-    }
+    sanitized_history = sanitized_history.filter(
+      msg => !msg.content.includes('###DESCRIBE')
+    );
     return sanitized_history
   }
 

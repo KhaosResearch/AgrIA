@@ -135,7 +135,7 @@
     "description": {
       "intro":"In this module, you may use one of the two options available to find your parcel. In both, the date will be used to extract the image.",
       "header1": "Coordinates Search (Spain only):",
-      "header2": "Parcel Drawing Search (resto of the world):",
+      "header2": "Parcel Drawing Search (rest of the world):",
       "bold0":"Click/tap on the map over your parcel or introduce a set of coordinates (latitude, longitude) that are within your state's limits ",
       "normal0":" as per the property's cadastral data in order to find it.",
       "normal00":"Introduce the parcel's location data, sepcifying each one of these fields: Province, Municipality, Industrial's Park numeric ID, and Parcel's numeric ID",

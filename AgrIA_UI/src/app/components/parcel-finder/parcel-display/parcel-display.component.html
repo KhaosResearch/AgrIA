@@ -15,7 +15,7 @@
             }
         </div>
         <div class="display-buttons">
-            @if(parcelImageUrl){
+            @if(parcelImageUrl && isLoading() != true){
                 <div class="parcel-actions-wrapper">
                     <label class="detailed-description-checkbox">
                         <input 

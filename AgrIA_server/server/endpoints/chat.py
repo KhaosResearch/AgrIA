@@ -6,6 +6,10 @@ from server.services.chat_service import *
 logger = structlog.get_logger()
 chat_bp = Blueprint('chat', __name__)
 
+@chat_bp.route('/hello-world', methods=['GET'])
+def hello_world():
+    return jsonify({'response': "Hello, World!"})
+
 @chat_bp.route('/send-user-input', methods=['POST'])
 def send_user_input():
     try:
@@ -37,7 +41,10 @@ def send_image():
 @chat_bp.route('/load-parcel-data-to-chat', methods=['POST'])
 def send_parcel_info_to_chat():
     try:
-        image_date = request.form.get('imageDate').split("/")[-1]
+        if request.form.get('imageDate'):
+            image_date = request.form.get('imageDate').split("/")[-1] 
+        else:
+            raise ValueError("No image date provided")
         land_uses = json.loads(request.form.get('landUses'))
         query = json.loads(request.form.get('query'))
         image_filename = request.form.get('imageFilename')
@@ -47,27 +54,36 @@ def send_parcel_info_to_chat():
         response = get_parcel_description(image_date, land_uses, query, image_filename, is_detailed_description, lang)
 
         return jsonify({'response': response})
-    except Exception as e:
+    except (Exception, ValueError) as e:
         logger.exception("Error loading parcel to chat:\n")
-        return jsonify({'error': str(e)}), 500
+        status_code = 400 if isinstance(e, ValueError) else 500
+        return jsonify({'error': str(e)}), status_code
     
 @chat_bp.route('/get-input-suggestion', methods=['POST'])
 def get_input_suggestion():
     try:
         lang = request.form.get('lang')
-        chat_history = chat.get_history()
+        if chat.get_history():
+            chat_history = chat.get_history()
+        else:
+            raise ValueError("No valid history provided.")
         response = get_suggestion_for_chat(chat_history, lang)
         return jsonify({'response': response})
-    except Exception as e:
+    except (Exception, ValueError) as e:
         logger.exception("Error getting suggestion:\n")
-        return jsonify({'error': str(e)}), 500
+        status_code = 400 if isinstance(e, ValueError) else 500
+        return jsonify({'error': str(e)}), status_code
     
 @chat_bp.route('/load-active-chat-history', methods=['GET'])
 def load_active_chat_history():
     try:
-        chat_history = chat.get_history()
+        if chat.get_history():
+            chat_history = chat.get_history()
+        else:
+            raise ValueError("No valid history provided.")
         response = get_role_and_content(chat_history)
         return jsonify({'response': response})
-    except Exception as e:
-        logger.exception("Error loading active history:\n")
-        return jsonify({'error': str(e)}), 500
+    except (Exception, ValueError) as e:
+        logger.exception("Error getting suggestion:\n")
+        status_code = 400 if isinstance(e, ValueError) else 500
+        return jsonify({'error': str(e)}), status_code
