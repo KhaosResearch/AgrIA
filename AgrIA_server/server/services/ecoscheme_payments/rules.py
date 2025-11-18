@@ -21,7 +21,7 @@ def get_ecoscheme_rules_data(rules_data_list) -> dict:
         rates = rule['Rates']
         threshold_ha = str(rates['Threshold_ha'])
         threshold = Decimal(threshold_ha) if threshold_ha.replace('.', '', 1).isdigit() else None
-        pluri_applicable = rates['Pluriannuality'] != 'N/A'
+        pluri_applicable = rates.get('Pluriannuality') in ('Yes', 'Applicable')
         
         base_rate_details = get_base_rate_details(rates, threshold)
 
