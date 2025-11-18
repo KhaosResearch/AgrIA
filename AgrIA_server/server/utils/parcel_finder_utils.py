@@ -948,7 +948,7 @@ def polygon_pixel_size(geojson_polygon, resolution=RESOLUTION):
 
     return max_dim_px
 
-def is_coord_in_zones(lon: float, lat: float, zones_json: dict = SPAIN_ZONES) -> str | None:
+def is_coord_in_zones(lon: float, lat: float, zones_json: dict = SPAIN_ZONES) -> bool:
     """
     Checks if a (lon, lat) coordinate falls within any given zone's bounding box.
 
@@ -962,10 +962,30 @@ def is_coord_in_zones(lon: float, lat: float, zones_json: dict = SPAIN_ZONES) ->
     """
     is_in_zone = False
     zones_list = zones_json["zones"]
+    point = Point(lon, lat)
     i = 0
     while not is_in_zone and i < len(zones_list):
         zone = zones_list[i]
-        min_lon, min_lat, max_lon, max_lat = zone["bbox"]
-        is_in_zone = min_lon <= lon <= max_lon and min_lat <= lat <= max_lat
+        zone_id = zone.get("id")
+        
+        if "bbox" in zone:
+            try:
+                min_lon, min_lat, max_lon, max_lat = zone["bbox"]
+                if min_lon <= lon <= max_lon and min_lat <= lat <= max_lat:
+                    is_in_zone = True
+            except (ValueError, TypeError) as e:
+                print(f"Warning: Zone '{zone_id}' has an invalid BBox format. Skipping zone: {e}")
+                
+        elif "polygon" in zone:
+            try:
+                # Create a Shapely Polygon object from the list of vertices
+                poly = Polygon(zone["polygon"])
+                
+                # Check if the point is within the polygon
+                if poly.contains(point):
+                    is_in_zone = True
+            except Exception as e:
+                # Log the warning but continue checking other zones
+                print(f"Warning: Zone '{zone_id}' has an invalid Polygon geometry. Skipping zone: {e}")
         i += 1
     return is_in_zone
