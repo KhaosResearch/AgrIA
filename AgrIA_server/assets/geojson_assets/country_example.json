@@ -5,7 +5,13 @@
     {
       "id": "Zone_Identifier",
       "desc": "Brief description of this zone",
-      "bbox": [-9.30, 35.90, 3.50, 43.80]
+      "polygon": [
+        [-9.30, 35.90],
+        [3.50, 35.90],
+        [3.50, 43.80],
+        [-9.30, 43.80],
+        [-9.30, 35.90]
+      ]
     },
     {
       "id": "Another_Zone",

@@ -8,6 +8,7 @@ import sen2sr
 import torch
 import geopandas as gpd
 import numpy as np
+import structlog
 
 from datetime import datetime, timedelta
 from rasterio.mask import mask
@@ -15,6 +16,8 @@ from rasterio.mask import mask
 from .constants import *
 from .utils import lonlat_to_utm_epsg, save_to_png, save_to_tif, get_cloudless_time_indices, make_pixel_faithful_comparison, reorder_bands
 from ...config.constants import RESOLUTION, TEMP_DIR
+
+logger = structlog.get_logger()
 
 def get_sr_image(lat: float, lon: float, bands: list, start_date: str, end_date: str, size: int):
     """
@@ -31,7 +34,7 @@ def get_sr_image(lat: float, lon: float, bands: list, start_date: str, end_date:
     """
     try:
         # Ensure sizeis right (minimum for SEN2SR)
-        print(f"Image size {size}x{size}px")
+        logger.debug(f"Image size {size}x{size}px")
         # Download model
         if not os.path.exists(MODEL_DIR) or len(os.listdir(MODEL_DIR)) == 0:
             mlstac.download(
@@ -77,7 +80,7 @@ def get_sr_image(lat: float, lon: float, bands: list, start_date: str, end_date:
         sr_image_filepath = str(crop_parcel_from_sr_tif(SR_TIF_FILEPATH, sample_date))
         return sr_image_filepath
     except Exception as e:
-        print(f"An error occurred (get_sr_image SEN2SR): {str(e)}")
+        logger.error(f"An error occurred (get_sr_image SEN2SR): {str(e)}")
         raise
 
 # --------------------
@@ -101,7 +104,7 @@ def download_sentinel_cubo(lat: float, lon: float, bands: list, start_date: str,
     """
     for attempt in range(max_retries):
         try:
-            print(f"🌍 Attempt {attempt+1}/{max_retries}: {start_date} → {end_date}")
+            logger.info(f"🌍 Attempt {attempt+1}/{max_retries}: {start_date} → {end_date}")
             
             da = cubo.create(
                 lat=lat,
@@ -124,20 +127,20 @@ def download_sentinel_cubo(lat: float, lon: float, bands: list, start_date: str,
             acq_date_str = np.datetime_as_string(acq_date, unit='D')
             cloudless_image_data = cloudless_image_data.rio.write_crs(crs).rio.reproject(crs)
 
-            print(f"☁️ Cloudless image found on {acq_date_str}!")
+            logger.info(f"☁️  Cloudless image found on {acq_date_str}!")
             return cloudless_image_data, str(acq_date_str)
 
         except ValueError as e:
-            print(f"⚠️ {e}")
+            logger.warning(f"⚠️  {e}")
             if attempt < max_retries - 1:
                 # Shift the date range backwards by `retry_days_shift` days
                 new_start = datetime.fromisoformat(start_date) - timedelta(days=retry_days_shift)
                 new_end = datetime.fromisoformat(end_date) - timedelta(days=retry_days_shift)
                 start_date, end_date = new_start.strftime("%Y-%m-%d"), new_end.strftime("%Y-%m-%d")
-                print(f"🔁 Retrying with earlier range: {start_date} → {end_date}")
+                logger.debug(f"🔁 Retrying with earlier range: {start_date} → {end_date}")
                 continue
             else:
-                print("❌ No valid images found after all retries.")
+                logger.error(f"❌ No valid images found after all retries.")
                 raise
 
 # --------------------
@@ -154,25 +157,18 @@ def crop_parcel_from_sr_tif(raster_path:str, date):
     with rasterio.open(raster_path) as src:
         
         raster_crs = src.crs
-        print(f"SR Raster CRS: {raster_crs}")
         gdf = gpd.read_file(GEOJSON_FILEPATH)
-        gdf = gpd.read_file(GEOJSON_FILEPATH)
-        print("Original GeoJSON CRS:", gdf.crs)
-        print("Original polygon bounds:", gdf.total_bounds)
         if raster_crs:
             gdf = gdf.to_crs(raster_crs)
             gdf["geometry"] = gdf["geometry"].buffer(1)
-            print(f"Reprojected polygon to match raster CRS: {raster_crs}")
-        print("Raster bounds:", src.bounds)
-        print("Raster CRS:", src.crs)
-        print("Polygon bounds:", gdf.total_bounds)
+            logger.info(f"Reprojected polygon to match raster CRS: {raster_crs}")
 
         # Get parcel's geom and apply mask on SR image
-        print("Cropping parcel's geometry from raster...")
+        logger.info(f"Cropping parcel's geometry from raster...")
         geom = [json.loads(gdf.to_json())["features"][0]["geometry"]]
         out_image, out_transform = mask(src, geom, crop=True)
         out_meta = src.meta.copy()
-        print("Cropping successful!")
+        logger.info(f"Cropping successful!")
 
     # Update TIF metadata
     out_meta.update({
@@ -193,7 +189,7 @@ def crop_parcel_from_sr_tif(raster_path:str, date):
     out_png_path= TEMP_DIR / f"{filename}.png"
     save_to_png(out_image, out_png_path, apply_gamma_correction=True)
 
-    print(f"✅ Clipped raster saved to {out_tif_path} and PNG saved to {out_png_path}")
+    logger.info(f"✅ Clipped raster saved to {out_tif_path} and PNG saved to {out_png_path}")
     
     return out_png_path
 
@@ -209,4 +205,4 @@ if __name__ == "__main__":
     start_time = time.time()
     get_sr_image(lat, lon, BANDS, look_from, now, 150)
     finish_time = time.time()
-    print(f"Total time:\t{(finish_time - start_time)/60:.1f} minutes")
+    logger.info(f"Total time:\t{(finish_time - start_time)/60:.1f} minutes")

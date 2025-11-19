@@ -1,14 +1,17 @@
 from pathlib import Path
 import json
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 
 MODEL_NAME = "gemini-2.0-flash-lite"
-BASE_CONTEXT_PATH = Path("./assets/LLM_assets/context")
-BASE_PROMPTS_PATH = Path("./assets/LLM_assets/prompts")
 
+BASE_GEOJSON_PATH = Path(ROOT_DIR / "assets/geojson_assets")
+
+BASE_CONTEXT_PATH = Path(ROOT_DIR / "assets/LLM_assets/context")
+BASE_PROMPTS_PATH = Path(ROOT_DIR / "assets/LLM_assets/prompts")
 CONTEXT_DOCUMENTS_FILE = "context_document_links.json"
 PROMPT_LIST_FILE = "prompt_list.json"
 
-TEMP_DIR = Path('temp/')
+TEMP_DIR = Path(ROOT_DIR / 'temp/')
 
 EXCLUSIVITY_RULE = """\n\n
 **CRITICAL EXCLUSIVITY DIRECTIVE FOR CALCULATION:**
@@ -45,7 +48,7 @@ MIME_TYPES = {
     'png': 'image/png',
 }
 
-SPAIN_JSON = Path("./assets/geojson_assets/spain.json")
+SPAIN_JSON = Path(BASE_GEOJSON_PATH / "spain.json")
 with open(SPAIN_JSON, 'r') as file:
     SPAIN_ZONES = json.load(file)
 

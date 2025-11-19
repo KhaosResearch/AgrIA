@@ -3,6 +3,7 @@ import json
 import time
 import os
 import traceback
+import structlog
 
 from flask import abort
 from .sigpac_tools_v2.find import find_from_cadastral_registry
@@ -12,7 +13,6 @@ from ..benchmark.sr.compare_sr_metrics import compare_sr_metrics
 
 from ..benchmark.sr.constants import BM_DATA_DIR, BM_RES_DIR
 
-from .sen2sr.utils import is_in_spain
 from .sen2sr.get_sr_image import get_sr_image
 from .sen2sr.constants import BANDS, GEOJSON_FILEPATH
 from ..services.sr4s.im.utils import get_bbox_from_center
@@ -21,6 +21,8 @@ from ..config.constants import GET_SR_BENCHMARK, SEN2SR_SR_DIR, SR_BANDS, RESOLU
 from ..utils.parcel_finder_utils import *
 
 from .sr4s.im.get_image_bands import request_date
+
+logger = structlog.get_logger()
 
 def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_reference: bool= True, parcel_geometry: str  = None, parcel_metadata: str = None, coordinates: list[float] = None, get_sr_image: bool = True) -> tuple:
     """
@@ -75,7 +77,6 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
         bands.pop()
     
     sigpac_image_url = ''
-    print("GET_SR_BENCHMARK", GET_SR_BENCHMARK)
     if GET_SR_BENCHMARK:
         reset_dir(BM_DATA_DIR)
         reset_dir(BM_RES_DIR)
@@ -83,16 +84,26 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
     time1 = datetime.now()-init
     msg1 = f"\nTIME TAKEN (SENTINEL HUB / MINIO + SR4S): {time1}" if sigpac_image_url else ""
     init2 = datetime.now()
-    sigpac_image_name = download_sen2sr_parcel_image(geometry, date)
-    sigpac_image_url = f"{os.getenv('API_URL')}/uploads/{os.path.basename(sigpac_image_name)}?v={int(time.time())}"
-    msg2 = f"\nTIME TAKEN (SEN2SR): {datetime.now()-init2}"
+    try:
+        init2 = datetime.now()
+        # Primary method: Download using SEN2SR service
+        sigpac_image_name = download_sen2sr_parcel_image(geometry, date)
+        
+        # If successful, calculate URL and time
+        sigpac_image_url = f"{os.getenv('API_URL')}/uploads/{os.path.basename(sigpac_image_name)}?v={int(time.time())}"
+        msg2 = f"\nTIME TAKEN (SEN2SR): {datetime.now()-init2}"
+        
+    except Exception as e:
+        # --- FAILOVER/BACKUP DOWNLOAD (Sentinel Hub / MinIO) ---
+        logger.error(f"❌ SEN2SR download failed: {e}. Falling back to backup method (SR4S)...")
+        sigpac_image_url = download_parcel_image(cadastral_reference, geojson_data, list_zones_utm, year, month, bands)
     msg3 = ''
     if GET_SR_BENCHMARK:
         init3 = datetime.now()
         compare_sr_metrics()
         msg3 = f"\nTIME TAKEN (BENCHMARK): {datetime.now()-init3}"
 
-    print(msg1 + msg2 + msg3)
+    logger.debug(f"{msg1 + msg2 + msg3}")
 
     return geometry, metadata, sigpac_image_url
 
@@ -107,26 +118,30 @@ def download_sen2sr_parcel_image(geometry, date):
     Returns:
         sigpac_image_url (str): Path to display SR image.
     """
-    min_size = 128
-    if geometry:
-        poly = shape(geometry)
-        lon, lat = float(poly.centroid.x), float(poly.centroid.y)
-        print("Centroid:", lat, lon)
-    else:
-        raise ValueError("Error: No GeoJSON or coordinates provided for parcel.")
-    bands= BANDS
+    try:
+        min_size = 128
+        if geometry:
+            poly = shape(geometry)
+            lon, lat = float(poly.centroid.x), float(poly.centroid.y)
+            logger.debug(f"Centroid: {lat}, {lon}")
+        else:
+            raise ValueError("Error: No GeoJSON or coordinates provided for parcel.")
+        bands= BANDS
 
-    sr_size=max(min_size, polygon_pixel_size(geometry))
+        sr_size=max(min_size, polygon_pixel_size(geometry))
 
-    year, month, day = date.split("-")
-    formatted_date = datetime(year=int(year), month=int(month), day=int(day))
-    delta = 15
-    end_date = formatted_date.strftime("%Y-%m-%d")
-    start_date = (formatted_date - timedelta(days=delta)).strftime("%Y-%m-%d")
+        year, month, day = date.split("-")
+        formatted_date = datetime(year=int(year), month=int(month), day=int(day))
+        delta = 15
+        end_date = formatted_date.strftime("%Y-%m-%d")
+        start_date = (formatted_date - timedelta(days=delta)).strftime("%Y-%m-%d")
 
-    sigpac_image_name = os.path.basename(get_sr_image(lat, lon, bands, start_date, end_date, sr_size))
+        sigpac_image_name = os.path.basename(get_sr_image(lat, lon, bands, start_date, end_date, sr_size))
 
-    return sigpac_image_name
+        return sigpac_image_name
+    except Exception as e:
+        logger.exception()
+        raise
 
 def download_parcel_image(cadastral_reference, geojson_data, list_zones_utm, year, month, bands):
     try:
@@ -135,7 +150,7 @@ def download_parcel_image(cadastral_reference, geojson_data, list_zones_utm, yea
         rgb_images_path = download_tile_bands(list_zones_utm, year, month, bands, geometry)
         if not rgb_images_path or len(rgb_images_path) < len(bands):
             error_message = "No images are available for the selected date, images are processed at the end of each month."
-            print(error_message)
+            logger.error(error_message)
             abort(404, description=error_message)
 
         __, png_paths, __ = get_rgb_parcel_image(cadastral_reference, geojson_data, rgb_images_path)
@@ -146,8 +161,7 @@ def download_parcel_image(cadastral_reference, geojson_data, list_zones_utm, yea
         sigpac_image_url = f"{os.getenv('API_URL')}/uploads/{os.path.basename(sigpac_image_name)}?v={int(time.time())}"
         return sigpac_image_url.split("?")[0]
     except Exception as e:
-        traceback.print_exc()
-        print(f"An error occurred (download_parcel_image): {str(e)}")
+        logger.exception(f"An error occurred (download_parcel_image):\n")
         raise
 
 def get_rgb_parcel_image(cadastral_reference, geojson_data, rgb_images_path):
@@ -190,5 +204,5 @@ def get_rgb_parcel_image(cadastral_reference, geojson_data, rgb_images_path):
 
         return out_dir, png_paths, rgb_tif_paths
     except Exception as e:
-        print(f"An error occurred (get_rgb_parcel_image): {str(e)}")
+        logger.exception(f"An error occurred (get_rgb_parcel_image):\n")
         raise

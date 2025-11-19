@@ -27,6 +27,7 @@ dependencies:
       - Pillow
       - protobuf
       - pytest
+      - pytest-mock
       - python-dotenv
       - requests
       - rioxarray

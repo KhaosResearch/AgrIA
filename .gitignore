@@ -6,16 +6,17 @@
 *temp*
 .venv
 *__pycache__/
+*.pytest_cache/
 *.kml
 *.png
 *.tif*
 *.tsv
 *assets/.scripts
-*model*
+*model/
 *data*
 *res*
 *out*
-server/benchmark/vlm/**/*.json
+*.json
 
 # Frontend
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.

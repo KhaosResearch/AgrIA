@@ -2,6 +2,7 @@ import math
 import os
 import cv2
 import rasterio
+import structlog
 
 import numpy as np
 
@@ -14,6 +15,7 @@ from ...config.constants import GET_SR_BENCHMARK
 from ...benchmark.sr.utils import copy_file_to_dir
 from .constants import BRIGHTNESS_FACTOR, COMPARISON_PNG_FILEPATH, GAMMA, PNG_DIR, SPAIN_MAINLAND, TIF_DIR
 
+logger = structlog.get_logger()
 # --------------------
 # GeoTIFF + PNG export
 # --------------------
@@ -65,15 +67,15 @@ def save_tif(image_nparray, filepath, adjust_transform, crs:str="EPSG:32630"):
         dst.write(image_nparray)
 
     if GET_SR_BENCHMARK:
-        print("Copying SEN2SR TIF file...")
+        logger.debug(f"Copying SEN2SR TIF file...")
         if "original" in str(filepath):
-            print("Copying original file for benchmark...")
+            logger.debug(f"Copying original file for benchmark...")
             copy_file_to_dir(filepath, is_sr4s=None)
         else:
-            print("Copying SEN2SR file for benchmark...")
+            logger.debug(f"Copying SEN2SR file for benchmark...")
             copy_file_to_dir(filepath)
 
-    print(f"✅ Saved {filepath} with corrected band order")
+    logger.info(f"✅ Saved {filepath} with corrected band order")
 
 def save_to_png(image_nparray, filepath, lat=None, apply_gamma_correction=False):
     """
@@ -92,11 +94,11 @@ def save_to_png(image_nparray, filepath, lat=None, apply_gamma_correction=False)
     if lat is not None:
         brightness_factor = np.clip(1.0 / np.cos(np.deg2rad(lat)), 0.7, 1.3)
         image_nparray = np.clip(image_nparray * brightness_factor, 0, 1)
-        print(f"🧭 Applied latitude-based brightness correction (lat={lat:.2f}, factor={brightness_factor:.3f})")
+        logger.debug(f"🧭 Applied latitude-based brightness correction (lat={lat:.2f}, factor={brightness_factor:.3f})")
 
     # Continue with normal save pipeline
     save_png(image_nparray, filepath, apply_gamma_correction=apply_gamma_correction)
-    print(f"✅ Saved {filepath} with corrected colors and brightness normalization")
+    logger.info(f"✅ Saved {filepath} with corrected colors and brightness normalization")
 
 def save_png(arr, path, enhance_contrast=True, contrast_factor=1.5, apply_gamma_correction=False, gamma=GAMMA, transparent_nodata=True):
     """
@@ -158,36 +160,40 @@ def get_cloudless_time_indices(scl: DataArray, cloud_threshold = 0.01):
     Returns:
         valid_indices (list): List of all valid dates' indices within acceptable cloud threshold
     """
-    valid_indices = []
-    min_threshold = 1  # 100%
-    min_index = -1
-    for t in range(scl.shape[0]):  # iterate over time dimension
-        scl_slice = scl.isel(time=t).compute().to_numpy()
-        # Get cloud image coverage
-        total_pixels = scl_slice.size
-        cloud_pixels = np.isin(scl_slice, [7, 8, 9, 10]).sum()
-        cloud_fraction = cloud_pixels / total_pixels
+    try:
+        valid_indices = []
+        min_threshold = 1  # 100%
+        min_index = -1
+        for t in range(scl.shape[0]):  # iterate over time dimension
+            scl_slice = scl.isel(time=t).compute().to_numpy()
+            # Get cloud image coverage
+            total_pixels = scl_slice.size
+            cloud_pixels = np.isin(scl_slice, [7, 8, 9, 10]).sum()
+            cloud_fraction = cloud_pixels / total_pixels
+            
+            logger.debug(f"Time {t}: cloud_fraction={cloud_fraction:.3%}")
+            
+            if cloud_fraction <= cloud_threshold:
+                valid_indices.append(t)
+            elif cloud_fraction < min_threshold:
+                min_threshold = cloud_fraction
+                min_index = t
         
-        print(f"Time {t}: cloud_fraction={cloud_fraction:.3%}")
-        
-        if cloud_fraction <= cloud_threshold:
-            valid_indices.append(t)
-        elif cloud_fraction < min_threshold:
-            min_threshold = cloud_fraction
-            min_index = t
-    
-    if len(valid_indices) == 0:
-        if min_index > -1:
-            print(f"No time indices with cloud fraction <= {cloud_threshold:.3%}. Using index {min_index} with minimum cloud fraction {min_threshold:.3%}.")
-            valid_indices.append(min_index)
-        else:
-           # No valid or even partially valid images found
-            raise ValueError(
-                f"❌ No cloud-free or minimally cloudy Sentinel-2 images found (min threshold = {min_threshold:.2%}) "
-                f"for the selected area and date range (original threshold = {cloud_threshold:.2%})."
-            ) 
-    print(f"Valid time indices (cloud = {min_threshold:.2%}):", valid_indices)
-    return valid_indices
+        if len(valid_indices) == 0:
+            if min_index > -1:
+                logger.debug(f"No time indices with cloud fraction <= {cloud_threshold:.3%}. Using index {min_index} with minimum cloud fraction {min_threshold:.3%}.")
+                valid_indices.append(min_index)
+            else:
+            # No valid or even partially valid images found
+                raise ValueError(
+                    f"❌ No cloud-free or minimally cloudy Sentinel-2 images found (min threshold = {min_threshold:.2%}) "
+                    f"for the selected area and date range (original threshold = {cloud_threshold:.2%})."
+                ) 
+        logger.info(f"Valid time indices (cloud = {min_threshold:.2%}): {valid_indices}")
+        return valid_indices
+    except Exception as e:
+        logger.exception("An error occurred while finding cloudless time indices.")
+        raise
 
 def prepare_rgb(arr, is_tensor=False):
     """
@@ -261,7 +267,7 @@ def make_pixel_faithful_comparison(original_arr, sr_arr, output_path=COMPARISON_
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     canvas.save(output_path)
-    print(f"✅ Saved pixel-faithful comparison with padding → {output_path}")
+    logger.info(f"✅ Saved pixel-faithful comparison with padding → {output_path}")
 
 def lonlat_to_utm_epsg(lon, lat):
     """
