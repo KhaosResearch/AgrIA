@@ -5,6 +5,8 @@ import shutil
 from flask import jsonify
 from pyproj import Transformer, CRS
 
+from ..services.sigpac_tools_v2.utils import build_cadastral_reference
+
 from ..services.sr4s.im.get_image_bands import download_from_sentinel_hub
 from ..services.sr4s.sr.get_sr_image import process_directory
 from ..services.sr4s.sr.utils import percentile_stretch, set_reflectance_scale
@@ -30,9 +32,11 @@ import geopandas as gpd
 import numpy as np
 import os
 import rasterio
+import structlog
+
+logger = structlog.get_logger()
 
 load_dotenv()
-
 
 GEOMETRY_FILE = os.getenv("GEOMETRY_FILE")
 
@@ -753,81 +757,6 @@ def check_cadastral_data(cadastral_reference: str, province: str, municipality: 
             # Build cadastral reference
             cadastral_reference = build_cadastral_reference(province, municipality, polygon, parcel_id)
             print("cadastral_reference", cadastral_reference)
-    return cadastral_reference
-
-def build_cadastral_reference(province: str, municipality: str, polygon: str, parcel_id: str):
-    """
-    Generates a valid RURAL cadastral reference with calculated control characters.
-    
-    Arguments:
-        province (str): Province data. ID-NAME format.
-        municipality (str): Municipality data. ID-NAME format.
-        polygon (str): Polygon ID. Max: 3 digits.
-        parcel_id (str): Parcel ID. Max: 5 digits.
-
-    Returns:
-        cadastral_reference (str) 
-    """
-
-    # --- 1. Prepare base components ---
-    # Province (2 chars)
-    prov = province.split('-')[0].zfill(2)
-
-    # Municipality (3 chars)
-    muni = municipality.split('-')[0].zfill(3)
-
-    # Section (1 char) -> Use non-digit (e.g., "X") to ensure RURAL
-    section = "X"
-
-    # Polygon (3 chars)
-    poly = str(polygon).zfill(3)
-
-    # Parcel (5 chars)
-    parcel = str(parcel_id).zfill(5)
-
-    # ID (4 chars) -> usually zero unless you have sub-parcel identifiers
-    parcel_id_4 = "0000"
-
-    # --- 2. Combine without control characters ---
-    partial_ref = prov + muni + section + poly + parcel + parcel_id_4  # 18 chars
-
-    # --- 3. Calculate control characters (positions 19-20) ---
-    res = "MQWERTYUIOPASDFGHJKLBZX"
-    pos = [13, 15, 12, 5, 4, 17, 9, 21, 3, 7, 1]
-
-    separated_ref = list(partial_ref)
-
-    sum_pd1 = 0
-    sum_sd2 = 0
-    mixt1 = 0
-
-    # First 7 characters
-    for i in range(7):
-        ch = separated_ref[i]
-        if ch.isdigit():
-            sum_pd1 += pos[i] * (ord(ch) - 48)
-        else:
-            sum_pd1 += pos[i] * ((ord(ch) - 63) if ord(ch) > 78 else (ord(ch) - 64))
-
-    # Next 7 characters
-    for i in range(7):
-        ch = separated_ref[i + 7]
-        if ch.isdigit():
-            sum_sd2 += pos[i] * (ord(ch) - 48)
-        else:
-            sum_sd2 += pos[i] * ((ord(ch) - 63) if ord(ch) > 78 else (ord(ch) - 64))
-
-    # Mixt calculation (last 4 digits before control)
-    for i in range(4):
-        mixt1 += pos[i + 7] * (ord(separated_ref[i + 14]) - 48)
-
-    code1 = res[(sum_pd1 + mixt1) % 23]
-    code2 = res[(sum_sd2 + mixt1) % 23]
-
-    # --- 4. Final cadastral reference ---
-    cadastral_reference = partial_ref + code1 + code2
-
-    print("FINAL CADASTRAL REF:", cadastral_reference)
     return cadastral_reference
 
 def bbox_from_polygon(polygon_geojson: dict, resolution_m: int = RESOLUTION, min_px: int=-1 ):

@@ -6,7 +6,7 @@ from .utils import read_cadastral_registry
 logger = structlog.get_logger()
 
 
-def find_from_cadastral_registry(cadastral_reg: str):
+def find_from_cadastral_registry(cadastral_ref: str):
     """
     Find the geometry and metadata of a cadastral reference in the SIGPAC database. The reference must be rural. Urban references are not supported.
 
@@ -21,7 +21,7 @@ def find_from_cadastral_registry(cadastral_reg: str):
     - 2 characters for the control
     Parameters
     ----------
-    cadastral_reg : str
+    cadastral_ref : str
         Cadastral reference to search for
 
     Returns
@@ -44,15 +44,16 @@ def find_from_cadastral_registry(cadastral_reg: str):
     NotImplementedError
         If the reference is urban
     """
-    reg = read_cadastral_registry(cadastral_reg)
+    reg = read_cadastral_registry(cadastral_ref)
 
     # Search for coordinates
 
     geometry, metadata = search(reg)
     if geometry == [] or metadata == []:
         raise ValueError(
-            f"The cadastral reference {cadastral_reg} does not exist in the SIGPAC database. Please check the if the reference is correct and try again. Urban references are not supported."
+            f"The cadastral reference {cadastral_ref} does not exist in the SIGPAC database. Please check the if the reference is correct and try again. Urban references are not supported."
         )
+    metadata['parcelaInfo']['referencia_cat'] = cadastral_ref
     return geometry, metadata
 
 if __name__ == '__main__':
