@@ -7,7 +7,6 @@ from server.endpoints import chat
 
 def test_hello_world(client):
     # --- ARRANGE --- #
-    
     # Prepare mockups
     MOCK_RESPONSE = "Hello, World!"
 
@@ -15,11 +14,9 @@ def test_hello_world(client):
     # NONE. This is a GET method
 
     # --- ACT --- #
-
     response = client.get('/hello-world')
     
     # --- ASSERT --- #
-
     assert response.status_code == 200
     assert response.get_json()['response'] == MOCK_RESPONSE
 
@@ -46,7 +43,6 @@ def test_send_user_input_scenarios(
     client, monkeypatch, test_name, user_input, expected_status, expected_response
 ):
     # --- ARRANGE --- #
-    
     # Prepare mockups
     monkeypatch.setattr(chat, "generate_user_response", lambda x: expected_response)
 
@@ -56,11 +52,9 @@ def test_send_user_input_scenarios(
     }
     
     # --- ACT --- #
-    
     response = client.post('/send-user-input', data=data)
     
     # --- ASSERT --- #
-    
     assert response.status_code == expected_status
     if expected_status != 200:
         assert response.get_json()['error'] == expected_response
@@ -106,7 +100,6 @@ def test_send_image_scenarios(
     }
     
     # --- ACT --- #
-
     # 'multipart/form-data' is necessary for file uploads
     response = client.post(
         '/send-image', 
@@ -115,7 +108,6 @@ def test_send_image_scenarios(
     )
     
     # --- ASSERT --- #
-
     assert response.status_code == expected_status
     if expected_status != 200:
         assert response.get_json()["error"] == expected_response
@@ -186,15 +178,12 @@ def test_send_parcel_info_to_chat_scenarios(
     """Tests various scenarios for the /load-parcel-data-to-chat endpoint."""
     
     # --- ARRANGE --- #
-
     monkeypatch.setattr(chat, "get_parcel_description", lambda *args: expected_response)
     
     # --- ACT --- #
-
     response = client.post('/load-parcel-data-to-chat', data=input_data) 
 
     # --- ASSERT --- #
-    
     assert response.status_code == expected_status
     response_json = response.get_json()
 
@@ -232,7 +221,6 @@ def test_get_input_suggestion_scenarios(
     client, monkeypatch, test_name, history_data, input_data, expected_status, expected_response
 ):
     # --- ARRANGE --- #
-    
     # Prepare the mockups
     
     # 1. Create a Mock Chat Object
@@ -255,11 +243,9 @@ def test_get_input_suggestion_scenarios(
     monkeypatch.setattr(chat, "get_suggestion_for_chat", mock_get_suggestion_for_chat)
         
     # --- ACT --- #
-    
     response = client.post('/get-input-suggestion', data=input_data)
     
     # --- ASSERT --- #
-    
     assert response.status_code == expected_status
     if expected_status != 200:
         assert response.get_json()['error'] == expected_response

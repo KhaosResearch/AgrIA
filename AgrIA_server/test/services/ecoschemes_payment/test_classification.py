@@ -3,7 +3,6 @@ from server.services.ecoscheme_payments.classification import (
     get_exclusivity_land_uses,
     get_ecoschemes_rates_and_totals
 )
-from server.services.ecoscheme_payments.main import calculate_ecoscheme_payment
 from server.services.ecoscheme_payments.rules import get_ecoscheme_rules_data
 
 # Use mocks to isolate the main function from file IO for testing
