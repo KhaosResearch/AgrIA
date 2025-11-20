@@ -756,7 +756,6 @@ def check_cadastral_data(cadastral_reference: str, province: str, municipality: 
         else:
             # Build cadastral reference
             cadastral_reference = build_cadastral_reference(province, municipality, polygon, parcel_id)
-            print("cadastral_reference", cadastral_reference)
     return cadastral_reference
 
 def bbox_from_polygon(polygon_geojson: dict, resolution_m: int = RESOLUTION, min_px: int=-1 ):
