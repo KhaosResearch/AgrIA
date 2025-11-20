@@ -9,7 +9,7 @@ import server.services.sigpac_tools_v2.utils as sigpac_utils
 import server.services.sigpac_tools_v2.search as sigpac_search
 import server.utils.parcel_finder_utils as parcel_finder_utils
 from server.services.sigpac_tools_v2.find import find_from_cadastral_registry
-from server.services.sigpac_tools_v2.locate import generate_cadastral_ref_from_coords
+from server.services.sigpac_tools_v2.locate import get_cadastral_data_from_coords
 from server.services.sigpac_tools_v2.utils import read_cadastral_registry
 from server.services.sigpac_tools_v2.search import search
 from server.utils.parcel_finder_utils import build_cadastral_reference

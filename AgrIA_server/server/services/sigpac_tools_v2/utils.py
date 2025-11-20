@@ -125,6 +125,7 @@ def get_geometry(full_json: dict)-> dict:
     -------
         ValueError: If no geometries were found
     """
+    full_parcel_geometry = {}
     # Extract all geometries from features
     all_geometries = [shape(feature["geometry"]) for feature in full_json["features"]]
 
@@ -260,8 +261,8 @@ def build_cadastral_reference(province: str, municipality: str, polygon: str, pa
     # Municipality (3 chars)
     muni = municipality.split('-')[0].zfill(3)
 
-    # Section (1 char) -> Use non-digit (e.g., "X") to ensure RURAL
-    section = "X"
+    # Section (1 char) -> Use non-digit (e.g., "A") to ensure RURAL
+    section = "A"
 
     # Polygon (3 chars)
     poly = str(polygon).zfill(3)
@@ -270,12 +271,24 @@ def build_cadastral_reference(province: str, municipality: str, polygon: str, pa
     parcel = str(parcel_id).zfill(5)
 
     # ID (4 chars) -> usually zero unless you have sub-parcel identifiers
-    parcel_id_4 = "0000"
+    parcel_id_4 = "".zfill(4)
 
     # --- 2. Combine without control characters ---
     partial_ref = prov + muni + section + poly + parcel + parcel_id_4  # 18 chars
 
     # --- 3. Calculate control characters (positions 19-20) ---
+    code = get_control_characters(partial_ref)
+
+    # --- 4. Final cadastral reference ---
+    cadastral_reference = partial_ref + code
+
+    logger.debug(f"FINAL CADASTRAL REF: {cadastral_reference}")
+    return cadastral_reference
+
+def get_control_characters(partial_ref:str)-> str:
+    """
+    Calculate the control characters for a given partial cadastral reference (without control characters)
+    """
     res = "MQWERTYUIOPASDFGHJKLBZX"
     pos = [13, 15, 12, 5, 4, 17, 9, 21, 3, 7, 1]
 
@@ -308,11 +321,7 @@ def build_cadastral_reference(province: str, municipality: str, polygon: str, pa
     code1 = res[(sum_pd1 + mixt1) % 23]
     code2 = res[(sum_sd2 + mixt1) % 23]
 
-    # --- 4. Final cadastral reference ---
-    cadastral_reference = partial_ref + code1 + code2
-
-    logger.debug(f"FINAL CADASTRAL REF: {cadastral_reference}")
-    return cadastral_reference
+    return code1 + code2
 
 def validate_cadastral_reference(reference: str) -> None:
     """Validate the cadastral reference

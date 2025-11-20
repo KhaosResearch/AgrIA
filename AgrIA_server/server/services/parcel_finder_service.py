@@ -7,7 +7,7 @@ import structlog
 
 from flask import abort
 from .sigpac_tools_v2.find import find_from_cadastral_registry
-from .sigpac_tools_v2.locate import  generate_cadastral_ref_from_coords
+from .sigpac_tools_v2.locate import  get_cadastral_data_from_coords
 
 from ..benchmark.sr.compare_sr_metrics import compare_sr_metrics
 
@@ -55,10 +55,16 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
             # Generate metadata from user input
             metadata = json.loads(parcel_metadata)
         elif coordinates:
-            # Retrieve geometry from coordinates
-            lat, lng = coordinates
-            cadastral_ref = generate_cadastral_ref_from_coords(lat, lng)
-            geometry, metadata = find_from_cadastral_registry(cadastral_ref)
+            try:
+                # Retrieve geometry from coordinates
+                lat, lng = coordinates
+                cadastral_ref = get_cadastral_data_from_coords(lat, lng)
+                geometry, metadata = find_from_cadastral_registry(cadastral_ref)
+            except (ValueError, Exception) as e:
+                logger.error(f"Error finding parcel (probably URBAN) with error: {e}")
+                logger.debug(f"Attempting to use coordinates only...")
+                geometry, metadata = get_cadastral_data_from_coords(lat, lng, use_cadastral_ref=False)
+
     else:
         raise ValueError("Cadastral reference missing. Reference must be provided when not using location or GeoJSON/coordinates")
     # Get GeoJSON data and dataframe and list of UTM zones
