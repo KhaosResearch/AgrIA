@@ -68,7 +68,6 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
     else:
         raise ValueError("Cadastral reference missing. Reference must be provided when not using location or GeoJSON/coordinates")
     # Get GeoJSON data and dataframe and list of UTM zones
-    # Open a file in write mode and save the string
     os.makedirs(SEN2SR_SR_DIR, exist_ok=True)
     with open(GEOJSON_FILEPATH, "w") as file:
         file.write(str(geometry).replace("'", '"').replace("(","[").replace(")","]"))  # format GeoJSON correctly
@@ -92,6 +91,12 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
     init2 = datetime.now()
     try:
         init2 = datetime.now()
+
+        # Remove old PNGs from TEMP dir if any
+        for file in os.listdir(TEMP_DIR):
+            if ".png" in file:
+                os.remove(TEMP_DIR / file)
+
         # Primary method: Download using SEN2SR service
         sigpac_image_name = download_sen2sr_parcel_image(geometry, date)
         
@@ -101,7 +106,7 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
         
     except Exception as e:
         # --- FAILOVER/BACKUP DOWNLOAD (Sentinel Hub / MinIO) ---
-        logger.error(f"❌ SEN2SR download failed: {e}. Falling back to backup method (SR4S)...")
+        logger.error(f"SEN2SR download failed: {e}. Falling back to backup method (SR4S)...")
         sigpac_image_url = download_parcel_image(cadastral_reference, geojson_data, list_zones_utm, year, month, bands)
     msg3 = ''
     if GET_SR_BENCHMARK:

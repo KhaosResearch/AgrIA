@@ -725,15 +725,26 @@ def merge_and_convert_to_geometry(feature_collection: dict) -> dict:
     del transformer
     return mapping(merged) 
 
-def reset_dir(dir: Path | str):
-    # Clear uploaded files and dirs
-    if os.path.exists(dir):
-        for file in os.listdir(dir):
-            file_path = os.path.join(os.getcwd(), dir, file)
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
+def reset_dir(dir: str | Path, keep_extensions: list[str] = None):
+    """
+    Removes ALL subdirectories and files inside `dir`, except files in the top-level
+    directory with an allowed extension (e.g., ['png']).
+    
+    - Files in the top-level: keep only ones that match allowed extensions.
+    - Any file in subdirectories: delete.
+    - All subdirectories: delete.
+    """
+    dir = Path(dir)
+    keep_extensions = [ext.lower().lstrip('.') for ext in (keep_extensions or [])]
+    if not dir.exists():
+        return
+    for item in dir.iterdir():
+        if item.is_dir():
+            shutil.rmtree(item)
+            continue
+        if item.is_file():
+            if item.suffix.lower().lstrip('.') not in keep_extensions:
+                item.unlink()
 
 def check_cadastral_data(cadastral_reference: str, province: str, municipality: str, polygon: str, parcel_id: str):
     """
