@@ -4,6 +4,7 @@ import json
 import os
 import pandas as pd
 import structlog
+import time
 
 from datetime import datetime, timedelta
 from PIL import Image
@@ -19,11 +20,12 @@ from ...services.sigpac_tools_v2.find import find_from_cadastral_registry
 from ...utils.chat_utils import generate_image_context_data
 from ...utils.parcel_finder_utils import reset_dir
 
-
 from .constants import BM_JSON_DIR, BM_LLM_DIR, BM_SR_IMAGES_DIR, CADASTRAL_REF_LIST_PAPER, DATES_PAPER, FULL_DESC_SYS_INSTR_EN, FULL_DESC_SYS_INSTR_ES, USE_PAPER_DATA, LANG, OG_CLASSIFICATION_FILEPATH
 from ...services.ecoscheme_payments.main import calculate_ecoscheme_payment
 from .llm_setup import generate_system_instructions
 from .utils import n_random_dates_between
+
+SLEEP_SECONDS = 60
 
 logger = structlog.get_logger()
 
@@ -127,7 +129,7 @@ def get_llm_full_desc(image_filepath: str, parcel_desc: str, lang: str=LANG, cla
             ),
         contents=[image, prompt]
     )
-    logger.debug(f"AgrIA's response:\n---BEGIN\n{llm_response.text}\n---END")
+    logger.debug(f"AgrIA's response:\n---BEGIN\n{llm_response.text[:300]}\n...\n...{llm_response.text[300:]}\n---END")
 
     return llm_response, json_data
 
@@ -192,29 +194,33 @@ def run_vlm_benchmark(use_vlm_only: bool=False, lang: str=LANG, use_paper_data: 
         for cadastral_ref in cadastral_ref_list:
             if len(cadastral_ref) != 20:
                 continue
+            logger.debug(f"Waiting {SLEEP_SECONDS} seconds until next parcel report generation...")
+            time.sleep(SLEEP_SECONDS) # <--- ADDED DELAY BETWEEN API CALLS
+            print()
+
             init_time = datetime.now()
         
-        # Get parcel input data
+            # Get parcel input data
             image_date = dates[i]
             geometry, parcel_desc = get_parcel_data_and_description(cadastral_ref, image_date, lang)
             image_filepath = get_parcel_image(cadastral_ref, geometry, image_date)
         
-        # Add data to input df
+            # Add data to input df
             new_row = pd.DataFrame([{
-            'cadastral_ref': cadastral_ref,
-            'image_date': image_date,
-            'parcel_desc':  parcel_desc ,  # Assuming 'en' for English description
-            'sr_image_filepath': image_filepath
-        }])
+                'cadastral_ref': cadastral_ref,
+                'image_date': image_date,
+                'parcel_desc':  parcel_desc ,  # Assuming 'en' for English description
+                'sr_image_filepath': image_filepath
+            }])
 
             input_df = pd.concat([input_df, new_row], ignore_index=True)
             logger.debug(f"Input DataFrame updated ({len(input_df)} entries)")
         
             reset_dir(TEMP_DIR)
         
-        # Run LLM and get response
+            # Run LLM and get response
             raw_text, json_data = get_llm_full_desc(image_filepath, parcel_desc, lang)
-        # Save full desc to file
+            # Save full desc to file
             full_desc_filepath = BM_LLM_DIR / f"{cadastral_ref}_full_desc_{lang}.md"
             if json_data:
                 with open(full_desc_filepath, "w") as f: 
@@ -223,7 +229,7 @@ def run_vlm_benchmark(use_vlm_only: bool=False, lang: str=LANG, use_paper_data: 
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(json_data, f, indent=4)
             exec_time = str(timedelta(seconds=(datetime.now() - init_time).total_seconds()))
-        # Parse LLM reply
+            # Parse LLM reply
             json_df = extract_json_from_reply(raw_text.text.strip(), cadastral_ref) if not json_data else json_data
             if json_data:
                 es_list = sorted({
@@ -247,16 +253,16 @@ def run_vlm_benchmark(use_vlm_only: bool=False, lang: str=LANG, use_paper_data: 
         
             predicted_plur_aid = predicted_plur_aid[0]
 
-        # es_list = str(es_list).replace("'", "").replace('"', "").replace("[", "").replace("]", "") if IS_PAPER_DATA else es_list
+            # es_list = str(es_list).replace("'", "").replace('"', "").replace("[", "").replace("]", "") if IS_PAPER_DATA else es_list
             out_row = pd.DataFrame([{
-            'cadastral_ref': cadastral_ref,
-            'parcel_area': parcel_area,
-            'land_uses_amount': len(parcel_desc.split("Land")) - 1,
-            'predicted_ecoschemes': es_list,
-            'predicted_base_aid': predicted_base_aid,
-            'predicted_plur_aid': predicted_plur_aid,
-            'exec_time': exec_time,
-        }])
+                'cadastral_ref': cadastral_ref,
+                'parcel_area': parcel_area,
+                'land_uses_amount': len(parcel_desc.split("Land")) - 1,
+                'predicted_ecoschemes': es_list,
+                'predicted_base_aid': predicted_base_aid,
+                'predicted_plur_aid': predicted_plur_aid,
+                'exec_time': exec_time,
+            }])
         
             out_df = pd.concat([out_df, out_row], ignore_index=True)
             logger.debug(f"Output DataFrame updated ({len(out_df)} entries)")
@@ -270,10 +276,10 @@ def run_vlm_benchmark(use_vlm_only: bool=False, lang: str=LANG, use_paper_data: 
     finally:
         total_time_formatted = str(timedelta(seconds=total_time))
         logger.debug(f"BENCHMARK EXEC. TIME {total_time_formatted}")
-        input_df = input_df.fillna(0)
-        out_df = out_df.fillna(0)
-
-    # Save dataframes
+        input_df = input_df.fillna(0).infer_objects(copy=False) 
+        out_df = out_df.fillna(0).infer_objects(copy=False)
+        
+        # Save dataframes
         lang = lang.upper()
         prefix = "PAPER_" if use_paper_data else ""
         prefix += f"VLM_{lang}_" if use_vlm_only else f"ALG_{lang}_"
@@ -311,4 +317,8 @@ def demo():
         with open(times_filepath, 'w') as f:
             json.dump(dict(times), f, indent=4)
 
-demo()
+# demo()
+# run_vlm_benchmark()
+# run_vlm_benchmark(use_vlm_only=False, lang="es")
+# run_vlm_benchmark(True, "en")
+run_vlm_benchmark(True, "es")
