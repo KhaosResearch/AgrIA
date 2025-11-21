@@ -35,6 +35,7 @@ export class ParcelFinderComponent {
 
   protected handleParcelFound(parcel: IFindParcelresponse) {
     this.selectedParcelInfo = parcel;
+    this.selectedParcelInfo.hasBeenDescribed = true
     this.isLoading.set(false);
   }
 
@@ -62,6 +63,7 @@ export class ParcelFinderComponent {
         this.isLoading.set(false);
         // Get parcel info
         this.selectedParcelInfo = response;
+        this.selectedParcelInfo.hasBeenDescribed = true
         this.parcelFinderService.setParcelInfo(this.selectedParcelInfo);
         console.log("Parcel finder response:", response)
       },

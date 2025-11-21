@@ -64,19 +64,18 @@ export class ChatComponent {
         if (parcel) {
           if (!parcel.hasBeenDescribed) {
             this.notificationService.showNotification("chat.load-parcel-finder-data-info", "", "info");
-          }
-          // Delay template updates to avoid ExpressionChangedAfterItHasBeenCheckedError
-          setTimeout(() => {
-            this.imagePreviewUrl = parcel.imagePath;
+            // Delay template updates to avoid ExpressionChangedAfterItHasBeenCheckedError
+            setTimeout(() => {
+              this.imagePreviewUrl = parcel.imagePath;
 
-            this.loadParcelDescription();
-    
-            if (!parcel.hasBeenDescribed) {
+              this.loadParcelDescription();
+      
               this.sendParcelInfoToChat(parcel);
-            }
-          }, 500);
+            }, 500);
+          }
         }
-      });
+      }
+    );
   }
 
   private loadParcelDescription() {
