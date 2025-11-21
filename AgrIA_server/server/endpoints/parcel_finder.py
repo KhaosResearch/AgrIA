@@ -45,7 +45,7 @@ def find_parcel():
     Returns:
         response: A JSON response with the parcel data or an error message and appropriate HTTP status code.
     """
-    reset_dir(TEMP_DIR)
+    reset_dir(TEMP_DIR, [".png"])
     init = datetime.now()
     try:
         cadastral_reference = request.form.get('cadastralReference')

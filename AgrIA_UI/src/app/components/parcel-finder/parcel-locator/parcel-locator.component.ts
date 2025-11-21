@@ -101,6 +101,66 @@ export class ParcelLocatorComponent {
   }
 
   /**
+   * Prevents user from typing anything other than integers
+   * 
+   * @param event 
+   * @returns 
+   */
+  public restrictKeys(event: KeyboardEvent) {
+    const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight'];
+
+    // Always allow navigation and deletion
+    if (allowedKeys.includes(event.key)) return;
+
+    // Allow digits 0–9
+    if (/^[0-9]$/.test(event.key)) return;
+
+    // Block everything else (e, -, ., +, letters…)
+    event.preventDefault();
+  }
+
+  /**
+   * Limits input digits length for input field
+   * 
+   * @param event 
+   * @param length 
+   * @param elementId 
+   */
+  public limitLength(event: any, length: number) {
+    let value = event.target.value;
+    if (value.length > length) {
+      value = value.slice(0, length);
+    // Update values
+    event.target.value = value;
+    if(length === 3){
+        this.polygon = value
+      } else {
+        this.parcelId = value
+      }
+    }
+  }
+  
+  /**
+   * Padds the input with 0s when input value length is not full
+   * 
+   * @param event 
+   * @param length 
+   */
+  public formatInput(event: any, length: number) {
+    let value = event.target.value;
+    if (value.length < length && value !== "") {
+      value = value.padStart(length, "0");
+    }
+    // Update values
+    event.target.value = value;
+    if(length === 3){
+      this.polygon = value
+    } else {
+      this.parcelId = value
+    }
+  }
+
+  /**
    * Validates input before sending a request.
    */
   private validateInput() {
@@ -155,8 +215,8 @@ export class ParcelLocatorComponent {
         const formData = new FormData();
         formData.append('province', this.province!!);
         formData.append('municipality', this.municipality!!);
-        formData.append('polygon', String(this.polygon));
-        formData.append('parcelId', String(this.parcelId));
+        formData.append('polygon', String(this.polygon!!));
+        formData.append('parcelId', String(this.parcelId!!));
         formData.append('selectedDate', this.selectedDate);
         formData.append('isFromCadastralReference', "True");
         

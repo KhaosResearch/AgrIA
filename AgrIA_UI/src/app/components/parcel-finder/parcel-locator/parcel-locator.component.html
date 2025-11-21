@@ -46,7 +46,9 @@
                     type="number"
                     placeholder="{{ 'parcel-locator.polygon.placeholder' | translate }}"
                     [(ngModel)]="polygon"
-                    maxlength=3
+                    (keydown)="restrictKeys($event)"
+                    (input)="limitLength($event, 3)"
+                    (blur)="formatInput($event, 3)"
                     />
                 </label>
             </div>
@@ -58,7 +60,9 @@
                     placeholder="{{ 'parcel-locator.parcel-id.placeholder' | translate }}"
                     class="form-input"
                     [(ngModel)]="parcelId"
-                    maxlength=5
+                    (keydown)="restrictKeys($event)"
+                    (input)="limitLength($event, 5)"
+                    (blur)="formatInput($event, 5)"
                     />
                 </label>
             </div>
