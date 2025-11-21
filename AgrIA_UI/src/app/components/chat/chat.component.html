@@ -42,7 +42,7 @@
             <textarea 
                 id="user-input" 
                 (keydown.enter)="sendUserInput()"
-                (keyup.enter)="clearUserInput()"
+                (keyup.enter)="this.userInput = this.userInput.trim()"
                 placeholder="{{ 'chat.chatInput.placeholder' | translate }}" 
                 [(ngModel)]="userInput"
             >
