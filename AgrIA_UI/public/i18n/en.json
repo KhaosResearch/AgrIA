@@ -158,7 +158,7 @@
       "clear-button": "Reset map and coordinates"
     },
     "sigpacForm": {
-      "title": "SIGPAC Classification",
+      "title": "Land Use Classification",
       "description": {
         "bold1": "Use the following form to indicate all of your states's crop types. ",
         "normal1": "These follow SIGPAC classification. Pertinent information should be available at SIGPAC's website or property-related documents.",

@@ -158,7 +158,7 @@
       "clear-button": "Reiniciar mapa y coordenadas"
     },
     "sigpacForm": {
-      "title": "Clasificación SIGPAC ",
+      "title": "Clasificación de Usos de Terreno ",
       "description": {
         "bold1": "Use el siguiente formulario para indicar todos los tipos de cultivo en su finca. ",
         "normal1": "Estos tipos siguen la clasificación SIGPAC. La información al resepcto debería estar disponible en la web de SIGPAC o en documentos relacionados con la propiedad.",
