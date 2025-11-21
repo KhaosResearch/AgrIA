@@ -22,6 +22,8 @@ export class ChatAssistantComponent {
   ];
   // Index of the first message after chat sanitizaion
   private firstIndex: number = 8;
+  // Miliscendos delay to display Chat Assistant's replies
+  private milisecondsDisplay: number = 3;
   // HTML element to automatically scroll to the bototm
   @ViewChild('scrollableContainer') scrollableContainer!: ElementRef;
   // Service to handle chat messages
@@ -220,7 +222,7 @@ export class ChatAssistantComponent {
         clearInterval(interval);
         msg.revealProgress = undefined; // done animating
       }
-    }, 5); // Adjust typing speed (ms per character)
+    }, this.milisecondsDisplay); // Adjust typing speed (ms per character)
   }
 
   private sanitizeMarkdown(md: string): string {
