@@ -150,8 +150,8 @@ def download_sen2sr_parcel_image(geometry, date):
         sigpac_image_name = os.path.basename(get_sr_image(lat, lon, bands, start_date, end_date, sr_size))
 
         return sigpac_image_name
-    except Exception as e:
-        logger.exception()
+    except Exception:
+        logger.exception(f"Error while getting the SEN2SR image: ")
         raise
 
 def download_parcel_image(cadastral_reference, geojson_data, list_zones_utm, year, month, bands):
