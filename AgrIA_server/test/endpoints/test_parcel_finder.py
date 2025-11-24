@@ -2,7 +2,7 @@ import os
 import pytest
 
 from flask import make_response
-from unittest.mock import mock_open
+from unittest.mock import MagicMock, mock_open
 
 from server.endpoints import parcel_finder 
 
@@ -19,19 +19,16 @@ MOCK_FILE_CONTENT = "Mock file content stream"
 def find_parcel_mocks(monkeypatch):
     """Mocks common dependencies for all /find-parcel tests."""
     
-
     # Mock external utility calls
-    monkeypatch.setattr(parcel_finder, "reset_dir", lambda x: None)
-    
+    mock_reset_dir = MagicMock(return_value=None)
+    monkeypatch.setattr(parcel_finder, "reset_dir", mock_reset_dir)
+
     # Mock check_cadastral_data to return a valid reference by default
-    def mock_check_cadastral_data(*args, **kwargs):
-        # This can be made more complex if needed, but for now, returns the valid mock ref
-        return MOCK_CADASTRAL_VALUE
+    mock_check_cadastral_data = MagicMock(return_value=MOCK_CADASTRAL_VALUE)
     monkeypatch.setattr(parcel_finder, "check_cadastral_data", mock_check_cadastral_data)
 
     # Mock get_parcel_image to return the three expected values
-    def mock_get_parcel_image(*args, **kwargs):
-        return MOCK_GEOMETRY, MOCK_METADATA, MOCK_URL
+    mock_get_parcel_image = MagicMock(return_value=(MOCK_GEOMETRY, MOCK_METADATA, MOCK_URL))
     monkeypatch.setattr(parcel_finder, "get_parcel_image", mock_get_parcel_image)
     
     # Yield the expected success response structure for assertions
@@ -41,7 +38,6 @@ def find_parcel_mocks(monkeypatch):
         "imagePath": MOCK_URL,
         "metadata": MOCK_METADATA,
     }
-
 
 def mock_send_from_directory_success(*args, **kwargs):
     return MOCK_FILE_CONTENT

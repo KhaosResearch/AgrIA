@@ -1,8 +1,12 @@
+import json
+import os
+import structlog
+
 from ..config.constants import BASE_CONTEXT_PATH, BASE_PROMPTS_PATH, CONTEXT_DOCUMENTS_FILE, FULL_DESC_TRIGGER, MIME_TYPES, PROMPT_LIST_FILE, SHORT_DESC_TRIGGER
 from ..services.llm_services import upload_context_document
 from google.genai.types import Content, Part
-import json
-import os
+
+logger = structlog.get_logger()
 
 def generate_system_instructions(prompt_json_path: str=PROMPT_LIST_FILE):
     """
@@ -144,10 +148,10 @@ def set_initial_history(documents_json_path: str=CONTEXT_DOCUMENTS_FILE):
     try:
         doc_paths_list = load_documents_from_json(documents_json_path)
     except FileNotFoundError:
-        print(f"Error: Document JSON file not found at {documents_json_path}")
+        logger.exception(f"Error: Document JSON file not found at {documents_json_path}")
         doc_paths_list = []
     except Exception as e:
-        print(f"Error loading documents from JSON: {e}")
+        logger.exception(f"Error loading documents from JSON: {e}")
         doc_paths_list = []
 
     if doc_paths_list:
@@ -158,13 +162,13 @@ def set_initial_history(documents_json_path: str=CONTEXT_DOCUMENTS_FILE):
 
         llm_answer = "Apologies, it appears there has been an error during the document upload process and I have not got access to the files. I will do my best to answer any queries though."
         if upload_success > 0:
-            print(f"Successfully uploaded and prepared {upload_success} files.")
+            logger.info(f"Successfully uploaded and prepared {upload_success} files.")
             # Append all document parts as a single 'user' turn
             initial_history.append(Content(role='user', parts=document_parts))
             # Model's optional "OK" response to the context
             llm_answer = "Okay, I have received the context documents, format examples and clasification file and I will use them for our conversation."
         else:
-            print("No documents were successfully uploaded to include in the initial history.")
+            logger.warning("No documents were successfully uploaded to include in the initial history.")
 
         initial_history.append(Content(role='model', parts=[Part(text=llm_answer)]))
 
@@ -182,7 +186,7 @@ def set_initial_history(documents_json_path: str=CONTEXT_DOCUMENTS_FILE):
     initial_history.append(Content(role='user', parts=[Part(text=user_input_intro)]))
     initial_history.append(Content(role='model', parts=[Part(text=model_output_intro)]))
 
-    print(f"Initial history prepared with {len(initial_history)} turns.")
+    logger.debug(f"Initial history prepared with {len(initial_history)} turns.")
     return initial_history
 
 def upload_context_files(document_parts, doc_paths_list, prompt):
@@ -202,10 +206,10 @@ def upload_context_files(document_parts, doc_paths_list, prompt):
                 # Append a descriptive text part and the JSON content itself as text
                 document_parts.append(Part(text=f"Example JSON User Input ({os.path.basename(doc_path)}):\n{json_content}"))
                 upload_success += 1
-                print(f"Successfully included JSON content as text: {os.path.basename(doc_path)}")
+                logger.info(f"Successfully included JSON content as text: {os.path.basename(doc_path)}")
 
             except Exception as e:
-                print(f"Error reading JSON file {doc_path}: {e}")
+                logger.exception(f"Error reading JSON file {doc_path}: ")
             # --- End JSON handling ---
 
         else:
@@ -214,13 +218,13 @@ def upload_context_files(document_parts, doc_paths_list, prompt):
             try:
                 uploaded_doc = upload_context_document(doc_path)
                 if uploaded_doc and uploaded_doc.uri:
-                    print(f"Successfully uploaded document. {os.path.basename(doc_path)} URI: {uploaded_doc.uri}")
+                    logger.info(f"Successfully uploaded document. {os.path.basename(doc_path)} URI: {uploaded_doc.uri}")
                     document_parts.append(Part(text=f"Document: {os.path.basename(doc_path)}"))
                     document_parts.append(Part.from_uri(file_uri=uploaded_doc.uri, mime_type=mime_type))
                     upload_success += 1
                 else:
-                    print(f"Warning: Failed to get URI for uploaded document: {doc_path}")
+                    logger.warning(f"Warning: Failed to get URI for uploaded document: {doc_path}")
             except Exception as e:
-                print(f"Error uploading document {doc_path}: {e}")
+                logger.exception(f"Error uploading document {doc_path}: ")
 
     return upload_success

@@ -64,19 +64,18 @@ export class ChatComponent {
         if (parcel) {
           if (!parcel.hasBeenDescribed) {
             this.notificationService.showNotification("chat.load-parcel-finder-data-info", "", "info");
-          }
-          // Delay template updates to avoid ExpressionChangedAfterItHasBeenCheckedError
-          setTimeout(() => {
-            this.imagePreviewUrl = parcel.imagePath;
+            // Delay template updates to avoid ExpressionChangedAfterItHasBeenCheckedError
+            setTimeout(() => {
+              this.imagePreviewUrl = parcel.imagePath;
 
-            this.loadParcelDescription();
-    
-            if (!parcel.hasBeenDescribed) {
+              this.loadParcelDescription();
+      
               this.sendParcelInfoToChat(parcel);
-            }
-          }, 500);
+            }, 500);
+          }
         }
-      });
+      }
+    );
   }
 
   private loadParcelDescription() {
@@ -158,10 +157,33 @@ export class ChatComponent {
   }
 
   /**
+   * Check if the Chat Assistatn is still loading its reply
+   * @returns boolean
+   */
+  private isAssistantLoading(): boolean {
+      const history = this.chatAssistant?.chatHistory;
+      
+      // Safely check if history exists, has entries, and the last one has 'loading: true'
+      if (history && history.length > 0) {
+          const lastMessage = history[history.length - 1];
+          
+          // Use the optional chaining operator (?) for safety
+          // The !! converts the result to a boolean (true/false)
+          return !!lastMessage?.loading; 
+      }
+      return false;
+  }
+
+
+  /**
    * Collect and send user input to LLM's chat in backend.
    * 
    */
   public sendUserInput(): void {
+    if (this.isAssistantLoading()) {
+        console.warn("Cannot send message: Assistant is loading a response.");
+        return; 
+    }
     if (this.userInput.trim()) {
       this.chatAssistant.addUserMessage(this.userInput);
       this.clearUserInput();

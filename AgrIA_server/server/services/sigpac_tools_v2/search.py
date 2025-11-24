@@ -1,9 +1,7 @@
-import requests
 import structlog
 
-from ...utils.parcel_finder_utils import build_cadastral_reference
 from ._globals import BASE_URL, QUERY_URL
-from .utils import find_community, get_parcel_metadata_and_geometry, read_cadastral_registry
+from .utils import find_community, get_parcel_metadata_and_geometry
 
 logger = structlog.get_logger()
 
