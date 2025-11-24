@@ -7,6 +7,7 @@
   --bg-color: #f0f2f5; /* Light grey background */
   --card-bg-color: #ffffff; /* White for cards */
   --border-color: #ddd; /* Light grey border */
+  --darker-border-color: #999; /* Light grey border */
   --text-color-dark: #333;
   --text-color-light: #666;
   --header-bg: #e0e0e0; /* Light grey for headers */
@@ -57,13 +58,12 @@ body, html {
   grid-template-columns: 1fr 2fr; /* Image takes 1 part, chat takes 2 parts */
   gap: var(--padding-unit);
   padding: var(--padding-unit); /* Padding inside the content box */
-  border-bottom: 1px solid var(--border-color); /* Separator */
 }
 
 /* Image Upload Section */
 #image {
   background-color: var(--card-bg-color);
-  border: 1px solid var(--border-color);
+  /* border: 0px solid var(--border-color); */
   border-radius: var(--border-radius);
   overflow: hidden; /* For image preview border-radius */
   display: flex;
@@ -71,14 +71,14 @@ body, html {
 }
 
 .image-header, .chat-header {
-  background-color: var(--header-bg);
+  /* background-color: var(--header-bg); */
   padding: 0.75rem var(--padding-unit);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 2px solid var(--darker-border-color);
   text-align: center;
 }
 
 .image-header h2, .chat-header h2 {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: var(--text-color-dark);
 }
 
@@ -86,7 +86,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--input-bg);
+  /* background-color: var(--input-bg); */
   min-height: 250px; /* Adjust as needed */
   flex-grow: 1; /* Allows it to take available space */
   padding: 1rem;
@@ -109,8 +109,8 @@ body, html {
 
 .image-desc {
   padding: 0.75rem var(--padding-unit);
-  border-top: 1px solid var(--border-color);
-  background-color: var(--header-bg); /* Match header background */
+  border-top: 1.5px solid var(--border-color);
+  /* background-color: var(--header-bg); */
   font-size: 0.9rem;
   color: var(--text-color-light);
   max-height: 150px;
@@ -127,7 +127,7 @@ body, html {
 #chat-box {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border-color);
+  /* border: 0px solid var(--border-color); */
   border-radius: var(--border-radius);
   overflow: hidden; /* For chat content scroll */
 }
@@ -153,7 +153,7 @@ app-chat-assistant {
   align-items: flex-end; /* Align items to the bottom of the input row */
   gap: 10px;
   padding: var(--padding-unit);
-  border-top: 1px solid var(--border-color); /* Separator from chat content */
+  border-top: 1.5px solid var(--border-color); /* Separator from chat content */
   background-color: var(--card-bg-color); /* Same as content background */
 }
 

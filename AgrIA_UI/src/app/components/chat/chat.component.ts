@@ -64,15 +64,15 @@ export class ChatComponent {
         if (parcel) {
           if (!parcel.hasBeenDescribed) {
             this.notificationService.showNotification("chat.load-parcel-finder-data-info", "", "info");
+          }
             // Delay template updates to avoid ExpressionChangedAfterItHasBeenCheckedError
             setTimeout(() => {
               this.imagePreviewUrl = parcel.imagePath;
-
               this.loadParcelDescription();
-      
-              this.sendParcelInfoToChat(parcel);
+              if (!parcel.hasBeenDescribed) {
+                this.sendParcelInfoToChat(parcel);
+              }
             }, 500);
-          }
         }
       }
     );
