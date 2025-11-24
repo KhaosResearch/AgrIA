@@ -34,7 +34,19 @@
                     {{ 'nav.chat' | translate }}
                 </a>
             </li>
-
+            <li class="nav-item">
+                <button
+                    class="btn theme"
+                    (click)="toggleTheme()"
+                    title="{{ isDarkMode() ? ('nav.theme.light' | translate) : ('nav.theme.dark' | translate) }}"
+                >
+                    @if (this.isDarkMode()) {
+                        <span>☀️</span> 
+                    } @else{ 
+                        <span>🌙</span>
+                    }
+                </button>
+            </li>
             <li class="nav-item">
                 <button
                     class="btn es"

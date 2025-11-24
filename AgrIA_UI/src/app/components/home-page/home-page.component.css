@@ -3,16 +3,19 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+
 }
 
 body, html {
     height: 100%;
     font-family: 'Roboto', sans-serif; /* Or your preferred font */
-    background-color: var(--color-surface-background);
     color: var(--color-text-primary);
     line-height: 1.6;
     scroll-behavior: smooth; /* Smooth scrolling for anchor links */
     margin-top: 2rem;
+}
+.homepage {
+    background-color: var(--color-surface-background);
 }
 
 /* General Layout */
@@ -751,12 +754,12 @@ body, html {
 }
 
 .input-button.get-suggestion {
-    background-color: var(--color-brand-warning);
+    background-color: var(--color-action-warning);
     color: var(--color-text-primary);
 }
 
 .input-button.get-suggestion:hover {
-    background-color: color-mix(in srgb, var(--color-brand-warning) 90%, black);
+    background-color: color-mix(in srgb, var(--color-action-warning) 90%, black);
 }
 
 .detailed-description-checkbox {

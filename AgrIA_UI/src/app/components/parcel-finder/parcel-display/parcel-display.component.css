@@ -42,7 +42,6 @@
   justify-content: center;
   align-items: center;
   min-height: 300px; /* Minimum height for the image display area */
-  background-color: var(--color-surface-input);
   padding: var(--spacing-large); /* Padding inside the display box */
   flex-grow: 1;
 }

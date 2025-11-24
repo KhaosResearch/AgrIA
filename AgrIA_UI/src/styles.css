@@ -20,6 +20,7 @@
     --color-text-primary: #333;          /* Main Text Color (Dark) */
     --color-text-secondary: #666;        /* Muted/Low-Contrast Text */
     --color-text-inverted: #fff;         /* Text on Primary/Dark BG */
+    --color-text-inverted-light:#121212; /* Text Dark2Light */
 
     /* --- 3. Borders & Shadows --- */
     --color-border-light: #ddd;          /* Subtle borders */
@@ -39,12 +40,44 @@
 
     /* --- 5. Navbar Specific (Defaulting to Dark Header for Light Theme) --- */
     --color-surface-navbar: #333;
-    --color-text-navbar: #f4f4f4;
+    --color-text-navbar: #f5f5f5 ;
     --color-surface-navbar-hover: #555;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body.dark-theme {
+    /* --- 1. Surfaces (Light colors become dark) --- */
+    --color-surface-background: #1f1f1f; /* Main Body BG: Very dark, pure black */
+    --color-surface-card: #292929;       /* Elevated Card BG: Slightly lighter dark */
+    --color-surface-header: #2c2c2c;     /* Section Header BG: Medium dark */
+    --color-surface-input: #333333;      /* Input Field BG: Lightest dark surface */
+    --color-surface-unfilled: #2c2c2c;   /* Unfilled Progress Bar */
+
+    /* --- 2. Text (Dark colors become light) --- */
+    --color-text-primary: #f5f5f5;      /* Main Text Color (Light) */
+    --color-text-secondary: #b0b0b0;    /* Muted/Low-Contrast Text */
+    --color-text-inverted: #121212;     /* Text on Primary/Action BG */
+    --color-text-inverted-light: #fff;  /* Text Light2Dark */
+
+    /* --- 3. Borders & Shadows --- */
+    --color-border-light: #383838;
+    --color-border-dark: #444444;
+    --shadow-subtle: 0 2px 5px rgba(0, 0, 0, 0.4);
+    --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.5); /* Stronger shadow in dark mode */
+
+    /* --- 4. Navbar Specific (Matching the card surface) --- */
+    --color-surface-navbar: #333;
+    --color-text-navbar: #f5f5f5;
+    --color-surface-navbar-hover: #333333;
+}
+
+html, body { 
+    background-color: var(--color-surface-background);
+    height: 100%;
+}
+body { 
+    background-color: var(--color-surface-background);
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 /* Success Snackbar */
 .success-snackbar {

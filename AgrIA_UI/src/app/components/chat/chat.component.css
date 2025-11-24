@@ -230,12 +230,12 @@ app-chat-assistant {
 }
 
 .input-button:nth-of-type(2) { /* 'Get suggestion' button */
-  background-color: var(--color-brand-warning); /* Amber */
+  background-color: var(--color-action-warning); /* Amber */
   color: var(--color-text-primary);
 }
 
 .input-button:nth-of-type(2):hover {
-  background-color: color-mix(in srgb, var(--color-brand-warning) 90%, black);
+  background-color: color-mix(in srgb, var(--color-action-warning) 90%, black);
 }
 
 

@@ -39,6 +39,7 @@
   /* Assistant message aligned left */
   .message.model {
     justify-content: flex-start;
+    color: var(--color-text-inverted-light);
     .bubble {
       border-left: 3px solid rgb(139, 88, 88);
       border-radius: 5px;
