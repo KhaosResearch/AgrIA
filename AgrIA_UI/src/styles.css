@@ -1,9 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 :root {
-    --success-color: #4CAF50; /* Green for success */
-    --info-color: #22a7ff; /* Blue, similar to the logo */
-    --error-color: #dc3545; /* Red for errors */
-    --warning-color: #FFC107; /* Amber for warnings */
+    --color-status-success: #4CAF50; /* Green for success */
+    --color-status-info: #22a7ff; /* Blue, similar to the logo */
+    --color-status-error: #dc3545; /* Red for errors */
+    --color-status-warning: #FFC107; /* Amber for warnings */
 }
 
 html, body { height: 100%; }
@@ -12,7 +12,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 /* Success Snackbar */
 .success-snackbar {
     border-radius: 5pt;
-    background-color: var(--success-color) !important; /* Green */
+    background-color: var(--color-status-success) !important; /* Green */
     color: white !important;
     font-weight: bold;
 }
@@ -20,14 +20,14 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 /* Error Snackbar */
 .error-snackbar {
     border-radius: 5pt;
-    background-color: var(--error-color)!important; /* Red */
+    background-color: var(--color-status-error)!important; /* Red */
     color: white !important;
 }
 
 /* Info Snackbar */
 .info-snackbar {
     border-radius: 5pt;
-    background-color: var(--info-color)!important; /* Blue */
+    background-color: var(--color-status-info)!important; /* Blue */
     color: white !important;
     max-width: 450px;
 }
@@ -35,6 +35,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 /* Warning Snackbar */
 .warning-snackbar {
     border-radius: 5pt;
-    background-color: var(--warning-color) !important; /* Amber/Yellow */
+    background-color: var(--color-status-warning) !important; /* Amber/Yellow */
     color: #333 !important; /* Dark text for contrast */
 }

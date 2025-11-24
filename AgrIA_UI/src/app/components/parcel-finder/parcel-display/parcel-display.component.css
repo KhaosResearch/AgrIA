@@ -1,21 +1,21 @@
 /* Variables for easy theme customization (consistent with previous component) */
 :host {
-  --primary-color: #4CAF50; /* Green */
-  --secondary-color: #607D8B; /* Greyish blue */
-  --tertiary-color: #FFC107; /* Amber for suggestions (not used directly here, but for consistency) */
-  --red-button-color: #dc3545; /* Red for Clear Form */
-  --blue-button-color: #22a7ff; /* Blue to Send Form */
-  --bg-color: #f0f2f5; /* Light grey background */
-  --card-bg-color: #ffffff; /* White for cards */
-  --border-color: #ddd; /* Light grey border */
-  --text-color-dark: #333;
-  --text-color-light: #666;
-  --header-bg: #e0e0e0; /* Light grey for headers */
-  --input-bg: #f9f9f9; /* Slightly off-white for input */
-  --shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  --border-radius: 8px;
-  --padding-unit: 1.5rem;
-  --max-width: 1000px; /* Consistent max width for content */
+  --color-action-success: #4CAF50; /* Green */
+  --color-brand-secondary: #607D8B; /* Greyish blue */
+  --color-brand-warning: #FFC107; /* Amber for suggestions (not used directly here, but for consistency) */
+  --color-action-error: #dc3545; /* Red for Clear Form */
+  --color-brand-primary: #22a7ff; /* Blue to Send Form */
+  --color-surface-background: #f0f2f5; /* Light grey background */
+  --color-surface-card: #ffffff; /* White for cards */
+  --color-border-light: #ddd; /* Light grey border */
+  --color-text-primary: #333;
+  --color-text-secondary: #666;
+  --color-surface-header: #e0e0e0; /* Light grey for headers */
+  --color-surface-input: #f9f9f9; /* Slightly off-white for input */
+  --shadow-subtle: 0 2px 5px rgba(0, 0, 0, 0.1);
+  --radius-default: 10px;
+  --spacing-large: 1.5rem;
+  --layout-max-width: 1000px; /* Consistent max width for content */
 }
 
 /* Basic Reset */
@@ -29,24 +29,24 @@
 .content {
   display: flex;
   flex-direction: column;
-  background-color: var(--card-bg-color);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
+  background-color: var(--color-surface-card);
+  border-radius: var(--radius-default);
+  box-shadow: var(--shadow-subtle);
   width: 100%;
-  max-width: var(--max-width); /* Adjust max width for this layout */
+  max-width: var(--layout-max-width); /* Adjust max width for this layout */
   overflow: hidden;
-  margin-bottom: var(--padding-unit); /* Space at the bottom */
+  margin-bottom: var(--spacing-large); /* Space at the bottom */
 }
 
 /* Form Section (Cadastral Data) */
 .display-title {
-  background-color: var(--header-bg);
-  padding: 0.75rem var(--padding-unit);
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--color-surface-header);
+  padding: 0.75rem var(--spacing-large);
+  border-bottom: 1px solid var(--color-border-light);
   text-align: center;
   h2 {
     font-size: 1.2rem;
-    color: var(--text-color-dark);
+    color: var(--color-text-primary);
   }
 }
 
@@ -54,7 +54,7 @@
 .parcel-finder-display {
   display: flex;
   flex-direction: column;
-  padding-bottom: var(--padding-unit); /* Padding below the image and buttons */
+  padding-bottom: var(--spacing-large); /* Padding below the image and buttons */
 }
 
 .display-box {
@@ -62,8 +62,8 @@
   justify-content: center;
   align-items: center;
   min-height: 300px; /* Minimum height for the image display area */
-  background-color: var(--input-bg);
-  padding: var(--padding-unit); /* Padding inside the display box */
+  background-color: var(--color-surface-input);
+  padding: var(--spacing-large); /* Padding inside the display box */
   flex-grow: 1;
 }
 
@@ -72,7 +72,7 @@
   min-height: 300px;
   min-width: 120px;
   object-fit: contain;
-  border-radius: var(--border-radius);
+  border-radius: var(--radius-default);
 }
 
 /* Placeholder icon for no image (reusing from chat component) */
@@ -86,8 +86,8 @@
   display: flex;
   justify-content: center; /* Center the new wrapper horizontally */
   align-items: flex-start; /* Align to the start of the cross-axis */
-  margin-top: var(--padding-unit); /* Space between image and actions */
-  padding: 0 var(--padding-unit); /* Horizontal padding */
+  margin-top: var(--spacing-large); /* Space between image and actions */
+  padding: 0 var(--spacing-large); /* Horizontal padding */
 }
 
 .parcel-actions-wrapper {
@@ -102,20 +102,20 @@
 /* "Confirm Parcel" button styling (adjustments) */
 .confirm-parcel-button {
   padding: 0.8rem 2rem;
-  background-color: var(--blue-button-color);
+  background-color: var(--color-brand-primary);
   color: white;
   border: none;
-  border-radius: var(--border-radius);
+  border-radius: var(--radius-default);
   cursor: pointer;
   font-size: 1.1rem;
   font-weight: 600;
   transition: background-color 0.3s ease, transform 0.1s ease;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-subtle);
   width: 100%; /* Make it take full width of its parent wrapper */
 }
 
 .confirm-parcel-button:hover {
-  background-color: color-mix(in srgb, var(--blue-button-color) 90%, black);
+  background-color: color-mix(in srgb, var(--color-brand-primary) 90%, black);
 }
 
 .confirm-parcel-button:active {
@@ -127,7 +127,7 @@
   align-items: center; /* Vertically align checkbox and text */
   cursor: pointer;
   font-size: 0.95rem; /* Slightly smaller text for checkbox */
-  color: var(--text-color-dark);
+  color: var(--color-text-primary);
   white-space: nowrap; /* Prevent text from wrapping unnecessarily */
   width: fit-content; /* Only take space needed by content, allows centering */
 }
@@ -138,9 +138,9 @@
   -moz-appearance: none;
   width: 20px;
   height: 20px;
-  border: 2px solid var(--primary-color);
+  border: 2px solid var(--color-action-success);
   border-radius: 4px;
-  background-color: var(--input-bg);
+  background-color: var(--color-surface-input);
   margin-right: 8px;
   cursor: pointer;
   position: relative;
@@ -149,8 +149,8 @@
 }
 
 .description-length:checked {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
+  background-color: var(--color-action-success);
+  border-color: var(--color-action-success);
 }
 
 .description-length:checked::before {
@@ -166,7 +166,7 @@
 
 .description-length:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(var(--primary-color), 0.3);
+  box-shadow: 0 0 0 3px rgba(var(--color-action-success), 0.3);
 }
 
 /* ================================== */
@@ -182,7 +182,7 @@
         display: flex;
         flex-direction: column;
         padding: 0.5rem; /* Less padding on small screens */
-        padding-bottom: var(--padding-unit); /* Padding below the image and buttons */
+        padding-bottom: var(--spacing-large); /* Padding below the image and buttons */
     }
 
     .parcel-finder-buttons {
