@@ -7,14 +7,6 @@
   z-index: 1000;
   transition: transform 0.3s ease-in-out;
   will-change: transform;
-  --color-surface-navbar: #333;
-  --color-text-navbar: #f4f4f4;
-  --color-surface-navbar-hover: #555;
-  --color-text-inverted: #fff;
-  --color-brand-primary: #007bff;
-  --color-text-inverted: #fff;
-  --color-brand-secondary: #6c757d;
-  --color-text-inverted: #fff;
   --color-navbar-btn-hover-darken: 10%; /* For hover effects */
 }
 

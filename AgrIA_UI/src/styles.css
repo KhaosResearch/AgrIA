@@ -1,9 +1,46 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================================== */
+/* GLOBAL CSS CUSTOM PROPERTIES (VARIABLES) */
+/* Defined in :root for maximum scope (Light Theme Defaults) */
+/* ============================================================== */
 :root {
-    --color-status-success: #4CAF50; /* Green for success */
-    --color-status-info: #22a7ff; /* Blue, similar to the logo */
-    --color-status-error: #dc3545; /* Red for errors */
-    --color-status-warning: #FFC107; /* Amber for warnings */
+    /* --- 1. Brand & Action Colors --- */
+    --color-brand-primary: #22a7ff;      /* Links, Logo, Info */
+    --color-brand-secondary: #607D8B;    /* Secondary Nav/Buttons */
+    --color-action-success: #4CAF50;     /* Green: Send/Submit/Success/Status */
+    --color-action-warning: #FFC107;     /* Amber: Suggestions/Warnings/Status */
+    --color-action-error: #dc3545;       /* Red: Clear/Errors/Status */
+
+    /* --- 2. Surface & Text Colors --- */
+    --color-surface-background: #f0f2f5; /* Main Body BG */
+    --color-surface-card: #ffffff;       /* Elevated Card BG */
+    --color-surface-header: #e0e0e0;     /* Section Header BG */
+    --color-surface-input: #f9f9f9;      /* Input Field BG */
+    --color-surface-unfilled: #e0e0e0;   /* Unfilled Progress Bar / Same as Header BG */
+    
+    --color-text-primary: #333;          /* Main Text Color (Dark) */
+    --color-text-secondary: #666;        /* Muted/Low-Contrast Text */
+    --color-text-inverted: #fff;         /* Text on Primary/Dark BG */
+
+    /* --- 3. Borders & Shadows --- */
+    --color-border-light: #ddd;          /* Subtle borders */
+    --color-border-dark: #999;           /* Stronger borders/dividers */
+    --shadow-subtle: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    /* --- 4. Structural & Spacing --- */
+    --radius-default: 10px;              /* Standard Corner Radius */
+    --spacing-large: 1.5rem;             /* Standard Padding Unit */
+    --layout-max-width: 1000px;
+    
+    /* Home Page Specific Spacing */
+    --spacing-xl: 2rem;
+    --spacing-mobile: 1.2rem;
+    --spacing-mobile-small: 0.8rem;
+
+    /* --- 5. Navbar Specific (Defaulting to Dark Header for Light Theme) --- */
+    --color-surface-navbar: #333;
+    --color-text-navbar: #f4f4f4;
+    --color-surface-navbar-hover: #555;
 }
 
 html, body { height: 100%; }

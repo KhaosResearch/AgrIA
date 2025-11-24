@@ -1,21 +1,3 @@
-/* Variables for easy theme customization */
-:host {
-  --color-action-success: #4CAF50; /* Green, similar to the image's "Send" button */
-  --color-brand-secondary: #607D8B; /* Greyish blue */
-  --color-brand-warning: #FFC107; /* Amber for suggestions */
-  --color-surface-background: #f0f2f5; /* Light grey background */
-  --color-surface-card: #ffffff; /* White for cards */
-  --color-border-light: #ddd; /* Light grey border */
-  --color-border-dark: #999; /* Light grey border */
-  --color-text-primary: #333;
-  --color-text-secondary: #666;
-  --color-surface-header: #e0e0e0; /* Light grey for headers */
-  --color-surface-input: #f9f9f9; /* Slightly off-white for input */
-  --shadow-subtle: 0 2px 5px rgba(0, 0, 0, 0.1);
-  --radius-default: 10px;
-  --spacing-large: 1.5rem;
-}
-
 /* Basic Reset */
 * {
   box-sizing: border-box;

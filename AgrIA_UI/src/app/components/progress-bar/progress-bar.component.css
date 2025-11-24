@@ -1,9 +1,3 @@
-:host {
-    --color-surface-unfilled:#e0e0e0;
-    --color-action-success: #4CAF50;
-    --color-brand-primary: #22a7ff;
-    --color-action-error: #dc3545;
-}
 .progress-container {
   width: 100%;
   background-color: var(--color-surface-unfilled);
