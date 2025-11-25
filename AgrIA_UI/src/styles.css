@@ -41,7 +41,7 @@
     /* --- 5. Navbar Specific (Defaulting to Dark Header for Light Theme) --- */
     --color-surface-navbar: #333;
     --color-text-navbar: #f5f5f5 ;
-    --color-surface-navbar-hover: #555;
+    --color-surface-navbar-hover: #777;
 }
 
 body.dark-theme {
@@ -67,7 +67,7 @@ body.dark-theme {
     /* --- 4. Navbar Specific (Matching the card surface) --- */
     --color-surface-navbar: #333;
     --color-text-navbar: #f5f5f5;
-    --color-surface-navbar-hover: #333333;
+    /* --color-surface-navbar-hover: #333333; */
 }
 
 html, body { 

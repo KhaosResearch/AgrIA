@@ -41,29 +41,26 @@
                     title="{{ isDarkMode() ? ('nav.theme.light' | translate) : ('nav.theme.dark' | translate) }}"
                 >
                     @if (this.isDarkMode()) {
-                        <span>&#x26AA;</span> 
+                        <span>&#9788;</span> 
                     } @else{ 
-                        <span>&#x26AB;</span>
+                        <span>&#9790;</span>
                     }
                 </button>
             </li>
             <li class="nav-item">
-                <button
-                    class="btn es"
-                    (click)="switchLanguage('es')"
-                    [class.active-language]="currentLanguage === 'es'"
-                    [class.btn-primary]="currentLanguage === 'es'"  >
-                    ES
-                </button>
-            </li>
-            <li class="nav-item">
-                <button
-                    class="btn en"
-                    (click)="switchLanguage('en')"
-                    [class.active-language]="currentLanguage === 'en'"
-                    [class.btn-primary]="currentLanguage === 'en'"  >
-                    EN
-                </button>
+                @if (this.currentLanguage == 'en') {
+                    <button
+                        class="btn es"
+                        (click)="switchLanguage('es')"
+                    >
+                    </button>
+                } @else {
+                    <button
+                        class="btn en"
+                        (click)="switchLanguage('en')"
+                    >
+                    </button>
+                }
             </li>
         </ul>
     </div>

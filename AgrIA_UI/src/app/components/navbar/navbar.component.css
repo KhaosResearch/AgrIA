@@ -175,7 +175,7 @@
   background-color: color-mix(in srgb, var(--color-brand-secondary) var(--color-navbar-btn-hover-darken), black);
 }
 
-/* --- Language Button Specific Styles --- */
+/* --- Navbar Button Specific Styles --- */
 
 /* Base styles for the language buttons (re-include for clarity if they were removed) */
 /* Adjust padding for buttons with flags to make space for the flag */
@@ -186,31 +186,43 @@
   background-position: 10px center;
   background-repeat: no-repeat;
   background-size: 20px 15px;
-
+  max-height: 39px;
+  min-width: 60px;
   /* You might want a slightly different default look for language buttons */
-  background-color: var(--color-brand-secondary); /* Default light background */
+  background-color: var(--color-surface-navbar); /* Default light background */
   color: var(--color-text-navbar); /* Default text color */
-  border-color: var(--color-surface-navbar-hover); /* Default subtle border */
 }
 
 .btn.theme {
-  background-color: var(--color-border-light); /* Default light background */
-  border: 1px solid var(--color-border-dark);
-  max-height: 42px;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   box-sizing: border-box;
+  span {
+    width: 20px;
+    font-size: 26px;
+  }
+
 }
+
+.btn.es,
+.btn.en {
+  min-width: 60px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 40px;
+  }
+
 /* Specific flag images */
 .btn.es {
-  padding-left: 40px;
+  /* padding-left: 40px; */
   background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/89/Bandera_de_Espa%C3%B1a.svg');
 }
 
 .btn.en {
-  padding-left: 40px;
+  /* padding-left: 40px; */
   background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg');
 }
 
@@ -245,6 +257,9 @@
   .nav-item {
     margin: 0.5rem 0; /* Adjust spacing for vertical menu */
     width: 100%;
+    .btn.theme {
+      border: none;
+    }
   }
 
   .nav-link {
