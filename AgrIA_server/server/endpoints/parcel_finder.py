@@ -71,8 +71,7 @@ def find_parcel():
             is_from_cadastral_reference,
             parcel_geometry,
             parcel_metadata,
-            coordinates,
-            get_sr_image=True
+            coordinates
             )
 
         response = { 
