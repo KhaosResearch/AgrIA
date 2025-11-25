@@ -2,7 +2,12 @@
   "nav": {
     "home": "Home",
     "parcel": "Parcel finder",
-    "chat": "Chat"
+    "chat": "Chat",
+    "theme": {
+      "light": "Swtich to Light Mode",
+      "dark": "Switch to Dark Mode"
+    }
+
   },
   "home": {
     "hero": {
@@ -57,12 +62,12 @@
       "paragraph2": "Here's how to use it:",
       "steps": {
         "1": "Go to the 'Parcel Finder' view.",
-        "2": "Introduce the cadastral reference code of your parcel or state.",
+        "2": "Select the search type in the tabs and introduce required data (see more on the actual view).",
         "3": "Select the date you want the image from.",
         "4": "Press 'Find Parcel' and wait for the system to retrieve your parcel image.",
         "5": "Confirm your parcel image to pass it to AgrIA's chat along with the SIGPAC classification information."
       },
-      "exampleTitle": "Example of Parcel Finder view."
+      "exampleTitle": "Example of Parcel Finder view: Cadastral reference."
     },
     "howToUse": {
       "title": "Interact with AgrIA: The Chat",
@@ -186,7 +191,7 @@
       "imageName": "Image Name"
     },
     "chatWithAgria": {
-      "title": "Chat with AgrIA",
+      "title": "AgrIA",
       "agriaMessage1": "Hello! I'm your Agricultural Image Assistant, but you can call me AgrIA! My purpose here is to analyze satellite images of cultivated fields to assist you...",
       "userMessage1": "Hello AgrIA, I have uploaded an image of my field in parcel 34. Could you analyze water usage?",
       "agriaMessage2": "Of course, I have analyzed the image of parcel 34. It seems there are areas with a low vegetation index that could indicate inefficient water use. I suggest...",

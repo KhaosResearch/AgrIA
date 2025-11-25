@@ -2,7 +2,11 @@
   "nav": {
     "home": "Inicio",
     "parcel": "Buscador de Parcelas",
-    "chat": "Chat"
+    "chat": "Chat",
+    "theme": {
+      "light": "Usar Tema Claro",
+      "dark": "Usar Tema Oscuro"
+    }
   },
   "home": {
     "hero": {
@@ -57,12 +61,12 @@
       "paragraph2": "Así es cómo se usa:",
       "steps": {
         "1": "Ve a la ventana de 'Buscador de Parcelas'.",
-        "2": "Introduce el código de referncia catastral de tu parcela o finca.",
+        "2": "Seleccione el tipo de búsqueda en las pestañas e introduzca la información necesaria (más información en la ventana específica).",
         "3": "Selecciona la fecha de la que quieres conseguir la imagen.",
         "4": "Pulsa 'Buscar Parcela' y espere a que el sistema obtenga la imagen de su parcela.",
         "5": "Confirme la imagen de su aprcela par apasarla al char de AgrIA junto con la información de clasificación SIGPAC."
       },
-      "exampleTitle": "Ejemplo de ventana de Buscador de Parcelas."
+      "exampleTitle": "Ejemplo de ventana de Buscador de Parcela: Código Catastral."
     },
     "howToUse": {
       "title": "Cómo Interactuar con AgrIA: El Chat",
@@ -187,7 +191,7 @@
       "imageName": "Nombre Imagen"
     },
     "chatWithAgria": {
-      "title": "Chat con AgrIA",
+      "title": "AgrIA",
       "agriaMessage1": "¡Hola! Soy tu Asistente de Imágenes Agrícolas, ¡pero puedes llamarme AgrIA! Mi propósito aquí es analizar imágenes satelitales de campos de cultivo para asistirte...",
       "userMessage1": "Hola AgrIA, he subido una imagen de mi campo en la parcela 34. ¿Podrías analizar el uso del agua?",
       "agriaMessage2": "Claro, he analizado la imagen de la parcela 34. Parece que hay áreas con bajo índice de vegetación que podrían indicar un uso ineficiente del agua. Te sugiero...",

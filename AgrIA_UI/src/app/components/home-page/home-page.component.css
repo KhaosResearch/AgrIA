@@ -438,7 +438,6 @@ body, html {
     justify-content: center;
     align-items: center;
     min-height: 300px;
-    background-color: var(--color-surface-input);
     padding: var(--spacing-xl);
     flex-grow: 1;
 }
@@ -567,7 +566,6 @@ body, html {
     display: flex;
     flex-direction: column;
     background-color: var(--color-surface-card);
-    border-right: 1px solid var(--color-border-light); /* Separator between image and chat */
 }
 
 .mockup-section:last-child {
@@ -575,9 +573,8 @@ body, html {
 }
 
 .mockup-header {
-    background-color: var(--color-surface-header);
     padding: 0.8rem var(--spacing-xl); /* Slightly more padding */
-    border-bottom: 1px solid var(--color-border-light);
+    border-bottom: 2px solid var(--color-border-light);
     text-align: center;
 }
 
@@ -590,7 +587,6 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--color-surface-input);
     min-height: 280px; /* Slightly taller */
     flex-grow: 1;
     padding: 1.5rem; /* More padding */
@@ -602,14 +598,12 @@ body, html {
     max-height: 100%;
     object-fit: contain;
     border-radius: var(--radius-default);
-    border: 1px solid var(--color-border-light);
     animation: slideInUp 0.8s ease-out; /* Animation for image */
 }
 
 .mockup-image-desc {
     padding: 1rem var(--spacing-xl); /* More padding */
     border-top: 1px solid var(--color-border-light);
-    background-color: var(--color-surface-header);
     font-size: 0.95rem; /* Slightly larger font */
     color: var(--color-text-secondary);
     max-height: 180px; /* Increased max height */
@@ -618,7 +612,6 @@ body, html {
 
 .mockup-chat-content {
     flex-grow: 1;
-    background-color: #f0f0f0;
     padding: var(--spacing-xl);
     height: 450px; /* Fixed height for mockup chat area, slightly taller */
     display: flex;
@@ -755,7 +748,7 @@ body, html {
 
 .input-button.get-suggestion {
     background-color: var(--color-action-warning);
-    color: var(--color-text-primary);
+    color: #000;
 }
 
 .input-button.get-suggestion:hover {
