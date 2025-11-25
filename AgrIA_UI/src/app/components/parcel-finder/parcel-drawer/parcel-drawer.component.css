@@ -30,6 +30,7 @@
 
 /* Form Section (Cadastral Data) */
 .form-title, .display-title {
+  color: var(--color-text-inverted-light);
   background-color: var(--color-surface-header);
   padding: 0.75rem var(--spacing-large);
   border-bottom: 1px solid var(--color-border-light);
@@ -187,12 +188,14 @@
 
 .selected-crops-table th,
 .selected-crops-table td {
+  color: var(--color-text-inverted-light);
   border: 1px solid var(--color-border-light);
   padding: 0.75rem;
   text-align: left;
 }
 
 .table-input {
+  color: var(--color-text-inverted-light);
   width: 100%;
   padding: 0.5rem;
   border-radius: 4px;

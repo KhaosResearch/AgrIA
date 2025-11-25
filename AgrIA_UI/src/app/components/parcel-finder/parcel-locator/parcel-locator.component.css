@@ -19,7 +19,7 @@
   margin-bottom: var(--spacing-large); /* Space at the bottom */
 }
 
-/* Form Section (Cadastral Data) */
+/* Form Section  */
 .form-title, .display-title {
   background-color: var(--color-surface-header);
   padding: 0.75rem var(--spacing-large);
