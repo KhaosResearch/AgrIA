@@ -201,16 +201,21 @@
   text-align: center;
   box-sizing: border-box;
   span {
-    width: 20px;
+    max-width: 20px;
     font-size: 26px;
     transform: rotate(-45deg);
+  }
+  &:hover {
+    span {
+      transition: 0.2s ease-in-out;
+      font-size: 32px;
+    }
   }
 
 }
 
 .btn.es,
 .btn.en {
-  min-width: 60px;
   background-repeat: no-repeat;
   background-position: center center;
   background-size: 40px;
@@ -287,5 +292,15 @@
   .btn {
     width: 100%; /* Make buttons full width */
     margin-bottom: 0.5rem; /* Space between stacked buttons */
+  }
+  .btn.theme {
+    span {
+      font-size: 40px;
+    }
+  }
+  .btn.es,
+  .btn.en  {
+    height: 120px;
+    background-size: 80px;
   }
 }
