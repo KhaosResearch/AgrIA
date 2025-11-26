@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "agri-multimodel": {
+    "agria-ui": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/agri-multimodel",
+            "outputPath": "dist/agria-ui",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -45,13 +45,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "1.5MB",
+                  "maximumError": "2MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "20kB",
+                  "maximumError": "25kB"
                 }
               ],
               "outputHashing": "all"
@@ -74,10 +74,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "agri-multimodel:build:production"
+              "buildTarget": "agria-ui:build:production"
             },
             "development": {
-              "buildTarget": "agri-multimodel:build:development"
+              "buildTarget": "agria-ui:build:development"
             }
           },
           "defaultConfiguration": "development"

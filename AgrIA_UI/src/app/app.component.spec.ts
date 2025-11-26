@@ -14,16 +14,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'agri-multimodel' title`, () => {
+  it(`should have the 'agria-ui' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('agri-multimodel');
+    expect(app.title).toEqual('agria-ui');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, agri-multimodel');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, agria-ui');
   });
 });
