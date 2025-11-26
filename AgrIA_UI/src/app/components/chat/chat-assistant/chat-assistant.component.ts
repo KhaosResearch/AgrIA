@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, signal, ViewChild, WritableSignal } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { IChatMessage } from '../../../models/chat-assistant.model';
 import { ChatAssistantService } from '../../../services/chat-assistant.service/chat-assistant.service';
 import { MarkdownModule } from 'ngx-markdown';

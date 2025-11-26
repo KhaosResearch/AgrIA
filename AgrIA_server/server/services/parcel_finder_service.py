@@ -160,7 +160,7 @@ def download_parcel_image(cadastral_reference, geojson_data, list_zones_utm, yea
         geometry =  geojson_data['features'][0]['geometry']
         rgb_images_path = download_tile_bands(list_zones_utm, year, month, bands, geometry)
         if not rgb_images_path or len(rgb_images_path) < len(bands):
-            error_message = "No images are available for the selected date, images are processed at the end of each month."
+            error_message = "No images are available for the selected date range. Please choose a different date range for seleceted parcel."
             logger.error(error_message)
             abort(404, description=error_message)
 
