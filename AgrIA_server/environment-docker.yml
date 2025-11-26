@@ -35,10 +35,11 @@ dependencies:
       - safetensors
       - sentinelhub
       - scikit-image
-
-      # PyTorch with CUDA 12.1 (instead of generic torch/torchvision)
-      - torch==2.4.1+cu121
-      - torchvision==0.19.1+cu121
+      - structlog
+      
+      # PyTorch without CUDA 12.1
+      - torch==2.4.1
+      - torchvision==0.19.1
       - -f https://download.pytorch.org/whl/torch_stable.html
 
       # SEN2SR stack
