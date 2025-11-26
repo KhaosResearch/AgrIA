@@ -81,8 +81,11 @@ This is a brief overview of each main directory in the project structure:
   - `endpoints`: Keeps all endpoints access and methods to a single file for each UI component.
   - `services`: Stores files with all the methods that call external services outside of our project scope.
     - `sen2sr`: Super-resolution (SR) module for satellite imagery. Handles image retrieving and upscaling (B02, B03, B04, B08 bands) using a deep learning model.
-    - `sigpac_tools_V2`: An updated version of KHAOS Research's [`sigpac-tools`](https://github.com/KhaosResearch/sigpac-tools.git@07145bcaebcdf37bc5b24191950a3f0a666841b4) implementation. Endpoints have been updated and functionality has been added.
-    - `sr4s`: Previous SR module. Used only for benchmarking.
-  - `utils`: An assortment of functions and methods that  help  all the data processing that mainly comes from endpoint input requests.
-- `tests`: A batery of integration tests for the server **(TODO)**.
+    - `sigpac_tools_V2`: An updated version of KHAOS Research's [`sigpac-tools`](https://github.com/KhaosResearch/sigpac-tools.git) implementation. Endpoints have been updated and additional functionality has been added.
+    - `sr4s`: Previous SR module. Used only for comparisons and benchmarking.
+  - `utils`: An assortment of functions and methods that  help all the data processing that mainly comes from endpoint input requests.
+- `tests`: A batery of unit tests to test system's main functions and logic, including:
+  - Endpoints.
+  - Satellite band image retrieval and Super-Resolution.
+  - Land Uses - Ecoschemes Classification Algorithm.
 
