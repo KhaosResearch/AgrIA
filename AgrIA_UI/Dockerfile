@@ -1,6 +1,7 @@
 # --- STAGE 1: Build the Angular application ---
 FROM node:20-alpine AS build
-
+ARG API_URL
+ENV API_URL_ENV=${API_URL}
 # 1. Set working directory
 WORKDIR /app
 
@@ -15,8 +16,7 @@ RUN npm install
 
 # 4. Inject the API URL into the environment file (FIXED POSITION)
 # The file now exists at /app/src/environments/environment.docker.ts
-RUN sed -i "s|apiUrl: 'http://backend:5000'|apiUrl: '${API_URL}'|" ./src/environments/environment.docker.ts
-
+RUN sed -i "s|apiUrl: 'http://backend:5000'|apiUrl: '${API_URL_ENV}'|" ./src/environments/environment.docker.ts
 # 5. Build the Angular app
 # This command runs inside /app, which contains node_modules and angular.json/package.json
 RUN npm run build -- --configuration docker --base-href=/ --optimization=false
