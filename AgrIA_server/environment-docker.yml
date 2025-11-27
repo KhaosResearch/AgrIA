@@ -9,6 +9,7 @@ dependencies:
   - pandas
   # Geospatial stack (conda-forge compiled binaries! much faster/safer than pip wheels)
   - geopandas
+  - gunicorn  # Added for deployment
   - shapely
   - pyproj
   - rasterio
