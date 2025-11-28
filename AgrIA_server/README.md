@@ -90,7 +90,7 @@ This is a brief overview of each main directory in the project structure:
   - `geojson_assets`: Ideally, where you'd put your `GEOMETRY_FILE`, but as long as you assign the variable the correct path to the `.kml` file, it doesn't matter. It also stores the country's BBox data
   - `llm_assets`: Stores context files and prompts for LLM initialization and role assignment. JSON files contain file paths information and are accessed by the server to pass to AgrIA as system instructions.
 - `server`: Contains all server's main logic components and directories:
-  - `benchmar`: Saves benchmark pipelines for both the SR and VLM modules of the project. It generates the corresponding metrics when ran (all credentials needed).
+  - `benchmark`: Saves benchmark pipelines for both the SR and VLM modules of the project. It generates the corresponding metrics when ran (all credentials needed).
   - `config`: Holds configuration-related files: from constants used all-over to initialization configuration.
   - `endpoints`: Keeps all endpoints access and methods to a single file for each UI component.
   - `services`: Stores files with all the methods that call external services outside of our project scope.
@@ -102,4 +102,68 @@ This is a brief overview of each main directory in the project structure:
   - Endpoints.
   - Satellite band image retrieval and Super-Resolution.
   - Land Uses - Ecoschemes Classification Algorithm.
+
+```bash
+Agria_server
+│
+├── Dockerfile                            # Docker instructions to build the backend server image.
+├── environment-docker.yml                # Conda env used in Docker builds.
+├── environment.yml                       # Local development Conda environment file.
+├── README.md                             # Project documentation and setup instructions.
+├── run.py                                # Application entrypoint used by Gunicorn/Flask.
+│
+├── assets                                # Stores all server asset files.
+│   ├── geojson_assets                    # Geometry files (+ country BBoxes/polygons). GEOMETRY_FILE can live here.
+│   │   ├── country_example.json
+│   │   ├── spain.json
+│   │   └── *.kml                         # GEOMETRY_FILE
+│   └── llm_assets                        # LLM init assets: prompts, context files, and metadata JSON.
+│       ├── context
+│       └── prompts
+│
+├── server                                # Core backend logic and architecture.
+│   ├── __init__.py                       # Marks the package and initializes app modules.
+│   │
+│   ├── benchmark                         # Benchmarking pipelines for SR and VLM modules.
+│   │   ├── sr
+│   │   └── vlm
+│   │
+│   ├── config                            # Core configuration: environment, constants, and clients.
+│   │   ├── chat_config.py
+│   │   ├── config.py
+│   │   ├── constants.py
+│   │   ├── env_config.py
+│   │   ├── llm_client.py
+│   │   └── minio_client.py
+│   │
+│   ├── endpoints                         # API endpoints grouped by feature or UI component.
+│   │   ├── chat.py
+│   │   └── parcel_finder.py
+│   │
+│   ├── services                          # Service layer: external integrations and feature modules.
+│   │   ├── chat_service.py
+│   │   ├── ecoscheme_payments            # Ecoschemes and CAP logic handler.
+│   │   ├── llm_services.py               # Gemini API calls and Chat logic handler.
+│   │   ├── parcel_finder_service.py      # Searches parcel and retrieves images from CUBO / Sentinel Hub / MinIO
+│   │   ├── sen2sr                        # Satellite SR module using ML (current production).
+│   │   ├── sigpac_tools_v2               # Updated SIGPAC API tools (fork + improvements).
+│   │   └── sr4s                          # Legacy SR module used only for compatibility/benchmarking.
+│   │
+│   └── utils                             # Shared helper utilities for data parsing and internal logic.
+│       ├── chat_utils.py
+│       ├── config_utils.py
+│       ├── llm_utils.py
+│       └── parcel_finder_utils.py
+│
+├── temp                                  # Temporary working directory for SR and parcel outputs.
+└── test                                  # Unit and integration tests for endpoints and logic.
+    ├── endpoints
+    │   ├── conftest.py
+    │   ├── test_chat.py
+    │   └── test_parcel_finder.py
+    └── services
+        ├── ecoschemes_payment
+        ├── sen2sr
+        └── sigpac_tools_v2
+```
 
