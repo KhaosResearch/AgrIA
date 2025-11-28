@@ -189,7 +189,7 @@
   max-height: 39px;
   min-width: 60px;
   /* You might want a slightly different default look for language buttons */
-  background-color: var(--color-surface-navbar); /* Default light background */
+  background-color: transparent;
   color: var(--color-text-navbar); /* Default text color */
 }
 

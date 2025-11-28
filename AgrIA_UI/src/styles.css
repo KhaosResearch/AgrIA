@@ -39,8 +39,8 @@
     --spacing-mobile-small: 0.8rem;
 
     /* --- 5. Navbar Specific (Defaulting to Dark Header for Light Theme) --- */
-    --color-surface-navbar: #333;
-    --color-text-navbar: #f5f5f5 ;
+    --color-surface-navbar: #f5f5f5;
+    --color-text-navbar: #333 ;
     --color-surface-navbar-hover: #777;
 }
 
@@ -75,7 +75,6 @@ html, body {
     height: 100%;
 }
 body { 
-    background-color: var(--color-surface-background);
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif; }
 
