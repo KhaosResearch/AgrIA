@@ -22,17 +22,8 @@ WORKDIR /app
 
 # Copy the Conda environment file
 COPY environment-docker.yml .
-# COPY install_docker_deps.sh .
-# COPY start.sh .
-
-# Make the script executable
-# RUN chmod +x install_docker_deps.sh
-# RUN chmod +x start.sh
-# RUN sed -i 's/\r$//' start.sh
 
 # Create the Conda environment using Mamba (faster than Conda)
-# This installs all your dependencies defined in environment-docker.yml
-# RUN ./install_docker_deps.sh 
 RUN mamba env update --file environment-docker.yml && \
     mamba clean -afy
 
@@ -53,5 +44,4 @@ EXPOSE 5000
 # -----------------------
 # CMD for runtime
 # -----------------------
-# CMD mamba run -n agria_server_env gunicorn -w 4 -b 0.0.0.0:5000 run:app
 CMD ["/bin/bash", "./start.sh"]

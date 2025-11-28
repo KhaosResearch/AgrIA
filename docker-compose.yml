@@ -11,7 +11,9 @@ services:
     
     env_file:
       - ./.env 
-      
+    # Overwrite API_URL env var
+    environment:
+      API_URL: ${DOCKER_BACKEND_URL}
     # Ensure EXPOSE 5000 is in your AgrIA_server/Dockerfile to match API_PORT
     networks:
       - agria_network
