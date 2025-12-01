@@ -1,4 +1,4 @@
 export interface IChatParcelResponse {
-    text: string,
-    imageDesc: string
+  text: string;
+  imageDesc: string;
 }

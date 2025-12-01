@@ -8,9 +8,8 @@ describe('ParcelFinderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ParcelFinderComponent]
-    })
-    .compileComponents();
+      imports: [ParcelFinderComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ParcelFinderComponent);
     component = fixture.componentInstance;

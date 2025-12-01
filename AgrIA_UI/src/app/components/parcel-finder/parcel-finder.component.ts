@@ -1,8 +1,8 @@
 import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ParcelCadastralComponent } from './parcel-cadastral/parcel-cadastral.component';
-import { ParcelDisplayComponent } from "./parcel-display/parcel-display.component";
-import { ParcelDrawerComponent } from "./parcel-drawer/parcel-drawer.component";
+import { ParcelDisplayComponent } from './parcel-display/parcel-display.component';
+import { ParcelDrawerComponent } from './parcel-drawer/parcel-drawer.component';
 import { ParcelLocatorComponent } from './parcel-locator/parcel-locator.component';
 import { IFindParcelresponse } from '../../models/parcel-finder.model';
 import { ParcelFinderService } from '../../services/parcel-finder.service/parcel-finder.service';
@@ -10,15 +10,9 @@ import { NotificationService } from '../../services/notification.service/notific
 
 @Component({
   selector: 'app-parcel-finder',
-  imports: [
-    TranslateModule,
-    ParcelCadastralComponent,
-    ParcelDisplayComponent,
-    ParcelDrawerComponent,
-    ParcelLocatorComponent,
-],
+  imports: [TranslateModule, ParcelCadastralComponent, ParcelDisplayComponent, ParcelDrawerComponent, ParcelLocatorComponent],
   templateUrl: './parcel-finder.component.html',
-  styleUrl: './parcel-finder.component.css'
+  styleUrl: './parcel-finder.component.css',
 })
 export class ParcelFinderComponent {
   // Active tab attribute
@@ -35,7 +29,7 @@ export class ParcelFinderComponent {
 
   protected handleParcelFound(parcel: IFindParcelresponse) {
     this.selectedParcelInfo = parcel;
-    this.selectedParcelInfo.hasBeenDescribed = true
+    this.selectedParcelInfo.hasBeenDescribed = true;
     this.isLoading.set(false);
   }
 
@@ -58,21 +52,22 @@ export class ParcelFinderComponent {
     this.parcelFinderService.findParcel(request).subscribe({
       next: (response: IFindParcelresponse) => {
         // Finish loading
-        this.notificationService.showNotification("parcel-finder.success","","success")
+        this.notificationService.showNotification('parcel-finder.success', '', 'success');
         document.body.style.cursor = 'default';
         this.isLoading.set(false);
         // Get parcel info
         this.selectedParcelInfo = response;
-        this.selectedParcelInfo.hasBeenDescribed = true
+        this.selectedParcelInfo.hasBeenDescribed = true;
         this.parcelFinderService.setParcelInfo(this.selectedParcelInfo);
-        console.log("Parcel finder response:", response)
+        console.log('Parcel finder response:', response);
       },
-      error: (err) => {
-        const errorMessage = err.error.error.includes("No images are available")? 
-          this.translateService.currentLang === "es"? "No hay imágenes disponibles para la fecha seleccionada, las imágenes se procesan al final de cada mes."
-            : "No images are available for the selected date, images are processed at the end of each month."
-          : err.error.error
-        this.notificationService.showNotification("parcel-finder.error",`\n${errorMessage}`,"error", 10000)
+      error: err => {
+        const errorMessage = err.error.error.includes('No images are available')
+          ? this.translateService.currentLang === 'es'
+            ? 'No hay imágenes disponibles para la fecha seleccionada, las imágenes se procesan al final de cada mes.'
+            : 'No images are available for the selected date, images are processed at the end of each month.'
+          : err.error.error;
+        this.notificationService.showNotification('parcel-finder.error', `\n${errorMessage}`, 'error', 10000);
         console.error('Parcel fetch failed', err);
         // Finish loading
         document.body.style.cursor = 'default';
@@ -83,14 +78,13 @@ export class ParcelFinderComponent {
         document.body.style.cursor = 'default';
         this.isLoading.set(false);
         document.body.style.cursor = 'default';
-      }
+      },
     });
-
   }
 
   protected handleLocatorFindParcelRequest(request: FormData) {
     this.scrollToDisplay();
-    console.log("request", request);
+    console.log('request', request);
   }
 
   /**
@@ -102,5 +96,4 @@ export class ParcelFinderComponent {
       mapElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
-
 }

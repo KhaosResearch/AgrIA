@@ -1,62 +1,60 @@
 <div id="parcel-cadastral">
-    <div class="content">
-        <div class="form-title">
-            <h2>{{ 'parcelFinder.cadastralData' | translate }}</h2>
-        </div>
-        <div class="form-description">
-            <p>
-                {{ 'parcelFinder.description1' | translate }}
-            </p>
-            <p style="font-weight: bold;">
-                {{ 'parcelFinder.description2' | translate }}
-            </p>
-            <p>
-                <span style="font-weight: bold;">{{ 'parcelFinder.description3Bold' | translate }}</span> {{ 'parcelFinder.description3' | translate }}
-            </p>
-            <p>
-                {{ "parcelDrawer.description.normal01" | translate }} <span style="font-weight: bold;">{{ "parcelDrawer.description.bold01" | translate }}</span>{{ "parcelDrawer.description.normal02" | translate }}
-            </p>
-        </div>
-        <div class="form">
-            <div class="cadastral-field">
-                <label class="form-label">
-                    {{ 'parcelFinder.cadastralReference' | translate }}
-                    <input class="form-input"
-                    type="text"
-                    placeholder="{{ 'parcelFinder.cadastralPlaceholder' | translate }}"
-                    [(ngModel)]="cadastralReference"
-                    maxlength="20"
-                    />
-                </label>
-            </div>
-            <div class="date-field">
-                <label class="form-label">
-                    {{ 'parcelFinder.selectDate' | translate }}:
-                    <input class="form-input"
-                    type="date"
-                    placeholder="{{ 'parcelFinder.datePlaceholder' | translate }}"
-                    [(ngModel)]="selectedDate"
-                    [max]="today"
-                    />
-                </label>
-            </div>
-            <div class="parcel-cadastral-buttons">
-                <button 
-                    class="input-button"
-                    [style.cursor]="isLoading() ? 'progress' : 'pointer'"
-                    [disabled]="isLoading() || cadastralReference.length !== 20"
-                    (click)="findParcel()"
-                >
-                {{ isLoading() ? ('parcelFinder.loading' | translate) : ('parcelFinder.findParcel' | translate) }}
-                </button>
-                <button
-                    class="clear-info-button"
-                    (click)="clearForm()"
-                    >
-                    {{ 'parcelFinder.clearForm' | translate }}
-                </button>
-            </div>
-        </div>
+  <div class="content">
+    <div class="form-title">
+      <h2>{{ 'parcelFinder.cadastralData' | translate }}</h2>
     </div>
-
+    <div class="form-description">
+      <p>
+        {{ 'parcelFinder.description1' | translate }}
+      </p>
+      <p style="font-weight: bold">
+        {{ 'parcelFinder.description2' | translate }}
+      </p>
+      <p>
+        <span style="font-weight: bold">{{ 'parcelFinder.description3Bold' | translate }}</span>
+        {{ 'parcelFinder.description3' | translate }}
+      </p>
+      <p>
+        {{ 'parcelDrawer.description.normal01' | translate }}
+        <span style="font-weight: bold">{{ 'parcelDrawer.description.bold01' | translate }}</span
+        >{{ 'parcelDrawer.description.normal02' | translate }}
+      </p>
+    </div>
+    <div class="form">
+      <div class="cadastral-field">
+        <label class="form-label">
+          {{ 'parcelFinder.cadastralReference' | translate }}
+          <input
+            class="form-input"
+            type="text"
+            placeholder="{{ 'parcelFinder.cadastralPlaceholder' | translate }}"
+            [(ngModel)]="cadastralReference"
+            maxlength="20" />
+        </label>
+      </div>
+      <div class="date-field">
+        <label class="form-label">
+          {{ 'parcelFinder.selectDate' | translate }}:
+          <input
+            class="form-input"
+            type="date"
+            placeholder="{{ 'parcelFinder.datePlaceholder' | translate }}"
+            [(ngModel)]="selectedDate"
+            [max]="today" />
+        </label>
+      </div>
+      <div class="parcel-cadastral-buttons">
+        <button
+          class="input-button"
+          [style.cursor]="isLoading() ? 'progress' : 'pointer'"
+          [disabled]="isLoading() || cadastralReference.length !== 20"
+          (click)="findParcel()">
+          {{ isLoading() ? ('parcelFinder.loading' | translate) : ('parcelFinder.findParcel' | translate) }}
+        </button>
+        <button class="clear-info-button" (click)="clearForm()">
+          {{ 'parcelFinder.clearForm' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
