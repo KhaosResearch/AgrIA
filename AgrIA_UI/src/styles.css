@@ -73,6 +73,13 @@ body.dark-theme {
 html, body { 
     background-color: var(--color-surface-background);
     height: 100%;
+    a {
+        color: var(--color-brand-primary);
+        &:hover {
+            color: var(--color-brand-secondary);
+            transition: 0.3 ease-in-out;
+        }
+    }
 }
 body { 
     margin: 0;
