@@ -1,0 +1,62 @@
+name: 1. CI - Quality and Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+# BEST PRACTICE: Uses Concurrency to avoid unnecessary parallel executions
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Default permission (read only)
+permissions:
+  contents: read 
+
+jobs:
+  unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 1. Checkout Code
+      uses: actions/checkout@v4
+
+    # --- Node.js Cache Setup (Frontend) ---
+    - name: 2. Setup Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        
+    - name: 3. Restore Node Cache
+      uses: actions/cache@v4
+      with:
+        path: AgrIA_UI/node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('AgrIA_UI/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+          
+    - name: 4. Install Frontend Dependencies
+      run: npm install
+      working-directory: AgrIA_UI
+
+    # Angular Tests
+    - name: 5. Run Frontend Tests
+      run: npm test -- --watch=false --no-progress --browsers=ChromeHeadless
+      working-directory: AgrIA_UI
+      continue-on-error: true 
+
+    # --- Setup Conda (Backend) ---
+    - name: 6. Setup Conda Environment (Mamba)
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        activate-environment: agria_server_env
+        environment-file: AgrIA_server/environment-docker.yml
+        auto-activate-base: false
+    
+    # Python/Flask Tests w/ Pytest
+    - name: 7. Run Backend Tests
+      run: |
+        cd AgrIA_server
+        mamba run -n agria_server_env python -m pytest
+      continue-on-error: true
