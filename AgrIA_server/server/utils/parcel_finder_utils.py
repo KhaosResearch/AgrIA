@@ -40,9 +40,11 @@ load_dotenv()
 
 GEOMETRY_FILE = os.getenv("GEOMETRY_FILE")
 
+
 def extract_polygons_2d(geometry):
     if isinstance(geometry, GeometryCollection):
-        polygons = [geom for geom in geometry.geoms if isinstance(geom, Polygon)]
+        polygons = [
+            geom for geom in geometry.geoms if isinstance(geom, Polygon)]
         if polygons:
             # return the first polygon if there is only one, otherwise return a MultiPolygon
             return (
@@ -54,14 +56,17 @@ def extract_polygons_2d(geometry):
         return ops.transform(lambda x, y, z=None: (x, y), geometry)
     return None
 
+
 def get_tiles_polygons(geojson):
     if not GEOMETRY_FILE or not os.path.exists(GEOMETRY_FILE):
-        raise FileNotFoundError(f"GEOMETRY_FILE is not set or does not exist: {GEOMETRY_FILE}")
+        raise FileNotFoundError(
+            f"GEOMETRY_FILE is not set or does not exist: {GEOMETRY_FILE}")
     base_geojson = gpd.read_file(GEOMETRY_FILE)
     if base_geojson.crs != geojson.crs:
         geojson = geojson.to_crs(base_geojson.crs)
 
-    base_geojson["geometry"] = base_geojson["geometry"].apply(extract_polygons_2d)
+    base_geojson["geometry"] = base_geojson["geometry"].apply(
+        extract_polygons_2d)
 
     interseccion = gpd.overlay(base_geojson, geojson, how="intersection")
 
@@ -69,30 +74,34 @@ def get_tiles_polygons(geojson):
 
     return tiles_zones_list
 
+
 def download_tile_bands(utm_zones, year, month, bands, geometry):
     """
     Download raw band tiles (.tif) for the given UTM zones and date range.
     """
     year_month_pairs = generate_date_range_last_n_months(year, month)
     downloaded_files = {band: [] for band in bands}
-    band_files_list = [] 
-    is_zone_in_andalusia =any(zone in ANDALUSIA_TILES for zone in utm_zones)
+    band_files_list = []
+    is_zone_in_andalusia = any(zone in ANDALUSIA_TILES for zone in utm_zones)
     set_reflectance_scale(is_zone_in_andalusia)
-    
+
     if is_zone_in_andalusia:
         print("Parcel located in Andalusia...")
-        band_files_list = download_from_minio(utm_zones, year_month_pairs, bands)
+        band_files_list = download_from_minio(
+            utm_zones, year_month_pairs, bands)
     else:
         print("Getting parcel outside of Andalusia...")
         # Download image bands using Sentinel Hub
-        parcel_center  = shape(geometry).representative_point()
-        band_files_list = download_from_sentinel_hub(parcel_center.y, parcel_center.x, f"{year}_{month}")
+        parcel_center = shape(geometry).representative_point()
+        band_files_list = download_from_sentinel_hub(
+            parcel_center.y, parcel_center.x, f"{year}_{month}")
         for path in band_files_list:
             for band in downloaded_files:
                 if band in path:
                     downloaded_files[band].append(path)
-    
+
     return band_files_list[-4:]
+
 
 def download_from_minio(utm_zones, year_month_pairs, bands):
     # Download image bands from MinIO DB:
@@ -103,20 +112,25 @@ def download_from_minio(utm_zones, year_month_pairs, bands):
             for year, month_folder in year_month_pairs:
                 composites_path = f"{zone}/{year}/{month_folder}/composites/"
                 try:
-                    composites_dir = minioClient.list_objects(bucket_name, prefix=composites_path, recursive=True)
+                    composites_dir = minioClient.list_objects(
+                        bucket_name, prefix=composites_path, recursive=True)
                     for file in composites_dir:
                         if file.object_name.endswith(".tif") and "raw" in file.object_name:
-                            band = file.object_name.split("/")[-1].split(".")[0]
+                            band = file.object_name.split(
+                                "/")[-1].split(".")[0]
                             if band in bands:
                                 # Assign and generate local download dir
                                 download_dir = BANDS_DIR
                                 download_dir.mkdir(parents=True, exist_ok=True)
                                 os.makedirs(download_dir, exist_ok=True)
                                 # Generate filename
-                                month_number = datetime.strptime(month_folder, "%B").month
-                                local_file_path = os.path.join(download_dir, f"{year}_{month_number}-{band}.tif")
+                                month_number = datetime.strptime(
+                                    month_folder, "%B").month
+                                local_file_path = os.path.join(
+                                    download_dir, f"{year}_{month_number}-{band}.tif")
                                 # Set the download file task
-                                task = executor.submit(download_image_file, minioClient, file, local_file_path)
+                                task = executor.submit(
+                                    download_image_file, minioClient, file, local_file_path)
                                 download_tasks.append((task, local_file_path))
                 except S3Error as exc:
                     print(f"Error when accessing {composites_path}: {exc}")
@@ -125,6 +139,7 @@ def download_from_minio(utm_zones, year_month_pairs, bands):
             task.result()
             res.append(local_file_path)
     return res
+
 
 def generate_date_range_last_n_months(year, month, month_range=2):
     """
@@ -140,7 +155,7 @@ def generate_date_range_last_n_months(year, month, month_range=2):
     """
     current_date = datetime.strptime(f"{year}-{month.zfill(2)}", "%Y-%m")
     start_date = current_date - relativedelta(months=month_range)
-    
+
     date_range = []
     while start_date <= current_date:
         date_range.append((start_date.year, start_date.strftime("%B")))
@@ -148,8 +163,10 @@ def generate_date_range_last_n_months(year, month, month_range=2):
 
     return date_range
 
+
 def download_image_file(client, file, local_file_path):
     client.fget_object(bucket_name, file.object_name, local_file_path)
+
 
 def merge_tifs(input_dir, year, band, month_number):
     """
@@ -208,6 +225,7 @@ def merge_tifs(input_dir, year, band, month_number):
 
     return str(merged_image_path)
 
+
 def reproject_tiles(input_dir):
     """
     Reproject tile files to the same Cooridinates Reference System (CRS) if needed.
@@ -216,7 +234,8 @@ def reproject_tiles(input_dir):
     Returns:
         all_files (list of `str`): list of reporjected / default file paths
     """
-    files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith(".tif")]
+    files = [os.path.join(input_dir, f)
+             for f in os.listdir(input_dir) if f.endswith(".tif")]
     if not files:
         print("No .tif files found in:", input_dir)
         return None
@@ -271,6 +290,7 @@ def reproject_tiles(input_dir):
         all_files = reprojected_files
     return all_files
 
+
 def get_rgb_composite(cropped_parcel_band_paths, geojson_data):
     """
     Generates RGB composite images from a list of merged band file paths, saves them as GeoTIFF and PNG files, and returns their paths.
@@ -287,11 +307,12 @@ def get_rgb_composite(cropped_parcel_band_paths, geojson_data):
     out_dir = TEMP_DIR
 
     # Check for the RBG + B08 bands for L1BSR upscale
-    get_sr_image = len(cropped_parcel_band_paths) == 4 and any(SR_BANDS[-1] in path for path in cropped_parcel_band_paths)
+    get_sr_image = len(cropped_parcel_band_paths) == 4 and any(
+        SR_BANDS[-1] in path for path in cropped_parcel_band_paths)
     if get_sr_image:
         out_dir = SR5M_DIR
         out_dir.mkdir(parents=True, exist_ok=True)
-        
+
     png_paths = []
     rgb_tif_paths = []
 
@@ -315,8 +336,9 @@ def get_rgb_composite(cropped_parcel_band_paths, geojson_data):
         input_dir = Path(cropped_parcel_band_paths[0]).parent
         print(f"\nProcessing {input_dir} directory for SR upscale...\n")
         sr_tif_path = process_directory(input_dir)
-        sr_tif = os.path.join(SR5M_DIR, os.path.splitext(os.path.basename(sr_tif_path))[0] + '.tif')
-        
+        sr_tif = os.path.join(SR5M_DIR, os.path.splitext(
+            os.path.basename(sr_tif_path))[0] + '.tif')
+
         # Crop parcel from SR RGB
         cropped_sr = crop_raster_to_geometry(
             image_path=sr_tif,
@@ -341,8 +363,8 @@ def get_rgb_composite(cropped_parcel_band_paths, geojson_data):
                 continue
 
             with rasterio.open(blue_band_04) as src4, \
-                rasterio.open(green_band_03) as src3, \
-                rasterio.open(red_band_02) as src2:
+                    rasterio.open(green_band_03) as src3, \
+                    rasterio.open(red_band_02) as src2:
 
                 red = handle_nodata(src4.read(1), src4.nodata)
                 green = handle_nodata(src3.read(1), src3.nodata)
@@ -350,7 +372,8 @@ def get_rgb_composite(cropped_parcel_band_paths, geojson_data):
 
                 profile = src4.profile
                 profile.update(count=3, dtype=rasterio.uint16, nodata=None)
-                nombre_tif = os.path.join(out_dir, f"RGB_{year}_{month_number}.tif")
+                nombre_tif = os.path.join(
+                    out_dir, f"RGB_{year}_{month_number}.tif")
 
                 with rasterio.open(nombre_tif, 'w', **profile) as dst:
                     dst.write(red, 1)
@@ -375,7 +398,8 @@ def get_rgb_composite(cropped_parcel_band_paths, geojson_data):
                     255
                 ).astype(np.uint8)
 
-                rgb_image = np.stack([red_norm, green_norm, blue_norm], axis=-1)
+                rgb_image = np.stack(
+                    [red_norm, green_norm, blue_norm], axis=-1)
                 rgb_image = gamma_correction(rgb_image, gamma=1.5)
                 rgba_image = np.dstack([rgb_image, alpha])
 
@@ -386,10 +410,11 @@ def get_rgb_composite(cropped_parcel_band_paths, geojson_data):
                 scale_factor = max(1, 240 / min(width, height))
                 new_width = int(width * scale_factor)
                 new_height = int(height * scale_factor)
-                upscaled_image = img_pil.resize((new_width, new_height), resample=Image.BICUBIC)
+                upscaled_image = img_pil.resize(
+                    (new_width, new_height), resample=Image.BICUBIC)
 
-
-                overlay = Image.new("RGBA", upscaled_image.size, (255, 255, 255, 0))
+                overlay = Image.new(
+                    "RGBA", upscaled_image.size, (255, 255, 255, 0))
                 final_img = Image.alpha_composite(upscaled_image, overlay)
 
                 png_file = os.path.join(out_dir, f"{year}_{month_number}.png")
@@ -397,7 +422,8 @@ def get_rgb_composite(cropped_parcel_band_paths, geojson_data):
                 png_paths.append(png_file)
 
     return out_dir, png_paths, rgb_tif_paths
-    
+
+
 def handle_nodata(array, nodata_value):
     """
     Handles null/none data values in arrays
@@ -406,6 +432,7 @@ def handle_nodata(array, nodata_value):
         array = np.where(array == nodata_value, 0, array)
     array = np.where(np.isnan(array), 0, array)
     return array
+
 
 def normalize(array):
     """
@@ -421,10 +448,13 @@ def normalize(array):
     norm_array = np.clip(norm_array * 255, 0, 255)
     return norm_array.astype(np.uint8)
 
+
 def gamma_correction(image, gamma=1.5):
     inv_gamma = 1.0 / gamma
-    table = np.array([(i / 255.0) ** inv_gamma * 255 for i in np.arange(0, 256)]).astype("uint8")
+    table = np.array([(i / 255.0) ** inv_gamma *
+                     255 for i in np.arange(0, 256)]).astype("uint8")
     return cv2.LUT(image, table)
+
 
 def save_raster(image, temp_file, src, transform, format):
     """Saves a raster image to a temporary file.
@@ -454,6 +484,7 @@ def save_raster(image, temp_file, src, transform, format):
     except Exception as e:
         raise Exception(f"Failed to save raster: {str(e)}")
 
+
 def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
     """
     Cuts multiple rasters based on a parcel geometry and returns a list of temporary files.
@@ -472,18 +503,18 @@ def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
     """
     try:
         geometry = gdf_parcel
-        
+
         # Check for the RBG + B08 bands for L1BSR upscale
-        get_sr_image = len(image_paths) == 4 and any(SR_BANDS[-1] in path for path in image_paths)
+        get_sr_image = len(image_paths) == 4 and any(
+            SR_BANDS[-1] in path for path in image_paths)
 
         if get_sr_image:
             if geometry:
                 geometry = bbox_from_polygon(geometry)
             # TODO:
-            # else: 
+            # else:
             #     geometry = get_bbox_from_center(lat, lon, min_size, min_size, RESOLUTION).geojson
 
-        
         # Sanity check
         if isinstance(geometry, dict):
             if "coordinates" not in geometry:
@@ -493,17 +524,20 @@ def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
             # Extract geom data
             parcel_geometry = shape(geometry)
             parcel_crs = geometry.get("CRS", {"init": "epsg:4326"})
-            geometry = gpd.GeoDataFrame(geometry=[parcel_geometry], crs=parcel_crs)
+            geometry = gpd.GeoDataFrame(
+                geometry=[parcel_geometry], crs=parcel_crs)
 
         cropped_parcel_files = []
 
         valid_files = [f for f in image_paths if f.endswith(f".{format}")]
         if not valid_files:
-            raise FileNotFoundError(f"No files found with the .{format} format.")
-        
+            raise FileNotFoundError(
+                f"No files found with the .{format} format.")
+
         # Extract geom mask for each band file
         masks_dir = MASKS_DIR
-        cropped_parcel_files = crop_directory(valid_files, geometry, geometry_id, masks_dir)
+        cropped_parcel_files = crop_directory(
+            valid_files, geometry, geometry_id, masks_dir)
 
         return cropped_parcel_files
 
@@ -514,7 +548,8 @@ def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
         print(f"An error occurred: {str(e)}")
         raise
 
-def crop_raster_to_geometry(image_path, geometry, geometry_id, output_dir, fmt="tif", target_size = (300, 300)):
+
+def crop_raster_to_geometry(image_path, geometry, geometry_id, output_dir, fmt="tif", target_size=(300, 300)):
     """
     Crop either a single-band or multi-band raster (e.g., Sentinel bands or True Color RGB) to a geometry.
 
@@ -541,7 +576,8 @@ def crop_raster_to_geometry(image_path, geometry, geometry_id, output_dir, fmt="
             return None
 
         # Rasterio expects list of shapes
-        geometries = [geometry.geometry.iloc[0] if hasattr(geometry, "geometry") else geometry]
+        geometries = [geometry.geometry.iloc[0] if hasattr(
+            geometry, "geometry") else geometry]
 
         # Crop
         out_image, out_transform = mask(src, geometries, crop=True)
@@ -549,7 +585,8 @@ def crop_raster_to_geometry(image_path, geometry, geometry_id, output_dir, fmt="
         # Prepare output filename
         ext = fmt.lower()
         original_filename = Path(image_path).name
-        new_filename = original_filename.replace(".tif", f"_{geometry_id}.{ext}").replace(".jp2", f"_{geometry_id}.{ext}")
+        new_filename = original_filename.replace(
+            ".tif", f"_{geometry_id}.{ext}").replace(".jp2", f"_{geometry_id}.{ext}")
         out_path = output_dir / new_filename
 
         # Save with georeferencing if GeoTIFF
@@ -567,10 +604,10 @@ def crop_raster_to_geometry(image_path, geometry, geometry_id, output_dir, fmt="
         # If PNG, drop CRS and save with Pillow
         elif fmt.lower() == "png":
             # Expecting C,H,W
-            if out_image.shape[0] >= 3:  
-                red  = out_image[0]  
+            if out_image.shape[0] >= 3:
+                red = out_image[0]
                 green = out_image[1]
-                blue   = out_image[2]
+                blue = out_image[2]
 
                 rgb = np.stack([red, green, blue], axis=-1)
 
@@ -579,7 +616,8 @@ def crop_raster_to_geometry(image_path, geometry, geometry_id, output_dir, fmt="
                 rgb_stretched = percentile_stretch(rgb_stretched)
 
                 # Create alpha channel: transparent where all channels are 0
-                alpha = np.where(np.all(rgb_stretched == 0, axis=-1), 0, 255).astype(np.uint8)
+                alpha = np.where(
+                    np.all(rgb_stretched == 0, axis=-1), 0, 255).astype(np.uint8)
 
                 # Combine RGB + alpha
                 rgba = np.dstack([rgb_stretched, alpha])
@@ -591,7 +629,8 @@ def crop_raster_to_geometry(image_path, geometry, geometry_id, output_dir, fmt="
                     scale_w = target_size[0] / img.width
                     scale_h = target_size[1] / img.height
                     scale = max(scale_w, scale_h)
-                    new_size = (int(img.width * scale), int(img.height * scale))
+                    new_size = (int(img.width * scale),
+                                int(img.height * scale))
                     img = img.resize(new_size, Image.Resampling.LANCZOS)
 
             else:
@@ -604,13 +643,15 @@ def crop_raster_to_geometry(image_path, geometry, geometry_id, output_dir, fmt="
                     scale_w = target_size[0] / img.width
                     scale_h = target_size[1] / img.height
                     scale = max(scale_w, scale_h)
-                    new_size = (int(img.width * scale), int(img.height * scale))
+                    new_size = (int(img.width * scale),
+                                int(img.height * scale))
                     img = img.resize(new_size, Image.Resampling.LANCZOS)
 
             img.save(out_path)
         else:
             raise ValueError(f"Unsupported output format: {fmt}")
         return str(out_path)
+
 
 def upscale_to_minimum(img, target_size):
     # Current size
@@ -627,6 +668,7 @@ def upscale_to_minimum(img, target_size):
         img = img.resize(new_size, Image.Resampling.LANCZOS)
     return img
 
+
 def crop_directory(valid_files, geometry, geometry_id, output_dir, fmt="tif"):
     """
     Apply crop_raster_to_geometry to all files in a directory.
@@ -634,13 +676,15 @@ def crop_directory(valid_files, geometry, geometry_id, output_dir, fmt="tif"):
     """
     cropped_files = []
     for image_path in valid_files:
-        cropped = crop_raster_to_geometry(image_path, geometry, geometry_id, output_dir, fmt)
+        cropped = crop_raster_to_geometry(
+            image_path, geometry, geometry_id, output_dir, fmt)
         if cropped:
             cropped_files.append(cropped)
     return cropped_files
 
+
 def get_geojson_data(geometry, metadata):
-    
+
     geojson_data = {
         "type": "FeatureCollection",
         "features": [{"type": "Feature", "geometry": geometry, "properties": metadata}],
@@ -652,6 +696,7 @@ def get_geojson_data(geometry, metadata):
     gdf = gdf.set_crs("EPSG:4326")  # Set CRS explicitly
 
     return geojson_data, gdf
+
 
 def find_nearest_feature_to_point(feature_collection: dict, lat: float, lng: float) -> dict | None:
     """
@@ -671,7 +716,8 @@ def find_nearest_feature_to_point(feature_collection: dict, lat: float, lng: flo
 
     # Parse current CRS and set up transformer to EPSG:4326
     current_crs = f"{feature_collection['crs']['type']}:{feature_collection['crs']['properties']['code']}"
-    transformer = Transformer.from_crs(current_crs, "EPSG:4326", always_xy=True)
+    transformer = Transformer.from_crs(
+        current_crs, "EPSG:4326", always_xy=True)
 
     for feature in feature_collection.get("features", []):
         geom = feature.get("geometry")
@@ -679,7 +725,8 @@ def find_nearest_feature_to_point(feature_collection: dict, lat: float, lng: flo
             continue
 
         shapely_geom = shape(geom)
-        transformed_geom = shapely_transform(lambda x, y, z=None: transformer.transform(x, y), shapely_geom)
+        transformed_geom = shapely_transform(
+            lambda x, y, z=None: transformer.transform(x, y), shapely_geom)
 
         dist = transformed_geom.distance(point)
         if dist < min_dist:
@@ -691,12 +738,14 @@ def find_nearest_feature_to_point(feature_collection: dict, lat: float, lng: flo
 
     return closest_feature
 
+
 def geojson_with_crs(geometry_dict: dict, crs: str = "epsg:4326") -> dict:
     """
     Adds a CRS field to a geometry dict, mimicking custom GeoJSON with CRS.
     """
     geometry_dict["CRS"] = crs
     return geometry_dict
+
 
 def merge_and_convert_to_geometry(feature_collection: dict) -> dict:
     """
@@ -708,14 +757,16 @@ def merge_and_convert_to_geometry(feature_collection: dict) -> dict:
 
     # Setup coordinate transformer: EPSG:3857 ➜ EPSG:4326
     current_crs = f"{feature_collection['crs']['type']}:{feature_collection['crs']['properties']['code']}"
-    transformer = Transformer.from_crs(current_crs, "EPSG:4326", always_xy=True)
+    transformer = Transformer.from_crs(
+        current_crs, "EPSG:4326", always_xy=True)
 
     # Step 1: Convert each polygon from GeoJSON to shapely geometry
     polygons = []
     for feature in features:
         geom = shape(feature["geometry"])  # Still in 3857
         # Transform coordinates to 4326
-        transformed = shapely_transform(lambda x, y, z= None: transformer.transform(x, y), geom)
+        transformed = shapely_transform(
+            lambda x, y, z=None: transformer.transform(x, y), geom)
         polygons.append(transformed)
 
     # Step 2: Merge/dissolve all polygons
@@ -723,19 +774,21 @@ def merge_and_convert_to_geometry(feature_collection: dict) -> dict:
 
     # Step 3: Return as plain geometry dict (not Feature or FeatureCollection)
     del transformer
-    return mapping(merged) 
+    return mapping(merged)
+
 
 def reset_dir(dir: str | Path, keep_extensions: list[str] = None):
     """
     Removes ALL subdirectories and files inside `dir`, except files in the top-level
     directory with an allowed extension (e.g., ['png']).
-    
+
     - Files in the top-level: keep only ones that match allowed extensions.
     - Any file in subdirectories: delete.
     - All subdirectories: delete.
     """
     dir = Path(dir)
-    keep_extensions = [ext.lower().lstrip('.') for ext in (keep_extensions or [])]
+    keep_extensions = [ext.lower().lstrip('.')
+                       for ext in (keep_extensions or [])]
     if not dir.exists():
         return
     for item in dir.iterdir():
@@ -746,11 +799,12 @@ def reset_dir(dir: str | Path, keep_extensions: list[str] = None):
             if item.suffix.lower().lstrip('.') not in keep_extensions:
                 item.unlink()
 
+
 def check_cadastral_data(cadastral_reference: str, province: str, municipality: str, polygon: str, parcel_id: str):
     """
     Checks cadastral data and handles cadastral reference assignment/generation.
     If no cadastral reference is provided, it generates one from the location data.
-    
+
     Arguments:
         cadastral_reference (str): Alphanumerical 20-character long cadastral reference.
         province (str): Province data. ID-NAME format.
@@ -766,10 +820,12 @@ def check_cadastral_data(cadastral_reference: str, province: str, municipality: 
             return jsonify({'error': 'No cadastral reference nor parcel address location data provided.'}), 400
         else:
             # Build cadastral reference
-            cadastral_reference = build_cadastral_reference(province, municipality, polygon, parcel_id)
+            cadastral_reference = build_cadastral_reference(
+                province, municipality, polygon, parcel_id)
     return cadastral_reference
 
-def bbox_from_polygon(polygon_geojson: dict, resolution_m: int = RESOLUTION, min_px: int=-1 ):
+
+def bbox_from_polygon(polygon_geojson: dict, resolution_m: int = RESOLUTION, min_px: int = -1):
     """
     Given a polygon, return a bbox geometry in EPSG:4326 that is centered
     on the polygon centroid, fully contains it, and ensures at least
@@ -824,10 +880,11 @@ def bbox_from_polygon(polygon_geojson: dict, resolution_m: int = RESOLUTION, min
 
     return geom
 
+
 def guess_crs_from_coords(coords):
     xs = [pt[0] for pt in coords]
     ys = [pt[1] for pt in coords]
-    
+
     if all(-180 <= x <= 180 for x in xs) and all(-90 <= y <= 90 for y in ys):
         return "EPSG:4326"  # Lat/lon in degrees
     if all(abs(x) < 20000000 and abs(y) < 20000000 for x, y in zip(xs, ys)):
@@ -835,6 +892,7 @@ def guess_crs_from_coords(coords):
     if all(100000 < x < 1000000 and 0 < y < 10000000 for x, y in zip(xs, ys)):
         return "UTM or national CRS (needs region)"
     return "Unknown"
+
 
 def polygon_pixel_size(geojson_polygon, resolution=RESOLUTION):
     """
@@ -868,7 +926,7 @@ def polygon_pixel_size(geojson_polygon, resolution=RESOLUTION):
     minx, miny, maxx, maxy = gdf_utm.total_bounds
 
     # Define offset (in meters)
-    offset_m = resolution * 10 # 10 pixels buffer
+    offset_m = resolution * 10  # 10 pixels buffer
 
     # Expand bounds equally in all directions
     minx = minx - offset_m
@@ -886,6 +944,7 @@ def polygon_pixel_size(geojson_polygon, resolution=RESOLUTION):
     max_dim_px = max(width_px, height_px)
 
     return max_dim_px
+
 
 def is_coord_in_zones(lon: float, lat: float, zones_json: dict = SPAIN_ZONES) -> bool:
     """
@@ -906,25 +965,27 @@ def is_coord_in_zones(lon: float, lat: float, zones_json: dict = SPAIN_ZONES) ->
     while not is_in_zone and i < len(zones_list):
         zone = zones_list[i]
         zone_id = zone.get("id")
-        
+
         if "bbox" in zone:
             try:
                 min_lon, min_lat, max_lon, max_lat = zone["bbox"]
                 if min_lon <= lon <= max_lon and min_lat <= lat <= max_lat:
                     is_in_zone = True
             except (ValueError, TypeError) as e:
-                print(f"Warning: Zone '{zone_id}' has an invalid BBox format. Skipping zone: {e}")
-                
+                print(
+                    f"Warning: Zone '{zone_id}' has an invalid BBox format. Skipping zone: {e}")
+
         elif "polygon" in zone:
             try:
                 # Create a Shapely Polygon object from the list of vertices
                 poly = Polygon(zone["polygon"])
-                
+
                 # Check if the point is within the polygon
                 if poly.contains(point):
                     is_in_zone = True
             except Exception as e:
                 # Log the warning but continue checking other zones
-                print(f"Warning: Zone '{zone_id}' has an invalid Polygon geometry. Skipping zone: {e}")
+                print(
+                    f"Warning: Zone '{zone_id}' has an invalid Polygon geometry. Skipping zone: {e}")
         i += 1
     return is_in_zone

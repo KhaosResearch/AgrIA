@@ -32,7 +32,6 @@ def search(data: dict) -> dict:
     polg = data.get("polygon", None)
     parc = data.get("parcel", None)
 
-
     if not comm:
         if not provi:
             raise ValueError(

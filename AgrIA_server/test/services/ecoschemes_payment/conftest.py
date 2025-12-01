@@ -3,6 +3,8 @@ from decimal import Decimal
 import json
 
 # --- Dummy Rules Data Fixture (Minimal set covering all assigned schemes) ---
+
+
 @pytest.fixture
 def dummy_rules_data():
     """Provides a sample of the raw rules data dictionary based on the expected output."""
@@ -13,7 +15,7 @@ def dummy_rules_data():
             "Land_Uses": "PA, PR, PS, MT",
             "Rates": {
                 "Threshold_ha": "95.0",
-                "Pluriannuality": "N/A", # No bonus
+                "Pluriannuality": "N/A",  # No bonus
                 "Peninsular": {"Tier_1": "27.27", "Tier_2": "27.27"},
                 "Insular": {"Tier_1": "49.27", "Tier_2": "49.27"},
             }
@@ -23,9 +25,10 @@ def dummy_rules_data():
             "Ecoscheme": "P3/P4 - Rotation/No-Till (Irrigated)",
             "Land_Uses": "TA",
             "Rates": {
-                "Threshold_ha": "30.0", # Set > 22.7474ha to force Tier 1
-                "Pluriannuality": "Applicable", # Bonus applies
-                "Peninsular": {"Tier_1": "141.742439", "Tier_2": "100.00"}, # Tier 2 assumed lower
+                "Threshold_ha": "30.0",  # Set > 22.7474ha to force Tier 1
+                "Pluriannuality": "Applicable",  # Bonus applies
+                # Tier 2 assumed lower
+                "Peninsular": {"Tier_1": "141.742439", "Tier_2": "100.00"},
                 "Insular": {"Tier_1": "221.742439", "Tier_2": "180.00"},
             }
         },
@@ -36,7 +39,7 @@ def dummy_rules_data():
             "Rates": {
                 "Threshold_ha": "N/A",
                 "Pluriannuality": "N/A",
-                "Peninsular": "145.098595", # Flat Rate
+                "Peninsular": "145.098595",  # Flat Rate
                 "Insular": "0.0",
             }
         },
@@ -45,8 +48,8 @@ def dummy_rules_data():
             "Ecoscheme": "P6/P7 - Plant Cover (Flat Woody Crops)",
             "Land_Uses": "VI, FY",
             "Rates": {
-                "Threshold_ha": "15.0", # Set > 9.4863ha to force Tier 1
-                "Pluriannuality": "Applicable", # Bonus applies
+                "Threshold_ha": "15.0",  # Set > 9.4863ha to force Tier 1
+                "Pluriannuality": "Applicable",  # Bonus applies
                 "Peninsular": {"Tier_1": "59.12", "Tier_2": "41.384"},
                 "Insular": {"Tier_1": "99.12", "Tier_2": "81.384"},
             }
@@ -60,6 +63,8 @@ def dummy_rules_data():
     ]
 
 # --- Parsed Data Fixture (Simulating dictionary after parsing the input string) ---
+
+
 @pytest.fixture
 def parsed_data_fixture():
     """Provides the dictionary structure of parsed input land uses based on the new sample."""
@@ -80,6 +85,8 @@ def parsed_data_fixture():
     }
 
 # --- Input Data String Fixture (For end-to-end test) ---
+
+
 @pytest.fixture
 def sample_input_data_str():
     """Provides the multi-LU string input for the main function test."""

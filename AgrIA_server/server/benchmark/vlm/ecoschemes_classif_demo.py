@@ -13,7 +13,7 @@ from ...utils.parcel_finder_utils import reset_dir
 PLURIANNUALITY_BONUS_PER_HA = Decimal('25.00')
 
 # Define rounding constants
-ROUNDING_RATE = Decimal('0.000001') # 6 decimals for applied rate
+ROUNDING_RATE = Decimal('0.000001')  # 6 decimals for applied rate
 ROUNDING_AREA = Decimal('0.0001')   # 4 decimals for total area
 ROUNDING_PAYMENT = Decimal('0.01')  # 2 decimals for total payments
 
@@ -22,9 +22,9 @@ logger = structlog.get_logger()
 
 # Example usage
 def demo():
-    
+
     init_time = datetime.now()
-    
+
     cad_ref_dict = {
         "en": {
             "26002A001000010000EQ": """IMAGE DATE: 2025-6-6
@@ -269,5 +269,6 @@ def demo():
     time_taken = (datetime.now() - init_time).total_seconds()
     time_taken_formatted = str(timedelta(seconds=time_taken))
     logger.info(f"Time taken for parcel processing {time_taken_formatted}")
+
 
 demo()

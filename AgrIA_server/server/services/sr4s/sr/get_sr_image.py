@@ -24,13 +24,17 @@ CURR_SCRIPT_DIR = Path(__file__).resolve().parent
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # --- Load model ---
-ENGINE = L1BSR(weights_path=CURR_SCRIPT_DIR / "REC_Real_L1B.safetensors", device=DEVICE)
+ENGINE = L1BSR(weights_path=CURR_SCRIPT_DIR /
+               "REC_Real_L1B.safetensors", device=DEVICE)
+
 
 def save_rgb_png(sr, out_path):
     """Save SR result as stretched RGB PNG"""
-    rgb = np.stack([sr[..., 2], sr[..., 1], sr[..., 0]], axis=-1)  # B04,R / B03,G / B02,B
+    rgb = np.stack([sr[..., 2], sr[..., 1], sr[..., 0]],
+                   axis=-1)  # B04,R / B03,G / B02,B
     rgb_u8 = percentile_stretch(rgb)
     Image.fromarray(rgb_u8).save(out_path)
+
 
 def save_multiband_tif(sr: np.ndarray, reference_band: str, out_path: str):
     """
@@ -73,6 +77,7 @@ def save_multiband_tif(sr: np.ndarray, reference_band: str, out_path: str):
         for i in range(c):
             dst.write(sr_clean[..., i], i + 1)
             dst.set_band_description(i + 1, f"B{i+1}")  # optional: label bands
+
 
 def process_directory(input_dir, output_dir=SR5M_DIR, save_as_tif=True):
     """
@@ -124,7 +129,8 @@ def process_directory(input_dir, output_dir=SR5M_DIR, save_as_tif=True):
         rgb_before_u8 = percentile_stretch(rgb_before_u16)
         h, w, _ = rgb_before_u8.shape
 
-        rgb_before_u8_resized = np.array(Image.fromarray(rgb_before_u8).resize((w*2, h*2), cv2.INTER_NEAREST))
+        rgb_before_u8_resized = np.array(Image.fromarray(
+            rgb_before_u8).resize((w*2, h*2), cv2.INTER_NEAREST))
 
         # Stack input
         img_bgrn = stack_bgrn(
@@ -148,7 +154,8 @@ def process_directory(input_dir, output_dir=SR5M_DIR, save_as_tif=True):
         if save_as_tif or GET_SR_BENCHMARK:
             sr_out_tif = os.path.join(output_dir, f"{sr_prefix}.tif")
             timestamp = str(time.time())
-            og_out_tif = os.path.join(BM_DATA_DIR, f"{timestamp}_{og_prefix}.tif")
+            og_out_tif = os.path.join(
+                BM_DATA_DIR, f"{timestamp}_{og_prefix}.tif")
             save_multiband_tif(sr_u16, band_files["B02"], sr_out_tif)
             print(f"Saved TIF: {sr_out_tif}")
             save_multiband_tif(img_bgrn, band_files["B02"], og_out_tif)
@@ -161,9 +168,9 @@ def process_directory(input_dir, output_dir=SR5M_DIR, save_as_tif=True):
         comp_dir.mkdir(parents=True, exist_ok=True)
         comp_png = comp_dir / f"{sr_prefix}_comparison.png"
         grid = make_grid([rgb_before_u8_resized,
-                        percentile_stretch(np.stack([sr_u16[...,2], sr_u16[...,1], sr_u16[...,0]], axis=-1))],
-                        ncols=2
-        )
+                          percentile_stretch(np.stack([sr_u16[..., 2], sr_u16[..., 1], sr_u16[..., 0]], axis=-1))],
+                         ncols=2
+                         )
         Image.fromarray(grid).save(comp_png)
         print(f"Saved comparison grid: {comp_png}")
 
