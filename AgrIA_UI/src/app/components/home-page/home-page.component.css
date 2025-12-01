@@ -272,8 +272,7 @@ body, html {
     line-height: 1.7;
 }
 
-.quickstart-list ol {
-    list-style: decimal;
+.quickstart-list ol, ul {
     padding-left: 20px;
     font-size: 1rem;
     color: var(--color-text-secondary);
@@ -801,51 +800,6 @@ body, html {
     box-shadow: 0 0 0 4px rgba(var(--color-brand-primary), 0.3); /* Larger focus shadow */
 }
 
-
-/* Contact Section */
-.contact-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem; /* Increased gap */
-    max-width: 600px;
-    margin: 0 auto;
-    padding: var(--spacing-xl); /* Add padding to the form directly */
-    background-color: var(--color-surface-card);
-    border-radius: var(--radius-default);
-    box-shadow: var(--shadow-elevated);
-    text-align: left;
-}
-
-.contact-form input[type="text"],
-.contact-form input[type="email"],
-.contact-form textarea {
-    padding: 1rem 1.2rem; /* More padding */
-    border: 1px solid var(--color-border-light);
-    border-radius: var(--radius-default);
-    font-size: 1.05rem; /* Slightly larger font */
-    background-color: var(--color-surface-input);
-    color: var(--color-text-primary);
-    font-family: inherit;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.contact-form input[type="text"]:focus,
-.contact-form input[type="email"]:focus,
-.contact-form textarea:focus {
-    outline: none;
-    border-color: var(--color-brand-primary);
-    box-shadow: 0 0 0 3px rgba(var(--color-brand-primary), 0.2);
-}
-
-.contact-form textarea {
-    min-height: 150px; /* Taller text area */
-    resize: vertical;
-}
-
-.contact-form button {
-    align-self: flex-start;
-}
-
 /* Footer */
 .main-footer {
     background-color: var(--color-surface-header);
@@ -1239,16 +1193,6 @@ body, html {
 
     .description-length:checked::before {
         font-size: 12px;
-    }
-
-    .contact-form {
-        padding: var(--spacing-mobile);
-    }
-
-    .contact-form input,
-    .contact-form textarea {
-        padding: 0.7rem 0.9rem;
-        font-size: 0.9rem;
     }
 
     .main-footer {

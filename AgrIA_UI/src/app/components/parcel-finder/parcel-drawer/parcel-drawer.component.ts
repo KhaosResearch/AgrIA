@@ -9,6 +9,7 @@ import { NotificationService } from '../../../services/notification.service/noti
 import { IFindParcelresponse, IParcelMetadata } from '../../../models/parcel-finder.model';
 import { Subscription } from 'rxjs';
 
+const GlobalL = (window as any).L;
 // Set default icon paths
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
@@ -164,7 +165,8 @@ export class ParcelDrawerComponent {
     this.map.addLayer(this.drawnItems);
 
     // Initialize the draw control and pass it the FeatureGroup of editable layers
-    const drawControl = new L.Control.Draw({
+    const DrawControl = GlobalL.Control.Draw;
+    const drawControl = new DrawControl({
       edit: {
         featureGroup: this.drawnItems,
       },
@@ -197,18 +199,19 @@ export class ParcelDrawerComponent {
    * 
    */
   private setupDrawEvents() {
+    const DrawEvent = GlobalL.Draw.Event;
     // Start of drawing/editing/deleting → enable drawing state
-    this.map.on(L.Draw.Event.DRAWSTART, () => this.isDrawing.set(true));
-    this.map.on(L.Draw.Event.EDITSTART, () => this.isDrawing.set(true));
-    this.map.on(L.Draw.Event.DELETESTART, () => this.isDrawing.set(true));
+    this.map.on(DrawEvent.DRAWSTART, () => this.isDrawing.set(true));
+    this.map.on(DrawEvent.EDITSTART, () => this.isDrawing.set(true));
+    this.map.on(DrawEvent.DELETESTART, () => this.isDrawing.set(true));
 
     // End of drawing/editing/deleting → disable drawing state
-    this.map.on(L.Draw.Event.DRAWSTOP, () => this.isDrawing.set(false));
-    this.map.on(L.Draw.Event.EDITSTOP, () => this.isDrawing.set(false));
-    this.map.on(L.Draw.Event.DELETESTOP, () => this.isDrawing.set(false));
+    this.map.on(DrawEvent.DRAWSTOP, () => this.isDrawing.set(false));
+    this.map.on(DrawEvent.EDITSTOP, () => this.isDrawing.set(false));
+    this.map.on(DrawEvent.DELETESTOP, () => this.isDrawing.set(false));
 
     // When a new shape is created
-    this.map.on(L.Draw.Event.CREATED, (event: any) => {
+    this.map.on(DrawEvent.CREATED, (event: any) => {
       this.drawnItems.clearLayers();
       const layer = event.layer;
       this.drawnItems.addLayer(layer);
@@ -219,7 +222,7 @@ export class ParcelDrawerComponent {
     });
 
     // When existing shapes are modified
-    this.map.on(L.Draw.Event.EDITED, (event: any) => {
+    this.map.on(DrawEvent.EDITED, (event: any) => {
       event.layers.eachLayer((layer: any) => {
         // Convert updated geometry to GeoJSON and save it
         this.parcelGeometry = layer.toGeoJSON().geometry as IParcelDrawerGeojson;
@@ -228,7 +231,7 @@ export class ParcelDrawerComponent {
     });
 
     // When features are deleted
-    this.map.on(L.Draw.Event.DELETED, () => {
+    this.map.on(DrawEvent.DELETED, () => {
       this.parcelGeometry = null;
     });
   }
@@ -267,28 +270,45 @@ export class ParcelDrawerComponent {
         }
       });
 
-
-        // Copy coordinates to clipboard
-        navigator.clipboard.writeText(coords)
-        .then(() => {
-          if (this.map) {
-            this.resetCoordinatesMarker(parseFloat(lat), parseFloat(lng));
-            this.coordinates = coords;
+        if (navigator.clipboard) {
+          // Copy coordinates to clipboard
+          navigator.clipboard.writeText(coords)
+          .then(() => {
+            if (this.map) {
+              this.resetCoordinatesMarker(parseFloat(lat), parseFloat(lng));
+              this.coordinates = coords;
+              this.notificationService.showNotification(
+                'parcel-drawer.coordinates.new-coordinates',
+                coords,
+                'info'
+              );
+            }
+          })
+          .catch(err => {
+            console.error('Failed to copy coordinates:', err);
             this.notificationService.showNotification(
               'parcel-drawer.coordinates.new-coordinates',
-              coords,
-              'info'
+              err,
+              'error'
             );
+          });
+          } 
+          else {
+            // Si el API del portapapeles no existe (HTTP), ejecuta la lógica que no depende de la copia.
+            // Esto es lo que querías que pasara después del clic (marcador, coordenadas, notificaciones)
+            console.warn("Clipboard API no disponible (falta HTTPS). Omitiendo copia.");
+            
+            // Ejecutamos la lógica que actualiza el mapa y la UI *manualmente*
+            if (this.map) {
+              this.resetCoordinatesMarker(parseFloat(lat), parseFloat(lng));
+              this.coordinates = coords;
+              this.notificationService.showNotification(
+                'parcel-drawer.coordinates.new-coordinates',
+                coords,
+                'info'
+              );
+            }
           }
-        })
-        .catch(err => {
-          console.error('Failed to copy coordinates:', err);
-          this.notificationService.showNotification(
-            'parcel-drawer.coordinates.new-coordinates',
-            err,
-            'error'
-          );
-        });
     });
   }
 

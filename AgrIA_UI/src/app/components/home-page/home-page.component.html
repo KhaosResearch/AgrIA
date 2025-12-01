@@ -146,64 +146,156 @@
 
         <section id="how-to-use" class="how-to-use-section content-section">
             <h2 class="section-title">{{ 'home.howToUse.title' | translate }}</h2>
-            <div class="how-to-use-content content-card">
-                <h3>{{ 'home.howToUse.exampleTitle' | translate }}</h3>
-                <div class="mockup-container">
-                    <div class="mockup-section">
-                        <div class="mockup-header">
-                            <h2>{{ 'chat.uploadImage.title' | translate }}</h2>
-                        </div>
-                        <div class="mockup-image-preview">
-                            <img src="img/SR_4-1-P6.jpg" alt="{{ 'chat.uploadImage.imageAlt' | translate }}">
-                        </div>
-                        <div class="mockup-image-desc">
-                            <p>{{ 'chat.uploadImage.description' | translate }}</p>
-                        </div>
-                    </div>
+                <div class="quickstart-list content-card">
+                    <p>{{ 'home.howToUse.paragraph1' | translate }}</p>
+                    <ul>
+                        <li><span style="font-weight: bold;">{{ 'home.howToUse.paragraphBold1' | translate }}</span>{{ 'home.howToUse.paragraphDetail1' | translate }}</li>
+                        <li><span style="font-weight: bold;">{{ 'home.howToUse.paragraphBold2' | translate }}</span>{{ 'home.howToUse.paragraphDetail2' | translate }}</li>
+                    </ul>
+                    <h3>{{ 'home.howToUse.exampleTitle' | translate }}</h3>
 
-                    <div class="mockup-section">
-                        <div class="mockup-header">
-                            <h2>{{ 'chat.chatWithAgria.title' | translate }}</h2>
-                        </div>
-                        <div class="mockup-chat-content">
-                            <div class="message agria-message">
-                                <p>{{ 'chat.chatWithAgria.agriaMessage1' | translate }}</p>
+                    <div class="mockup-container">
+                        <div class="mockup-section">
+                            <div class="mockup-header">
+                                <h2>{{ 'chat.uploadImage.title' | translate }}</h2>
                             </div>
-                            <div class="message user-message">
-                                <p>{{ 'chat.chatWithAgria.userMessage1' | translate }}</p>
+                            <div class="mockup-image-preview">
+                                <img src="img/SR_4-1-P6.jpg" alt="{{ 'chat.uploadImage.imageAlt' | translate }}">
                             </div>
-                            <div class="message agria-message">
-                                <p>{{ 'chat.chatWithAgria.agriaMessage2' | translate }}</p>
+                            <div class="mockup-image-desc">
+                                <p>{{ 'chat.uploadImage.description' | translate }}</p>
                             </div>
                         </div>
-                        <div class="mockup-input">
-                            <textarea id="mockup-user-input" placeholder="{{ 'chat.chatWithAgria.inputPlaceholder' | translate }}"></textarea>
-                            <div class="mockup-input-actions-wrapper">
-                                <div class="mockup-input-buttons-wrapper">
-                                    <button class="input-button">{{ 'chat.chatWithAgria.sendButton' | translate }}</button>
-                                    <button class="input-button get-suggestion">{{ 'chat.chatWithAgria.getSuggestionButton' | translate }}</button>
+
+                        <div class="mockup-section">
+                            <div class="mockup-header">
+                                <h2>{{ 'chat.chatWithAgria.title' | translate }}</h2>
+                            </div>
+                            <div class="mockup-chat-content">
+                                <div class="message agria-message">
+                                    <p>{{ 'chat.chatWithAgria.agriaMessage1' | translate }}</p>
                                 </div>
-                                <label class="detailed-description-checkbox">
-                                    <input type="checkbox" class="description-length">
-                                    {{ 'parcelFinder.detailedDescription' | translate }}
-                                </label>
+                                <div class="message user-message">
+                                    <p>{{ 'chat.chatWithAgria.userMessage1' | translate }}</p>
+                                </div>
+                                <div class="message agria-message">
+                                    <p>{{ 'chat.chatWithAgria.agriaMessage2' | translate }}</p>
+                                </div>
+                            </div>
+                            <div class="mockup-input">
+                                <textarea id="mockup-user-input" placeholder="{{ 'chat.chatWithAgria.inputPlaceholder' | translate }}"></textarea>
+                                <div class="mockup-input-actions-wrapper">
+                                    <div class="mockup-input-buttons-wrapper">
+                                        <button class="input-button">{{ 'chat.chatWithAgria.sendButton' | translate }}</button>
+                                        <button class="input-button get-suggestion">{{ 'chat.chatWithAgria.getSuggestionButton' | translate }}</button>
+                                    </div>
+                                    <label class="detailed-description-checkbox">
+                                        <input type="checkbox" class="description-length">
+                                        {{ 'parcelFinder.detailedDescription' | translate }}
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
         </section>
 
-        <section id="contact" class="contact-section content-section">
-            <div class="content-card">
-                <h2 class="section-title">{{ 'home.contact.title' | translate }}</h2>
-                <p>{{ 'home.contact.description' | translate }}</p>
-                <form class="contact-form">
-                    <input type="text" placeholder="{{ 'home.contact.namePlaceholder' | translate }}" required>
-                    <input type="email" placeholder="{{ 'home.contact.emailPlaceholder' | translate }}" required>
-                    <textarea placeholder="{{ 'home.contact.messagePlaceholder' | translate }}" rows="5" required></textarea>
-                    <button type="submit" class="cta-button">{{ 'home.contact.sendButton' | translate }}</button>
-                </form>
+        <section id="notice" class="content-section">
+            <div class="quickstart-list content-card">
+                <details>
+                    <summary class="section-title" style="font-size: xx-large; color: var(--color-brand-secondary); cursor: pointer;">
+                        {{ 'home.transparencyNotice.sectionTitle' | translate }}
+                    </summary>
+
+                    <p style="text-align: center;">
+                        {{ 'home.transparencyNotice.introParagraph' | translate }} <a href="https://artificialintelligenceact.eu/" target="_blank">{{ 'home.transparencyNotice.euAiAct' | translate }}</a>
+                    </p>
+                    <hr>
+                    <br>
+                    <ol>
+                        <li>
+                            <span style="font-weight: bold;">
+                                {{ 'home.transparencyNotice.heading1' | translate }}
+                            </span>
+                            <ul>
+                                <li>
+                                    <span style="font-weight: bold;">
+                                        {{ 'home.transparencyNotice.item1_1_title' | translate }}
+                                    </span>
+                                    {{ 'home.transparencyNotice.item1_1_text' | translate }}
+                                </li>
+                                <li>
+                                    <span style="font-weight: bold;">
+                                        {{ 'home.transparencyNotice.item1_2_title' | translate }}
+                                    </span>
+                                    {{ 'home.transparencyNotice.item1_2_text1' | translate }}
+                                    <span style="font-weight: bold;">
+                                        {{ 'home.transparencyNotice.item1_2_textBold' | translate }}
+                                    </span>
+                                    {{ 'home.transparencyNotice.item1_2_text2' | translate }}
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <span style="font-weight: bold;">
+                                {{ 'home.transparencyNotice.heading2' | translate }}
+                            </span>
+                            <ul>
+                                <li>
+                                    <span style="font-weight: bold;">
+                                        {{ 'home.transparencyNotice.item2_1_title' | translate }}
+                                    </span>
+                                    {{ 'home.transparencyNotice.item2_1_text' | translate }}
+                                    
+                                    <a href="{{ 'home.transparencyNotice.fegaLink' | translate }}" target="_blank">
+                                        {{ 'home.transparencyNotice.fega' | translate }}
+                                    </a>
+
+                                    {{ 'home.transparencyNotice.item2_1_1_text' | translate }}
+                                    
+                                    <ul>
+                                        <li>
+                                            <a href="https://www.fega.gob.es/sites/default/files/inline-files/220930_nota_aclaratoria_aplicacion_eco_regimenes.pdf" target="_blank">
+                                                {{ 'home.transparencyNotice.item2_1_link1' | translate }}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.fega.gob.es/sites/default/files/files/document/230306_pmf4-ecorregimenes_v4.pdf" target="_blank">
+                                                {{ 'home.transparencyNotice.item2_1_link2' | translate }}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.fega.gob.es/sites/default/files/files/document/250925_NOTA_WEB_Ecorregimenes_Ca_2025_ANTICIPO_v02.pdf" target="_blank">
+                                                {{ 'home.transparencyNotice.item2_1_link3' | translate }}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                
+                                <li>
+                                    <span style="font-weight: bold;">
+                                        {{ 'home.transparencyNotice.item2_2_title' | translate }}
+                                    </span>
+                                    {{ 'home.transparencyNotice.item2_2_text' | translate }}
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <span style="font-weight: bold;">
+                                {{ 'home.transparencyNotice.heading3' | translate }}
+                            </span>
+                            <ul>
+                                <li>
+                                    {{ 'home.transparencyNotice.paragraph3' | translate }}
+                                </li>
+                            </ul>
+                        </li>
+                    </ol>
+                    <br>
+                    <hr>
+                </details>
             </div>
         </section>
 

@@ -9,9 +9,9 @@ from .endpoints.chat import chat_bp
 from .endpoints.parcel_finder import parcel_finder_bp
 from .utils.parcel_finder_utils import reset_dir
 
-def create_app():
+def create_app(ui_url: str =UI_URL):
     app = Flask(__name__)
-    CORS(app, resources={r"/*": {"origins": UI_URL}})
+    CORS(app, resources={r"/*": {"origins": ui_url}})
     
     # Reset temp and benchmark dirs
     reset_dir(TEMP_DIR)
