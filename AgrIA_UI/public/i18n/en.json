@@ -81,7 +81,7 @@
     "transparencyNotice": {
       "sectionTitle": "Transparency notice and sources of AgrIA",
       "introParagraph": "This notice is issued in compliance with the principles of Transparency and Accountability established in the ",
-      "euAiAct": "European Union's Artificial Intelligence Act (AI Act):",
+      "euAiAct": "European Union's Artificial Intelligence Act (Regulation-EU-2024/1689 / AI Act):",
       "heading1": "Identification and Nature of the System:",
       "item1_1_title": "Identification:",
       "item1_1_text": "The AgrIA Chat Assistant Module is a fine-tuned modification of Google's multimodal model, Gemini.",
