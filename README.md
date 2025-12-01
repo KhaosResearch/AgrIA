@@ -23,6 +23,14 @@ In order to run `AgrIA` properly, you will need the following:
 - `Node.js` and `npm` (download tutorial available at [npmjs.com](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)).
     - `Angular CLI` (easy to get if you have `npm` by just using `npm install -g @angular/cli`).
 
+Alternatively, you can easily deploy AgrIA by installing **[Docker](https://docs.docker.com/get-started/get-docker/)** and running the following command:
+
+```bash
+cd AgrIA
+docker compose up --build
+```
+Be advised, given the specialized Machine Learning dependencies (Pytorch), the first time building the backend might might make the process take considerable time, depending on processing power (10+ minutes). On the other hand, no other additional installation is required this way.
+
 ## Quickstart:
 ### Cloning this repository:
 This repository contains the unified source code for both the Frontend UI (`AgrIA_UI`) and the Python Backend services (`AgrIA_server`).
