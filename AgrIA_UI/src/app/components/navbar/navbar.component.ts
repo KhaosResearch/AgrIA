@@ -3,21 +3,17 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DEFAULT_LANG } from '../../config/constants';
 
-
 @Component({
   selector: 'app-navbar',
-  imports: [
-    RouterModule,
-    TranslateModule
-],
+  imports: [RouterModule, TranslateModule],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
   // Initialize isMenuOpen to false, meaning the menu is closed by default
   protected isMenuOpen: boolean = false;
   // Theme state
-  public isDarkMode: WritableSignal<boolean> = signal(true)
+  public isDarkMode: WritableSignal<boolean> = signal(true);
   // Style tracking variables
   private isVisible: boolean = true;
   private lastScrollTop: number = 0;
@@ -32,11 +28,11 @@ export class NavbarComponent {
 
   constructor() {
     this.translateService.setDefaultLang(DEFAULT_LANG);
- }
+  }
 
   ngOnInit() {
-    this.updateTheme()
-    this.updateLanguage()
+    this.updateTheme();
+    this.updateLanguage();
     this.updateVisibility();
   }
 
@@ -47,7 +43,6 @@ export class NavbarComponent {
   @HostBinding('class.visible') get visible() {
     return this.isVisible;
   }
-
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
@@ -90,7 +85,6 @@ export class NavbarComponent {
     this.isVisible = this.isAtTop || this.isHoveringTop;
   }
 
-
   /**
    * Toggles the state of the mobile menu (open/closed).
    * This method is called when the hamburger icon is clicked.
@@ -109,7 +103,7 @@ export class NavbarComponent {
   public closeMenu(): void {
     this.isMenuOpen = false;
   }
-  
+
   public switchLanguage(lang: string) {
     this.translateService.use(lang);
     this.currentLanguage = lang;
@@ -136,7 +130,7 @@ export class NavbarComponent {
   private updateTheme(): void {
     // Check local storage or fallback to system preference (optional: window.matchMedia)
     const savedTheme = localStorage.getItem('app_theme');
-    
+
     // Default to light mode if nothing is saved
     this.isDarkMode.set(savedTheme === 'dark');
 

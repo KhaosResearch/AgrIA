@@ -8,9 +8,8 @@ describe('ParcelLocatorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ParcelLocatorComponent]
-    })
-    .compileComponents();
+      imports: [ParcelLocatorComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ParcelLocatorComponent);
     component = fixture.componentInstance;

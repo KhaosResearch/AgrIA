@@ -7,6 +7,7 @@ load_dotenv()
 if not GEMINI_API_KEY:
     raise ValueError("GEMINI_API_KEY is not set in .env")
 
+
 class Config:
     REFLECTANCE_SCALE = 400.0  # default
 
@@ -14,4 +15,3 @@ class Config:
     def set_reflectance_scale(cls, value: float):
         cls.REFLECTANCE_SCALE = value
         print("REFLECTANCE_SCALE", value)
-

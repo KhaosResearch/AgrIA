@@ -1,14 +1,14 @@
-import { IParcelGeometry } from "./parcel-finder.model";
+import { IParcelGeometry } from './parcel-finder.model';
 
 export interface IParcelDrawerGeojson extends IParcelGeometry {
-  properties: { [key: string]: any}
+  properties: { [key: string]: any };
 }
 export interface ICropClassification {
-    class: string,
-    name: string,
-    type: string,
-    subtype1: string | null;
-    subtype2: string | null;
+  class: string;
+  name: string;
+  type: string;
+  subtype1: string | null;
+  subtype2: string | null;
 }
 
 export interface IGroupedCropClassification {

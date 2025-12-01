@@ -8,29 +8,32 @@ from google.genai.types import Content, Part
 
 logger = structlog.get_logger()
 
-def generate_system_instructions(prompt_json_path: str=PROMPT_LIST_FILE):
+
+def generate_system_instructions(prompt_json_path: str = PROMPT_LIST_FILE):
     """
     Sets up the initial model's system instructions and context documents for the chat.
-    
+
     Args:
         prompt_json_path (str): JSON filepath containing paths to the actual prompts.
-    
+
     Returns:
         system_instructions (str): All system instructions for AgrIA as raw text.
     """
     # Upload files and read role and description files
     role_prompt = load_prompt_from_json(prompt_json_path)
-    classification_data = load_prompt_from_json(prompt_json_path, 'classification')
+    classification_data = load_prompt_from_json(
+        prompt_json_path, 'classification')
     # short_description_prompt = load_prompt_from_json(prompt_json_path,'short', True)
     # full_description_prompt = load_prompt_from_json(prompt_json_path, 'long', True)
-    examples_data = load_prompt_from_json(prompt_json_path, 'examples', True).replace("}{", "}\n\n{")
+    examples_data = load_prompt_from_json(
+        prompt_json_path, 'examples', True).replace("}{", "}\n\n{")
 
     # Compose system instructions from files' URI and role text data
     # short_description_instruction = f"""\n\nThese are the description instructions, format and example for the short image description. You will use these to describe and classify a parcel whenever you are prompted with an image and the tokens {SHORT_DESC_TRIGGER} and date and crop info:\n\n{short_description_prompt}\n\nNotice how if a land use is eligible for more than one ES, you must only take the most long-term benefitial option and indicate so using the `Applicable` column as specified by the **MUTUALLY EXCLUSIVE** rule."""
     # long_description_instruction = "\n\nThese are the description instructions, format and example for the long image description. You will use these to describe and classify a parcel whenever you are prompted with an image and the tokens '" + FULL_DESC_TRIGGER +"' and date and crop info:\n\n" + full_description_prompt
     classification_instruction = "\n\nThese is the Eco-schemes classification data for each possible land use. There is an English and Spanish version. Use these to fill out the table data whenever you are prompted to describe a parcel:\n\n" + classification_data
 
-    examples_instructions=f"""\n\n
+    examples_instructions = f"""\n\n
 ## CORE DIRECTIVES: REPORT GENERATION & DATA HIERARCHY
 
 ### A. DATA SOURCE HIERARCHY (Single Source of Truth)
@@ -54,9 +57,11 @@ You will use two external references to construct the report:
 {examples_data}
 \n---END
 """
-    system_instructions = role_prompt + classification_instruction + examples_instructions
+    system_instructions = role_prompt + \
+        classification_instruction + examples_instructions
 
     return system_instructions
+
 
 def load_prompt_from_json(json_path: str, prompt_type_key: str = 'role', is_image_desc_prompt: bool = False, base_path: str = BASE_PROMPTS_PATH) -> dict:
     """
@@ -77,10 +82,12 @@ def load_prompt_from_json(json_path: str, prompt_type_key: str = 'role', is_imag
     prompt_type = prompt_type_key
 
     prompt_data = meta.get(prompt_type)
-    content = get_description_prompt(base_path, prompt_data, is_image_desc_prompt)
+    content = get_description_prompt(
+        base_path, prompt_data, is_image_desc_prompt)
     meta['content'] = content
 
     return content
+
 
 def get_description_prompt(base_path, prompt_data, is_image_desc_prompt):
     """
@@ -94,9 +101,11 @@ def get_description_prompt(base_path, prompt_data, is_image_desc_prompt):
     """
     content = "\n"
     if is_image_desc_prompt:
-        prompt_example_dir = os.path.join(base_path, prompt_data["examples"]).replace("\\", "/")
+        prompt_example_dir = os.path.join(
+            base_path, prompt_data["examples"]).replace("\\", "/")
         for prompt_example_path in os.listdir(prompt_example_dir):
-            prompt_example_path = os.path.join(prompt_example_dir, prompt_example_path)
+            prompt_example_path = os.path.join(
+                prompt_example_dir, prompt_example_path)
             with open(prompt_example_path, 'r', encoding='utf-8') as f:
                 content += f.read()
     else:
@@ -108,14 +117,15 @@ def get_description_prompt(base_path, prompt_data, is_image_desc_prompt):
 
     return content
 
+
 def load_documents_from_json(json_path: str, base_path: str = BASE_CONTEXT_PATH) -> list:
     """
     Reads a JSON file to get the document metadata and returns a list of document contents.
-    
+
     Args:
         json_path (`str`): Path to the JSON file containing document metadata.
         base_path (`str`): Base path where the JSON and document files are located. Default: `BASE_CONTEXT_PATH`.
-    
+
     Returns:
         documents (list of `str`): A list of document contents.
     """
@@ -131,7 +141,8 @@ def load_documents_from_json(json_path: str, base_path: str = BASE_CONTEXT_PATH)
         documents.append(doc_filepath)
     return documents
 
-def set_initial_history(documents_json_path: str=CONTEXT_DOCUMENTS_FILE):
+
+def set_initial_history(documents_json_path: str = CONTEXT_DOCUMENTS_FILE):
     """
     Constructs the initial history for a chat session, including examples & context documents.
 
@@ -148,7 +159,8 @@ def set_initial_history(documents_json_path: str=CONTEXT_DOCUMENTS_FILE):
     try:
         doc_paths_list = load_documents_from_json(documents_json_path)
     except FileNotFoundError:
-        logger.exception(f"Error: Document JSON file not found at {documents_json_path}")
+        logger.exception(
+            f"Error: Document JSON file not found at {documents_json_path}")
         doc_paths_list = []
     except Exception as e:
         logger.exception(f"Error loading documents from JSON: {e}")
@@ -156,21 +168,26 @@ def set_initial_history(documents_json_path: str=CONTEXT_DOCUMENTS_FILE):
 
     if doc_paths_list:
         prompt = "Use the following files as context documents for the task. You may display tables and quote or reference information directly from these documents:\n"
-        upload_success = upload_context_files(document_parts, doc_paths_list[:3], prompt)
+        upload_success = upload_context_files(
+            document_parts, doc_paths_list[:3], prompt)
         prompt = "Use the following files examples of user input (JSON) and your output (MD) when prompted for a parcel description with that input:\n"
-        upload_success += upload_context_files(document_parts, doc_paths_list[3:], prompt)
+        upload_success += upload_context_files(
+            document_parts, doc_paths_list[3:], prompt)
 
         llm_answer = "Apologies, it appears there has been an error during the document upload process and I have not got access to the files. I will do my best to answer any queries though."
         if upload_success > 0:
-            logger.info(f"Successfully uploaded and prepared {upload_success} files.")
+            logger.info(
+                f"Successfully uploaded and prepared {upload_success} files.")
             # Append all document parts as a single 'user' turn
             initial_history.append(Content(role='user', parts=document_parts))
             # Model's optional "OK" response to the context
             llm_answer = "Okay, I have received the context documents, format examples and clasification file and I will use them for our conversation."
         else:
-            logger.warning("No documents were successfully uploaded to include in the initial history.")
+            logger.warning(
+                "No documents were successfully uploaded to include in the initial history.")
 
-        initial_history.append(Content(role='model', parts=[Part(text=llm_answer)]))
+        initial_history.append(
+            Content(role='model', parts=[Part(text=llm_answer)]))
 
     user_input_intro = 'Recuerda que debes hablar en el mismo idioma que el usuario, ya esa español, inglés u otro. Ahora preséntate.'
     model_output_intro = (
@@ -183,11 +200,15 @@ def set_initial_history(documents_json_path: str=CONTEXT_DOCUMENTS_FILE):
         'Si tiene alguna pregunta, también puede escribir en el cuadro de texto.'
     )
 
-    initial_history.append(Content(role='user', parts=[Part(text=user_input_intro)]))
-    initial_history.append(Content(role='model', parts=[Part(text=model_output_intro)]))
+    initial_history.append(
+        Content(role='user', parts=[Part(text=user_input_intro)]))
+    initial_history.append(
+        Content(role='model', parts=[Part(text=model_output_intro)]))
 
-    logger.debug(f"Initial history prepared with {len(initial_history)} turns.")
+    logger.debug(
+        f"Initial history prepared with {len(initial_history)} turns.")
     return initial_history
+
 
 def upload_context_files(document_parts, doc_paths_list, prompt):
     document_parts.append(Part(text=prompt))
@@ -202,11 +223,13 @@ def upload_context_files(document_parts, doc_paths_list, prompt):
                 # Read JSON content as a string
                 with open(doc_path, 'r', encoding='utf-8') as f:
                     json_content = f.read()
-                
+
                 # Append a descriptive text part and the JSON content itself as text
-                document_parts.append(Part(text=f"Example JSON User Input ({os.path.basename(doc_path)}):\n{json_content}"))
+                document_parts.append(Part(
+                    text=f"Example JSON User Input ({os.path.basename(doc_path)}):\n{json_content}"))
                 upload_success += 1
-                logger.info(f"Successfully included JSON content as text: {os.path.basename(doc_path)}")
+                logger.info(
+                    f"Successfully included JSON content as text: {os.path.basename(doc_path)}")
 
             except Exception as e:
                 logger.exception(f"Error reading JSON file {doc_path}: ")
@@ -214,16 +237,21 @@ def upload_context_files(document_parts, doc_paths_list, prompt):
 
         else:
             # --- Existing handling for other file types (e.g., .md, images) ---
-            mime_type = MIME_TYPES.get(file_extension, 'application/octet-stream')
+            mime_type = MIME_TYPES.get(
+                file_extension, 'application/octet-stream')
             try:
                 uploaded_doc = upload_context_document(doc_path)
                 if uploaded_doc and uploaded_doc.uri:
-                    logger.info(f"Successfully uploaded document. {os.path.basename(doc_path)} URI: {uploaded_doc.uri}")
-                    document_parts.append(Part(text=f"Document: {os.path.basename(doc_path)}"))
-                    document_parts.append(Part.from_uri(file_uri=uploaded_doc.uri, mime_type=mime_type))
+                    logger.info(
+                        f"Successfully uploaded document. {os.path.basename(doc_path)} URI: {uploaded_doc.uri}")
+                    document_parts.append(
+                        Part(text=f"Document: {os.path.basename(doc_path)}"))
+                    document_parts.append(Part.from_uri(
+                        file_uri=uploaded_doc.uri, mime_type=mime_type))
                     upload_success += 1
                 else:
-                    logger.warning(f"Warning: Failed to get URI for uploaded document: {doc_path}")
+                    logger.warning(
+                        f"Warning: Failed to get URI for uploaded document: {doc_path}")
             except Exception as e:
                 logger.exception(f"Error uploading document {doc_path}: ")
 

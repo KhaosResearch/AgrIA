@@ -9,18 +9,14 @@ import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-parcel-locator',
-  imports: [
-    TranslateModule,
-    FormsModule,
-    NgSelectModule,
-],
+  imports: [TranslateModule, FormsModule, NgSelectModule],
   templateUrl: './parcel-locator.component.html',
-  styleUrl: './parcel-locator.component.css'
+  styleUrl: './parcel-locator.component.css',
 })
 export class ParcelLocatorComponent {
   // Loading flag
   @Input() isLoading: WritableSignal<boolean> = signal(false);
-  
+
   // Parcel found emmiter
   @Output() parcelFound = new EventEmitter<IFindParcelresponse>();
   // Start loading process emmiter
@@ -47,7 +43,7 @@ export class ParcelLocatorComponent {
   // Max date field value
   protected today: string = new Date().toISOString().split('T')[0];
   // Selected date field value
-  protected selectedDate: string  = this.today;
+  protected selectedDate: string = this.today;
 
   // Valid input flag
   protected isValidInput: WritableSignal<boolean> = signal(true);
@@ -58,7 +54,7 @@ export class ParcelLocatorComponent {
   private parcelFinderService: ParcelFinderService = inject(ParcelFinderService);
   // Notification service
   private notificationService: NotificationService = inject(NotificationService);
-  
+
   ngOnInit() {
     this.loadSigpacLocationData();
   }
@@ -71,15 +67,19 @@ export class ParcelLocatorComponent {
       (sigpacLocationData: ISigpacLocationData[]) => {
         this.sigpacLocationData = sigpacLocationData;
         this.provinces = this.sigpacLocationData.map(data => data.province);
-
       },
-      (error) => {
-        this.notificationService.showNotification("parcel-finder.sigpac-table.error", `\n${error.error.error}`, "error", 10000);
+      error => {
+        this.notificationService.showNotification(
+          'parcel-finder.sigpac-table.error',
+          `\n${error.error.error}`,
+          'error',
+          10000
+        );
         console.error('Error loading crop classifications:', error);
       }
     );
   }
-  
+
   /**
    * Handles changes when selecting a province.
    * @param selected - Province entry
@@ -91,9 +91,9 @@ export class ParcelLocatorComponent {
 
   /**
    * Updates dropdown municipalities based on selected province.
-   * 
+   *
    * @param province - Province entry
-   * @returns 
+   * @returns
    */
   private getMunicipalities(province: string): string[] {
     const entry = this.sigpacLocationData.find(data => data.province === province);
@@ -102,9 +102,9 @@ export class ParcelLocatorComponent {
 
   /**
    * Prevents user from typing anything other than integers
-   * 
-   * @param event 
-   * @returns 
+   *
+   * @param event
+   * @returns
    */
   public restrictKeys(event: KeyboardEvent) {
     const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight'];
@@ -121,42 +121,42 @@ export class ParcelLocatorComponent {
 
   /**
    * Limits input digits length for input field
-   * 
-   * @param event 
-   * @param length 
-   * @param elementId 
+   *
+   * @param event
+   * @param length
+   * @param elementId
    */
   public limitLength(event: any, length: number) {
     let value = event.target.value;
     if (value.length > length) {
       value = value.slice(0, length);
-    // Update values
-    event.target.value = value;
-    if(length === 3){
-        this.polygon = value
+      // Update values
+      event.target.value = value;
+      if (length === 3) {
+        this.polygon = value;
       } else {
-        this.parcelId = value
+        this.parcelId = value;
       }
     }
   }
-  
+
   /**
    * Padds the input with 0s when input value length is not full
-   * 
-   * @param event 
-   * @param length 
+   *
+   * @param event
+   * @param length
    */
   public formatInput(event: any, length: number) {
     let value = event.target.value;
-    if (value.length < length && value !== "") {
-      value = value.padStart(length, "0");
+    if (value.length < length && value !== '') {
+      value = value.padStart(length, '0');
     }
     // Update values
     event.target.value = value;
-    if(length === 3){
-      this.polygon = value
+    if (length === 3) {
+      this.polygon = value;
     } else {
-      this.parcelId = value
+      this.parcelId = value;
     }
   }
 
@@ -166,33 +166,22 @@ export class ParcelLocatorComponent {
   private validateInput() {
     this.isValidInput.set(false);
     if (!this.province || this.province.length < 1) {
-      const message = "Province not specified.";
-      this.notificationService.showNotification(
-        "parcel-locator.missing.province", "", "error", 10000
-      );
+      const message = 'Province not specified.';
+      this.notificationService.showNotification('parcel-locator.missing.province', '', 'error', 10000);
       throw new Error(message);
-    } 
-    else if (!this.municipality || this.municipality.length < 1) {
-      const message = "Municipality not specified.";
-      this.notificationService.showNotification(
-        "parcel-locator.missing.municipality", "", "error", 10000
-      );
+    } else if (!this.municipality || this.municipality.length < 1) {
+      const message = 'Municipality not specified.';
+      this.notificationService.showNotification('parcel-locator.missing.municipality', '', 'error', 10000);
+      throw new Error(message);
+    } else if (!this.polygon) {
+      const message = 'Polygon not specified.';
+      this.notificationService.showNotification('parcel-locator.missing.polygon', '', 'error', 10000);
+      throw new Error(message);
+    } else if (!this.parcelId) {
+      const message = 'Parcel not specified.';
+      this.notificationService.showNotification('parcel-locator.missing.parcel-id', '', 'error', 10000);
       throw new Error(message);
     }
-    else if (!this.polygon) {
-      const message = "Polygon not specified.";
-      this.notificationService.showNotification(
-        "parcel-locator.missing.polygon", "", "error", 10000
-      );
-      throw new Error(message);
-    } 
-    else if (!this.parcelId) {
-      const message = "Parcel not specified.";
-      this.notificationService.showNotification(
-        "parcel-locator.missing.parcel-id", "", "error", 10000
-      );
-      throw new Error(message);
-    } 
     this.isValidInput.set(true);
   }
 
@@ -203,14 +192,14 @@ export class ParcelLocatorComponent {
     try {
       // Validate input before sending request
       this.validateInput();
-      
-      if(this.isValidInput()) {
+
+      if (this.isValidInput()) {
         // Init loading notifications
-        this.notificationService.showNotification("parcel-finder.searching", "", "info")
+        this.notificationService.showNotification('parcel-finder.searching', '', 'info');
         this.isLoading.set(true);
         this.loadingStarted.emit(this.maxLoadingDuration);
         document.body.style.cursor = 'progress';
-        
+
         // Create find parcel request
         const formData = new FormData();
         formData.append('province', this.province!!);
@@ -218,16 +207,16 @@ export class ParcelLocatorComponent {
         formData.append('polygon', String(this.polygon!!));
         formData.append('parcelId', String(this.parcelId!!));
         formData.append('selectedDate', this.selectedDate);
-        formData.append('isFromCadastralReference', "True");
-        
+        formData.append('isFromCadastralReference', 'True');
+
         // Output request to parcel finder component
-        this.findParcelRequest.emit(formData)
+        this.findParcelRequest.emit(formData);
       }
     } catch (err) {
-      if(this.isValidInput()) {
-        this.notificationService.showNotification("parcel-finder.error",`\n${err}`,"error", 10000)
+      if (this.isValidInput()) {
+        this.notificationService.showNotification('parcel-finder.error', `\n${err}`, 'error', 10000);
       }
-      console.error("Request error:", err);
+      console.error('Request error:', err);
     }
   }
 

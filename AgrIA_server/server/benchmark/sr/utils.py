@@ -1,5 +1,6 @@
 import cv2
-import os, re
+import os
+import re
 import numpy as np
 import shutil
 import time
@@ -8,7 +9,8 @@ from .constants import BM_SR_DIR, BM_DATA_DIR
 
 EPS = 1e-10
 
-def copy_file_to_dir(src, dest_dir = BM_SR_DIR, is_sr4s: bool = False):
+
+def copy_file_to_dir(src, dest_dir=BM_SR_DIR, is_sr4s: bool = False):
     """
     Copy source file to destiny dir. Used mainly to copy SR TIFs into `BM_SR_DIR`
     Arguments:
@@ -25,7 +27,7 @@ def copy_file_to_dir(src, dest_dir = BM_SR_DIR, is_sr4s: bool = False):
     else:
         name = "SR4S" if is_sr4s else "SEN2SR"
     timestamp = str(time.time())
-    filename =  f"{timestamp}_{name}{ext}"
+    filename = f"{timestamp}_{name}{ext}"
 
     # Construct the initial destination path
     os.makedirs(dest_dir, exist_ok=True)
@@ -40,10 +42,12 @@ def copy_file_to_dir(src, dest_dir = BM_SR_DIR, is_sr4s: bool = False):
     print(f"\nFile copied for benchmark to: {dest_path}\n")
     return dest_path
 
+
 def extract_timestamp(filename: str):
     """Extract leading numeric timestamp from filename (before underscore)."""
     match = re.match(r"(\d+\.\d+)_", filename)
     return float(match.group(1)) if match else None
+
 
 def find_closest_sr(timestamp, sr_files, model_tag, tolerance=10.0):
     """
@@ -62,6 +66,7 @@ def find_closest_sr(timestamp, sr_files, model_tag, tolerance=10.0):
             best_file, min_diff = f, diff
     return best_file
 
+
 def spectral_angle_mapper(img1, img2):
     """Mean SAM across pixels (img shape H,W,B). Returns radians."""
     # Flatten pixels x bands
@@ -72,15 +77,17 @@ def spectral_angle_mapper(img1, img2):
     angles = np.arccos(np.clip(dot / denom, -1.0, 1.0))
     return np.mean(angles)
 
+
 def ergas(sr, gt, ratio=2):
     """ERGAS metric. ratio = resolution_LR / resolution_HR (e.g., 2 for 20->10m)."""
     gt = gt.astype(np.float64)
     sr = sr.astype(np.float64)
-    mean_gt = np.mean(gt, axis=(0,1))
-    mse = np.mean((sr - gt)**2, axis=(0,1))
+    mean_gt = np.mean(gt, axis=(0, 1))
+    mse = np.mean((sr - gt)**2, axis=(0, 1))
     # Avoid divide by zero for mean_gt
     denom = (mean_gt**2 + EPS)
     return 100.0 * ratio * np.sqrt(np.mean(mse / denom))
+
 
 def resize_image(img, target_shape):
     """
@@ -91,8 +98,10 @@ def resize_image(img, target_shape):
     bands = img.shape[-1]
     out = np.zeros((Ht, Wt, bands), dtype=np.float32)
     for b in range(bands):
-        out[..., b] = cv2.resize(img[..., b], (Wt, Ht), interpolation=cv2.INTER_CUBIC)
+        out[..., b] = cv2.resize(
+            img[..., b], (Wt, Ht), interpolation=cv2.INTER_CUBIC)
     return out
+
 
 def detect_and_normalize(sr, gt, auto_normalize=True):
     """
@@ -121,7 +130,8 @@ def detect_and_normalize(sr, gt, auto_normalize=True):
             "sr_min": sr_min, "sr_max": sr_max
         })
         # compute ratio safely
-        ratios.append((sr_max / (gt_max + EPS)) if (gt_max + EPS) != 0 else np.inf)
+        ratios.append((sr_max / (gt_max + EPS))
+                      if (gt_max + EPS) != 0 else np.inf)
 
     median_ratio = float(np.median(ratios))
     # Heuristics to decide mapping
@@ -140,7 +150,8 @@ def detect_and_normalize(sr, gt, auto_normalize=True):
                 gmax = per_band_stats[b]["gt_max"]
                 if (smax - smin) < EPS:
                     # constant band in SR: set to GT mean (avoid divide by zero)
-                    sr_mapped[..., b] = np.full(sr[..., b].shape, np.nanmean(gt[..., b]), dtype=np.float32)
+                    sr_mapped[..., b] = np.full(
+                        sr[..., b].shape, np.nanmean(gt[..., b]), dtype=np.float32)
                     warnings.append(f"band_{b}_constant_sr; set to gt_mean")
                 else:
                     sr_norm = (sr[..., b] - smin) / (smax - smin)
@@ -157,5 +168,3 @@ def detect_and_normalize(sr, gt, auto_normalize=True):
         method = "auto_normalize_disabled"
 
     return sr_mapped, normalized, method, per_band_stats, warnings
-
-

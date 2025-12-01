@@ -9,10 +9,11 @@ from .endpoints.chat import chat_bp
 from .endpoints.parcel_finder import parcel_finder_bp
 from .utils.parcel_finder_utils import reset_dir
 
-def create_app(ui_url: str =UI_URL):
+
+def create_app(ui_url: str = UI_URL):
     app = Flask(__name__)
     CORS(app, resources={r"/*": {"origins": ui_url}})
-    
+
     # Reset temp and benchmark dirs
     reset_dir(TEMP_DIR)
     reset_dir(BM_DATA_DIR)
@@ -21,5 +22,5 @@ def create_app(ui_url: str =UI_URL):
     # Register Blueprints
     app.register_blueprint(chat_bp)
     app.register_blueprint(parcel_finder_bp)
-    
+
     return app

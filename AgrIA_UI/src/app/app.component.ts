@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { NavbarComponent } from "./components/navbar/navbar.component";
+import { NavbarComponent } from './components/navbar/navbar.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { TranslateModule } from '@ngx-translate/core';
@@ -14,14 +14,9 @@ export function HttpLoaderFactory(http: HttpClient) {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    RouterOutlet,
-    NavbarComponent,
-    TranslateModule,
-    MatSnackBarModule,
-  ],
+  imports: [RouterOutlet, NavbarComponent, TranslateModule, MatSnackBarModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
 })
 export class AppComponent {
   title = 'AgrIA - Agricultural Imaging Assistant';

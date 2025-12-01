@@ -8,9 +8,8 @@ describe('ParcelDrawerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ParcelDrawerComponent]
-    })
-    .compileComponents();
+      imports: [ParcelDrawerComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ParcelDrawerComponent);
     component = fixture.componentInstance;

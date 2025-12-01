@@ -1,67 +1,53 @@
 <nav class="navbar">
-    <div class="navbar-brand">
-        <a routerLink="/" class="navbar-logo">
-            <img src="img/logo.png" alt="AgrIA Logo" class="logo-img">
-            AgrIA
-        </a>
-    </div>
+  <div class="navbar-brand">
+    <a routerLink="/" class="navbar-logo">
+      <img src="img/logo.png" alt="AgrIA Logo" class="logo-img" />
+      AgrIA
+    </a>
+  </div>
 
-    <button class="navbar-toggler" (click)="toggleMenu()">
-        <span class="toggler-icon"></span>
-        <span class="toggler-icon"></span>
-        <span class="toggler-icon"></span>
-    </button>
-    
-    <div class="navbar-menu" [className]="isMenuOpen ? 'active': 'navbar-menu'">
-        <ul class="navbar-nav" (click)="toggleMenu()">
-            <li class="nav-item" >
-                <a 
-                    routerLink="/" 
-                    routerLinkActive="active" 
-                    [routerLinkActiveOptions]="{ exact: true }" 
-                    class="nav-link"
-                >
-                    {{ 'nav.home' | translate }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <a routerLink="/parcel-finder" routerLinkActive="active" class="nav-link">
-                    {{ 'nav.parcel' | translate }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <a routerLink="/chat" routerLinkActive="active" class="nav-link">
-                    {{ 'nav.chat' | translate }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <button
-                    class="btn theme"
-                    (click)="toggleTheme()"
-                    title="{{ isDarkMode() ? ('nav.theme.light' | translate) : ('nav.theme.dark' | translate) }}"
-                >
-                    @if (this.isDarkMode()) {
-                        <span>&#9788;</span> 
-                    } @else{ 
-                        <span>&#9790;</span>
-                    }
-                </button>
-            </li>
-            <li class="nav-item">
-                @if (this.currentLanguage == 'en') {
-                    <button
-                        class="btn es"
-                        (click)="switchLanguage('es')"
-                    >
-                    </button>
-                } @else {
-                    <button
-                        class="btn en"
-                        (click)="switchLanguage('en')"
-                    >
-                    </button>
-                }
-            </li>
-        </ul>
-    </div>
+  <button class="navbar-toggler" (click)="toggleMenu()">
+    <span class="toggler-icon"></span>
+    <span class="toggler-icon"></span>
+    <span class="toggler-icon"></span>
+  </button>
+
+  <div class="navbar-menu" [className]="isMenuOpen ? 'active' : 'navbar-menu'">
+    <ul class="navbar-nav" (click)="toggleMenu()">
+      <li class="nav-item">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+          {{ 'nav.home' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/parcel-finder" routerLinkActive="active" class="nav-link">
+          {{ 'nav.parcel' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/chat" routerLinkActive="active" class="nav-link">
+          {{ 'nav.chat' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <button
+          class="btn theme"
+          (click)="toggleTheme()"
+          title="{{ isDarkMode() ? ('nav.theme.light' | translate) : ('nav.theme.dark' | translate) }}">
+          @if (this.isDarkMode()) {
+            <span>&#9788;</span>
+          } @else {
+            <span>&#9790;</span>
+          }
+        </button>
+      </li>
+      <li class="nav-item">
+        @if (this.currentLanguage == 'en') {
+          <button class="btn es" (click)="switchLanguage('es')"></button>
+        } @else {
+          <button class="btn en" (click)="switchLanguage('en')"></button>
+        }
+      </li>
+    </ul>
+  </div>
 </nav>
