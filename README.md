@@ -8,6 +8,8 @@ AgrIA (Agricultural Image Assistant) is an **integrated image analysis and intel
 
 It leverages an Angular-based frontend and a FastAPI Python server logic along with access to Google's Gemini LLM provided an API key and a Super-Resolution module for improved image visualization.
 
+This repository contains the unified source code for both the Frontend UI (`AgrIA_UI`) and the Python Backend services (`AgrIA_server`).
+
 ## Main features:
 - **Parcel Location:** Automatically find your parcel by simply using its cadastral reference, address or drawing/locating it in the map interface.
 - **Image Super-Resolution:** Improved 10m/px image resolution up to 2,5m/px thanks to the [SEN2SR](https://github.com/ESAOpenSR/SEN2SR.git) implementation of a Deep Learning model.
@@ -22,33 +24,32 @@ In order to run `AgrIA` properly, you will need the following:
 - `Conda` package manager (installment guide available at [conda.io](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)).
 - `Node.js` and `npm` (download tutorial available at [npmjs.com](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)).
     - `Angular CLI` (easy to get if you have `npm` by just using `npm install -g @angular/cli`).
+- Have the `AgrIA_server/.env` file setup and have the `GEOJSON_FILE` constant set (see [`AgrIA_server/README.md`](AgrIA_server/README.md)). This last file is essential if you want access to the MinIO database.
 
-Alternatively, you can easily deploy AgrIA by installing **[Docker](https://docs.docker.com/get-started/get-docker/)** and running the following command:
-
+## Quickstart:
+### Option 1: Docker (User mode)
+You can easily deploy AgrIA by installing **[Docker](https://docs.docker.com/get-started/get-docker/)** and running the following command:
 ```bash
 cd AgrIA
 docker compose up --build
 ```
-Be advised, given the specialized Machine Learning dependencies (Pytorch), the first time building the backend might might make the process take considerable time, depending on processing power (10+ minutes). On the other hand, no other additional installation is required this way.
+Be advised, given the specialized Machine Learning dependencies (Pytorch), the first time building the backend might might make the process take considerable time, depending on processing power (10+ minutes). On the other hand, no other additional installation is required this way. This is ideal for those users that want to deploy and use AgrIA
 
-## Quickstart:
-### Cloning this repository:
-This repository contains the unified source code for both the Frontend UI (`AgrIA_UI`) and the Python Backend services (`AgrIA_server`).
-
+### Option 2: Cloning and running the project (Dev mode)
+Alternatively, you can clone/download the repository files and follow these instructions to run AgrIA while still having access to the code. Ideal for developers.
 ```bash
 git clone https://github.com/KhaosResearch/AgrIA.git
 cd AgrIA
 ```
 ### Setup
 Each component (`AgrIA_UI` & `AgrIA_server`) has their own detailed documentation, but for a quickstart, here are the essentials:
-1. Initialize and run the frontend:
+1. Open a terminal window on root dir (`AgrIA`) and run this command to initialize the frontend:
 ```bash
 cd AgrIA_UI
 npm install
 ng serve
 ```
-2. Have the `AgrIA_server/.env` file and the the `GEOJSON_FILE` ready (see [`AgrIA_server/README.md`](AgrIA_server/README.md))
-3. Open a new terminal window on root dir to setup and run the backend:
+2. Open a new terminal window on root dir to setup and run the backend:
 ```bash
 cd AgrIA_server
 conda env create -f environment.yml -y
