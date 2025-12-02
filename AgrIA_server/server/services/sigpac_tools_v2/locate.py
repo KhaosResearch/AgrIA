@@ -11,7 +11,7 @@ logger = structlog.get_logger()
 
 def get_cadastral_data_from_coords(lat: float, lon: float, crs: str = "4258", use_cadastral_ref: bool = True):
     """Gets the cadastral reference of the given coordinates and reference in the given parcel.
-    WARNING: The result is synthetic and does not necesarily match a real SIGPAC cadastral reference.
+    WARNING: The result is synthetic and does not necessarily match a real SIGPAC cadastral reference.
     However, it works for the system's scope.
 
     Parameters

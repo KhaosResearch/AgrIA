@@ -48,7 +48,7 @@ DOCKER_HOST=backend
 DOCKER_BACKEND_URL=/api/
 
 ```
-The folowwing are legacy variables, but needed if you want to use the benchmark pipelines:
+The folowing are legacy variables, but needed if you want to use the benchmark pipelines:
 ```bash
 # Contact authors to gain access to these database credentials and files
 MINIO_ACCESS_PORT=0000
