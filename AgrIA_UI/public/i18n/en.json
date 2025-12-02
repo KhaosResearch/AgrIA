@@ -6,8 +6,10 @@
     "theme": {
       "light": "Swtich to Light Mode",
       "dark": "Switch to Dark Mode"
+    },
+    "lang": {
+      "switch": "Switch to Spanish"
     }
-
   },
   "home": {
     "hero": {
@@ -116,7 +118,6 @@
     "description2": "Make sure the code has 20 characters.",
     "description3Bold": "Urban cadastral reference codes will not be accepted. If you have difficulty finding your parcel, search it via coordinates / drawing parcel limits.",
     "description3": "",
-    "cadastralReference": "Cadastral reference code:",
     "cadastralPlaceholder": "Cadastral Ref. Code",
     "selectDate": "Select approximate date",
     "datePlaceholder": "Date",

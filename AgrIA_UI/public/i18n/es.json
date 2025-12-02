@@ -6,6 +6,9 @@
     "theme": {
       "light": "Usar Tema Claro",
       "dark": "Usar Tema Oscuro"
+    },
+    "lang": {
+      "switch": "Cambiar a Inglés"
     }
   },
   "home": {
@@ -110,7 +113,7 @@
     }
   },
   "parcelFinder": {
-    "cadastralData": "Datos Catastrales",
+    "cadastralData": "Datos Catastrales:",
     "description1": "Introduzca el código de referencia catastral de la parcela que desea consultar. Si no lo conoce, puede buscarlo en el sitio web del catastro o en documentos relacionados con la propiedad.",
     "description2": "Asegúrese de que el código tenga 20 caracteres.",
     "description3Bold": "No se admitirán códigos de referencia catastral urbanos. Si tiene dificultades para encontrar su parcela, búsquela por coordenadas / dibujando sus límites.",
