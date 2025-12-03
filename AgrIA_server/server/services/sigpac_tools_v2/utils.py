@@ -108,14 +108,14 @@ def get_parcel_metadata_and_geometry(base_endpoint: str) -> dict:
     response.raise_for_status()
     full_json = response.json()
 
-    geometry = get_geometry(full_json)
-    metadata = get_metadata(full_json)
+    geometry = extract_geometry(full_json)
+    metadata = extract_metadata(full_json)
 
     return geometry, metadata
 
 
-def get_geometry(full_json: dict) -> dict:
-    """ Extract parcel geometry info from all of the indificual encolusres info JSON file.
+def extract_geometry(full_json: dict) -> dict:
+    """ Extract parcel geometry info from all of the individual enclosures geometry data.
 
     Parameters:
     ----------
@@ -153,7 +153,7 @@ def get_geometry(full_json: dict) -> dict:
     return full_parcel_geometry
 
 
-def get_metadata(full_json: dict) -> dict:
+def extract_metadata(full_json: dict) -> dict:
     """Extract parcel metadata and geometry and returns them in a single JSON.
 
     Parameters:
