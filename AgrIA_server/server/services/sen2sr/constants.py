@@ -7,8 +7,7 @@ from ...config.constants import RESOLUTION, TEMP_DIR
 RESOLUTION = RESOLUTION
 TEMP_DIR = TEMP_DIR
 
-CURR_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CURR_SCRIPT_DIR = Path.Path(CURR_SCRIPT_DIR)
+CURR_SCRIPT_DIR = Path.Path(os.path.dirname(os.path.abspath(__file__)))
 
 MODEL_DIR = str(CURR_SCRIPT_DIR / "model")
 PNG_DIR = SEN2SR_SR_DIR / "png"

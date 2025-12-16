@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 import json
 import time
 import os
-import traceback
 import structlog
 
 from flask import abort
@@ -78,10 +77,6 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
     with open(GEOJSON_FILEPATH, "w") as file:
         file.write(str(geometry).replace("'", '"').replace(
             "(", "[").replace(")", "]"))  # format GeoJSON correctly
-    geojson_data, gdf = get_geojson_data(geometry, metadata)
-    zones_utm = get_tiles_polygons(gdf)
-    list_zones_utm = list(zones_utm)
-
     # Get bands for RGB/SR processing
     bands = [b + f"_{RESOLUTION}m" for b in SR_BANDS]
     if not get_sr_image:
@@ -90,6 +85,9 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
 
     sigpac_image_url = ''
     if GET_SR_BENCHMARK:
+        geojson_data, gdf = get_geojson_data(geometry, metadata)
+        zones_utm = get_tiles_polygons(gdf)
+        list_zones_utm = list(zones_utm)
         reset_dir(BM_DATA_DIR)
         reset_dir(BM_RES_DIR)
         sigpac_image_url = download_parcel_image(
@@ -129,13 +127,14 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
     return geometry, metadata, sigpac_image_url
 
 
-def download_sen2sr_parcel_image(geometry, date):
+def download_sen2sr_parcel_image(geometry, date, delta_days = 15):
     """
     Download and super-resolve parcel image cropped from Sentinel imagery cubo data.
 
     Arguments:
         geometry (dict): Geometry containing the parcel/image's limits.
-        date (str): Most recent date to get the image from.
+        date (str): Most recent date to get the image from. ISO format.
+        delta_days (int): Nunmber of days to searh backwards for images.
 
     Returns:
         sigpac_image_url (str): Path to display SR image.
@@ -156,9 +155,8 @@ def download_sen2sr_parcel_image(geometry, date):
         year, month, day = date.split("-")
         formatted_date = datetime(
             year=int(year), month=int(month), day=int(day))
-        delta = 15
         end_date = formatted_date.strftime("%Y-%m-%d")
-        start_date = (formatted_date - timedelta(days=delta)
+        start_date = (formatted_date - timedelta(days=delta_days)
                       ).strftime("%Y-%m-%d")
 
         sigpac_image_name = os.path.basename(get_sr_image(

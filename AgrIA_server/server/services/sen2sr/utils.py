@@ -187,6 +187,7 @@ def get_cloudless_time_indices(scl: DataArray, cloud_threshold=0.01):
 
             if cloud_fraction <= cloud_threshold:
                 valid_indices.append(t)
+                break
             elif cloud_fraction < min_threshold:
                 min_threshold = cloud_fraction
                 min_index = t
