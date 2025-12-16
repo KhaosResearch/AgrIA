@@ -4,6 +4,26 @@
   <img src="./assets/img/logo.png" alt="AgrIA Logo" width="300"/>
 </div>
 
+![License](https://img.shields.io/badge/license-MIT-green)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![Docker](https://img.shields.io/badge/docker-containerized-blue?logo=docker&logoColor=white)
+
+![Angular](https://img.shields.io/badge/Angular-v20.1.4-DD0031?logo=angular&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-~5.8.3-3178C6?logo=typescript&logoColor=white)
+![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-199900?logo=leaflet&logoColor=white)
+![Angular Material](https://img.shields.io/badge/Material-20.1.4-3f51b5?logo=angular&logoColor=white)
+![RxJS](https://img.shields.io/badge/RxJS-~7.8.0-B7178C?logo=reactivex&logoColor=white)
+![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4?logo=prettier&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-Proxy-009639?logo=nginx&logoColor=white)
+
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.0+-000000?logo=flask&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.4.1-EE4C2C?logo=pytorch&logoColor=white)
+![GeoPandas](https://img.shields.io/badge/GeoPandas-Enabled-139C5A?logo=pandas&logoColor=white)
+![SentinelHub](https://img.shields.io/badge/SentinelHub-Active-blue)
+![Conda](https://img.shields.io/badge/conda-forge-342B029?logo=anaconda&logoColor=white)
+![Flake8](https://img.shields.io/badge/linter-flake8-blueviolet)
+
 AgrIA (Agricultural Image Assistant) is an **integrated image analysis and intelligent chat tool that specializes in agricultural satellite image classification**. Designed to assist farmers and landowners, AgrIA facilitates crop valuation and provides a report that helps them **qualify for various European Union eco-scheme aids within the framework of the Common Agricultural Policy (CAP).** It is currently only applicalbe to Spain's national territory and fields, but allows modification to adapt to other EU member states.
 
 It leverages an Angular-based frontend and a FastAPI Python server logic along with access to Google's Gemini LLM provided an API key and a Super-Resolution module for improved image visualization.

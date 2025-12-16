@@ -1,5 +1,13 @@
 # AgrIA_server
 
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.0+-000000?logo=flask&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.4.1-EE4C2C?logo=pytorch&logoColor=white)
+![GeoPandas](https://img.shields.io/badge/GeoPandas-Enabled-139C5A?logo=pandas&logoColor=white)
+![SentinelHub](https://img.shields.io/badge/SentinelHub-Active-blue)
+![Conda](https://img.shields.io/badge/conda-forge-342B029?logo=anaconda&logoColor=white)
+![Flake8](https://img.shields.io/badge/linter-flake8-blueviolet)
+
 This is the server side of the Agricultural Imaging Assistant (AgrIA). It includes information on how to setup and run the server side of AgrIA.
 
 ## Requirements:

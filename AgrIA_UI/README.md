@@ -1,5 +1,13 @@
 # AgrIA_UI
 
+![Angular](https://img.shields.io/badge/Angular-v20.1.4-DD0031?logo=angular&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-~5.8.3-3178C6?logo=typescript&logoColor=white)
+![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-199900?logo=leaflet&logoColor=white)
+![Angular Material](https://img.shields.io/badge/Material-20.1.4-3f51b5?logo=angular&logoColor=white)
+![RxJS](https://img.shields.io/badge/RxJS-~7.8.0-B7178C?logo=reactivex&logoColor=white)
+![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4?logo=prettier&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-Proxy-009639?logo=nginx&logoColor=white)
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.8.
 
 ## Installation:
