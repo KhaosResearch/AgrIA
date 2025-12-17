@@ -48,6 +48,15 @@ In order to run `AgrIA` properly, you will need the following:
 - Have the `AgrIA_server/.env` file setup and have the `GEOJSON_FILE` constant set (see [`AgrIA_server/README.md`](AgrIA_server/README.md)). This last file is essential if you want access to the MinIO database.
 
 ## Quickstart:
+In order to get AgrIA started, you will need to assign the essential environment variables:
+1. **Copy the environment template file:**
+    ```bash
+    cp .env.example .env
+    ```
+2. **Set the variables:** Depending whether you choose **Option 1** (*User mode*) or **Option 2** (*Dev mode*), configure the variables as you need.
+
+> *NOTE:* The `NON-ESSENTIAL VARIABLES` may be assigned but will only be used for benchmarking purposes (available by modifying the code in *Dev mode*).
+
 ### Option 1: Docker (User mode)
 You can easily deploy AgrIA by installing **[Docker](https://docs.docker.com/get-started/get-docker/)** and running the following command:
 ```bash
