@@ -7,6 +7,7 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Docker](https://img.shields.io/badge/docker-containerized-blue?logo=docker&logoColor=white)
+![CI Status](https://img.shields.io/badge/build-passing-brightgreen?logo=github-actions&logoColor=white)
 
 ![Angular](https://img.shields.io/badge/Angular-v20.1.4-DD0031?logo=angular&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-~5.8.3-3178C6?logo=typescript&logoColor=white)

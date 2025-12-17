@@ -83,6 +83,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libglib2.0-0
+
       - name: Setup Mamba Environment
         uses: conda-incubator/setup-miniconda@v3
         with:
@@ -90,8 +95,10 @@ jobs:
           environment-file: AgrIA_server/environment-docker.yml
           auto-activate-base: false
 
-      - name: Backend Tests
-        shell: bash -l {0} 
-        run: |
-          mamba run -n agria_server_env pytest -vv
+      - name: Run Backend Tests
+        shell: bash -l {0}
         working-directory: AgrIA_server
+        env:
+          PYTHONPATH: . 
+        run: |
+          python -m pytest -vv
