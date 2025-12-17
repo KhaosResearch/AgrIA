@@ -1,11 +1,17 @@
+import os
+import structlog
 from dotenv import load_dotenv
 
-from .env_config import GEMINI_API_KEY
+logger = structlog.getLogger()
 
 load_dotenv()
 
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
 if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY is not set in .env")
+    ve = ValueError("Warning: 'GEMINI_API_KEY' was not set correctly in '.env' file. Detected value: {GEMINI_API_KEY}")
+    logger.warning(f"{ve}")
+    logger.warning(f"Set a valid value to access AgrIA's Chat Assistant services!")
 
 
 class Config:
