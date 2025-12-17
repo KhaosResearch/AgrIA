@@ -1,4 +1,4 @@
-name: 1. CI - Quality and Tests
+name: CI - Quality and Testing
 
 on:
   push:
@@ -43,8 +43,32 @@ jobs:
         run: npm install
         working-directory: AgrIA_UI
 
+      - name: SAFECHECK Install Chrome dependencies for Headless testing
+        run: |
+          # 1. Update apt and install utilidades necesarias
+          sudo apt-get update -qq
+          sudo apt-get install -y wget gnupg
+
+          # 2. Iport Google Chrome sign-in key
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /etc/apt/keyrings/google-chrome.gpg
+
+          # 3. Add Chrome repository to source list
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+
+          # 4. update apt to identify new repo
+          sudo apt-get update -qq
+
+          # 5. Install Google Chrome Stable & necessary dependencies
+          sudo apt-get install -y \
+            google-chrome-stable \
+            libgbm-dev \
+            libxss1 \
+            libasound2t64
+
       - name: 5. Run Angular Tests
-        run: npm test -- --watch=false --no-progress --browsers=ChromeHeadless
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
         working-directory: AgrIA_UI
 
 
@@ -66,7 +90,8 @@ jobs:
           environment-file: AgrIA_server/environment-docker.yml
           auto-activate-base: false
 
-      - name: Run Backend Tests
+      - name: Backend Tests
+        shell: bash -l {0} 
         run: |
-          cd AgrIA_server
           mamba run -n agria_server_env pytest -vv
+        working-directory: AgrIA_server
