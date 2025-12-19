@@ -42,7 +42,6 @@
   text-decoration: none;
   color: var(--color-text-navbar);
   font-size: 1.5rem;
-  font-weight: bold;
   white-space: nowrap; /* Prevents logo text from wrapping */
 }
 

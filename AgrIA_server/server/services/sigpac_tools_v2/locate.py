@@ -2,16 +2,14 @@ import requests
 import structlog
 
 from ._globals import BASE_URL, QUERY_URL
-from .utils import get_parcel_metadata_and_geometry
-
-from ...utils.parcel_finder_utils import build_cadastral_reference
+from .utils import build_cadastral_reference, get_parcel_metadata_and_geometry
 
 logger = structlog.get_logger()
 
 
 def get_cadastral_data_from_coords(lat: float, lon: float, crs: str = "4258", use_cadastral_ref: bool = True):
     """Gets the cadastral reference of the given coordinates and reference in the given parcel.
-    WARNING: The result is synthetic and does not necesarily match a real SIGPAC cadastral reference.
+    WARNING: The result is synthetic and does not necessarily match a real SIGPAC cadastral reference.
     However, it works for the system's scope.
 
     Parameters
@@ -37,7 +35,6 @@ def get_cadastral_data_from_coords(lat: float, lon: float, crs: str = "4258", us
     logger.info(f"Retrieving info from parcel at coordinates: {lat}, {lon}")
     base_endpoint = f"{BASE_URL}/{QUERY_URL}/recinfobypoint/{crs}/{lon}/{lat}.json"
     logger.debug(f"SIGPAC request URL: {base_endpoint}")
-    # TODO: Review if the conditional statement is ultimately redundant (if so, also build_cadastral_reference()'s logic)
     if use_cadastral_ref:
         try:
             response = requests.get(base_endpoint)
@@ -63,5 +60,7 @@ def get_cadastral_data_from_coords(lat: float, lon: float, crs: str = "4258", us
         return cadastral_ref
     else:
         geojson_endpoint = base_endpoint.replace('.json', '.geojson')
+        with open("ñ.log", "w") as f:
+            f.write(geojson_endpoint)
         geometry, metadata = get_parcel_metadata_and_geometry(geojson_endpoint)
         return geometry, metadata

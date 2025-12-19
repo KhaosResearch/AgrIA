@@ -154,11 +154,6 @@ def mock_sigpact_tools_v2_dependencies(monkeypatch):
     mock_read_cadastral_registry = MagicMock(return_value=MOCK_REG)
     monkeypatch.setattr(sigpac_find, "read_cadastral_registry",
                         mock_read_cadastral_registry)
-    mock_get_geometry = MagicMock(return_value=MOCK_GEOMETRY)
-    monkeypatch.setattr(sigpac_utils, "get_geometry", mock_get_geometry)
-    mock_get_metadata = MagicMock(return_value=MOCK_METADATA)
-    monkeypatch.setattr(sigpac_utils, "get_metadata", mock_get_metadata)
-
     mock_search = MagicMock(return_value=(MOCK_GEOMETRY, MOCK_METADATA))
     monkeypatch.setattr(sigpac_find, "search", mock_search)
     mock_find_community = MagicMock(return_value=MOCK_COMMUNITY)
@@ -181,8 +176,6 @@ def mock_sigpact_tools_v2_dependencies(monkeypatch):
 
     yield {
         "mock_read_cadastral_registry": mock_read_cadastral_registry,
-        "mock_get_geometry": mock_get_geometry,
-        "mock_get_metadata": mock_get_metadata,
         "mock_search": mock_search,
         "mock_find_community": mock_find_community,
         "mock_get_parcel_metadata_and_geometry": mock_get_parcel_metadata_and_geometry,

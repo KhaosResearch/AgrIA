@@ -15,7 +15,6 @@ from rasterio.mask import mask
 
 from .constants import *
 from .utils import lonlat_to_utm_epsg, save_to_png, save_to_tif, get_cloudless_time_indices, make_pixel_faithful_comparison, reorder_bands
-from ...config.constants import RESOLUTION, TEMP_DIR
 
 logger = structlog.get_logger()
 
@@ -34,7 +33,7 @@ def get_sr_image(lat: float, lon: float, bands: list, start_date: str, end_date:
         sr_image_filepath (str): Local filepath to SR image.
     """
     try:
-        # Ensure sizeis right (minimum for SEN2SR)
+        # Ensure size is right (minimum for SEN2SR)
         logger.debug(f"Image size {size}x{size}px")
         # Download model
         if not os.path.exists(MODEL_DIR) or len(os.listdir(MODEL_DIR)) == 0:

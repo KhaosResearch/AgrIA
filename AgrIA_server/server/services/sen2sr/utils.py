@@ -13,7 +13,7 @@ from PIL import Image, ImageEnhance
 from ...config.constants import GET_SR_BENCHMARK
 
 from ...benchmark.sr.utils import copy_file_to_dir
-from .constants import BRIGHTNESS_FACTOR, COMPARISON_PNG_FILEPATH, GAMMA, PNG_DIR, SPAIN_MAINLAND, TIF_DIR
+from .constants import BRIGHTNESS_FACTOR, COMPARISON_PNG_FILEPATH, GAMMA, PNG_DIR, TIF_DIR
 
 logger = structlog.get_logger()
 # --------------------
@@ -187,6 +187,7 @@ def get_cloudless_time_indices(scl: DataArray, cloud_threshold=0.01):
 
             if cloud_fraction <= cloud_threshold:
                 valid_indices.append(t)
+                break
             elif cloud_fraction < min_threshold:
                 min_threshold = cloud_fraction
                 min_index = t
@@ -209,22 +210,6 @@ def get_cloudless_time_indices(scl: DataArray, cloud_threshold=0.01):
         logger.exception(
             "An error occurred while finding cloudless time indices.")
         raise
-
-
-def prepare_rgb(arr, is_tensor=False):
-    """
-    Convert (bands, H, W) array to RGB uint8 (H, W, 3).
-    Assumes arr has bands in order [NIR, B, G, R] -> we take R,G,B.
-    """
-    if is_tensor:
-        arr = arr.detach().cpu().numpy()
-
-    # Take only R,G,B
-    rgb = np.stack([arr[3], arr[2], arr[1]], axis=-1)  # (H,W,3)
-
-    # Normalize to 0–255
-    rgb_norm = (rgb - rgb.min()) / (rgb.max() - rgb.min() + 1e-6)
-    return (rgb_norm * 255).astype(np.uint8)
 
 
 def make_pixel_faithful_comparison(original_arr, sr_arr, output_path=COMPARISON_PNG_FILEPATH, apply_brightness=True, apply_gamma=False, border=15, spacing=5, bg_color=(255, 255, 255)):
@@ -300,10 +285,3 @@ def lonlat_to_utm_epsg(lon, lat):
         return f"EPSG:{32600 + zone}"  # Northern hemisphere
     else:
         return f"EPSG:{32700 + zone}"  # Southern hemisphere
-# Load Spain shapefile (or GeoJSON)
-
-
-def is_in_spain(lon, lat):
-    """Return True if a lon/lat point is inside mainland Spain bbox."""
-    min_lon, min_lat, max_lon, max_lat = SPAIN_MAINLAND
-    return (min_lon <= lon <= max_lon) and (min_lat <= lat <= max_lat)

@@ -1,5 +1,13 @@
 # AgrIA_server
 
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.0+-000000?logo=flask&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.4.1-EE4C2C?logo=pytorch&logoColor=white)
+![GeoPandas](https://img.shields.io/badge/GeoPandas-Enabled-139C5A?logo=pandas&logoColor=white)
+![SentinelHub](https://img.shields.io/badge/SentinelHub-Active-blue)
+![Conda](https://img.shields.io/badge/conda-forge-342B029?logo=anaconda&logoColor=white)
+![Flake8](https://img.shields.io/badge/linter-flake8-blueviolet)
+
 This is the server side of the Agricultural Imaging Assistant (AgrIA). It includes information on how to setup and run the server side of AgrIA.
 
 ## Requirements:
@@ -26,13 +34,20 @@ pip install sen2sr mlstac git+https://github.com/ESDS-Leipzig/cubo.git -q
 ```
 ### System environment setup:
 You will need to rename the `.env_example` file to `.env` and complete it with your own data.
+  ```bash
+  cp .env.example .env
+  ```
 
 **Content of your `.env` file:**
 ```bash
-# Replace variables with your data and rename file to ".env"
-GEMINI_API_KEY=YOUR_API_KEY
+# --------------------------------------
+# ESSENTIAL DEVELOPER VARIABLES
+#--------------------------------------
 
-# Fronted config (default values)
+# LLM variable
+GEMINI_API_KEY= # YOUR_API_KEY
+
+# Frontend config (default values)
 UI_PORT=4200
 UI_HOST=locahost
 UI_URL=http://${UI_HOST}:${UI_PORT}*
@@ -42,15 +57,22 @@ API_PORT=5000
 API_HOST=127.0.0.1
 API_URL=http://${API_HOST}:${API_PORT}
 
+# --------------------------------------
+# ESSENTIAL DEPLOYMENT VARIABLES
+#--------------------------------------
+
 # Docker config (default values | for deployment)
 DOCKER_PORT=5001
 DOCKER_HOST=backend
 DOCKER_BACKEND_URL=/api/
-
 ```
-The folowwing are legacy variables, but needed if you want to use the benchmark pipelines:
+The folowing are legacy variables, but needed if you want to use the benchmark pipelines:
 ```bash
-# Contact authors to gain access to these database credentials and files
+# --------------------------------------
+# OPTIONAL VARIABLES
+#--------------------------------------
+
+# Contact authors to gain access to these database credentials and geometry files
 MINIO_ACCESS_PORT=0000
 MINIO_ENDPOINT=255.000.000.000:${MINIO_ACCESS_PORT}
 MINIO_ACCESS_KEY=minio-access-key
@@ -59,6 +81,7 @@ bucket_name="bucket-name"
 
 GEOMETRY_FILE = path/to/geometry-file.kml
 
+# Use a free Copernicus account - vars used for benchmark purposes
 COPERNICUS_CLIENT_ID=copernicusl-client-id
 COPERNICUS_CLIENT_SECRET=copernicus-client-secret
 COPERNICUS_CONFIG_NAME=any-config-name

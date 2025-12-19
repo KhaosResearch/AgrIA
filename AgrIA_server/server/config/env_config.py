@@ -3,11 +3,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
-if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY is not set in .env")
-
 UI_PORT = os.getenv("UI_PORT", "4200")
 UI_HOST = os.getenv("UI_HOST", "localhost")
 UI_URL = os.getenv("UI_URL", f"http://{UI_HOST}:{UI_PORT}")

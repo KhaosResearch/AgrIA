@@ -49,3 +49,15 @@ def search(data: dict) -> dict:
         raise ValueError(
             '"Community" has not been specified and it could have not been found from the "province" parameter'
         )
+
+if __name__ == '__main__':
+    data = {
+        "community": 2,
+        "province": 6,
+        "municipality": 2,
+        "polygon": 1,
+        "parcel": 1
+    }
+
+    geojson = search(data)
+    print("GEOJSON:", geojson)
