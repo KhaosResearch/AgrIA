@@ -146,42 +146,40 @@ MOCK_RESPONSE_JSON = [
     }
 ]
 
+
 @pytest.fixture
 def mock_sigpact_tools_v2_dependencies(monkeypatch):
     # --- ARRANGE ---
     # Prepare mockups (find.py)
-    mock_read_cadastral_registry  = MagicMock(return_value=MOCK_REG)
-    monkeypatch.setattr(sigpac_find, "read_cadastral_registry", mock_read_cadastral_registry)
-    mock_get_geometry=MagicMock(return_value=MOCK_GEOMETRY)
-    monkeypatch.setattr(sigpac_utils, "get_geometry", mock_get_geometry)
-    mock_get_metadata=MagicMock(return_value=MOCK_METADATA)
-    monkeypatch.setattr(sigpac_utils, "get_metadata", mock_get_metadata)
-
-    mock_search  = MagicMock(return_value=(MOCK_GEOMETRY, MOCK_METADATA))
+    mock_read_cadastral_registry = MagicMock(return_value=MOCK_REG)
+    monkeypatch.setattr(sigpac_find, "read_cadastral_registry",
+                        mock_read_cadastral_registry)
+    mock_search = MagicMock(return_value=(MOCK_GEOMETRY, MOCK_METADATA))
     monkeypatch.setattr(sigpac_find, "search", mock_search)
-    mock_find_community  = MagicMock(return_value=MOCK_COMMUNITY)
+    mock_find_community = MagicMock(return_value=MOCK_COMMUNITY)
     monkeypatch.setattr(sigpac_utils, "find_community", mock_find_community)
-    mock_get_parcel_metadata_and_geometry  = MagicMock(return_value=(MOCK_GEOMETRY, MOCK_METADATA))
-    monkeypatch.setattr(sigpac_utils, "get_parcel_metadata_and_geometry", mock_get_parcel_metadata_and_geometry)
-    
+    mock_get_parcel_metadata_and_geometry = MagicMock(
+        return_value=(MOCK_GEOMETRY, MOCK_METADATA))
+    monkeypatch.setattr(sigpac_utils, "get_parcel_metadata_and_geometry",
+                        mock_get_parcel_metadata_and_geometry)
+
     # Prepare mockups (locate.py)
-    mock_build_cadastral_reference  = MagicMock(return_value=MOCK_CADASTRAL_REF)
-    monkeypatch.setattr(sigpac_locate, "build_cadastral_reference", mock_build_cadastral_reference)
-    
+    mock_build_cadastral_reference = MagicMock(return_value=MOCK_CADASTRAL_REF)
+    monkeypatch.setattr(
+        sigpac_locate, "build_cadastral_reference", mock_build_cadastral_reference)
+
     # Prepare mockups (external dependecies)
     mock_response_json = MagicMock(return_value=MOCK_RESPONSE_JSON)
     mock_response = MagicMock(status_code=200, json=mock_response_json)
     mock_requests_get = MagicMock(return_value=mock_response)
     monkeypatch.setattr(requests, "get", mock_requests_get)
-    
+
     yield {
         "mock_read_cadastral_registry": mock_read_cadastral_registry,
-        "mock_get_geometry": mock_get_geometry,
-        "mock_get_metadata": mock_get_metadata,
         "mock_search": mock_search,
         "mock_find_community": mock_find_community,
         "mock_get_parcel_metadata_and_geometry": mock_get_parcel_metadata_and_geometry,
         "mock_build_cadastral_reference": mock_build_cadastral_reference,
-        "mock_response_json": mock_response_json, 
-        "mock_requests_get": mock_requests_get 
+        "mock_response_json": mock_response_json,
+        "mock_requests_get": mock_requests_get
     }

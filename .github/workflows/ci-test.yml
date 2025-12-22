@@ -1,0 +1,136 @@
+name: CI - Quality and Testing
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read 
+
+jobs:
+
+  # -------------------------
+  # FRONTEND TEST JOB
+  # -------------------------
+  test_frontend:
+    name: Frontend Tests (Angular)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 3. Restore Node Cache
+        uses: actions/cache@v4
+        with:
+          path: AgrIA_UI/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('AgrIA_UI/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: 4. Install Dependencies
+        run: npm install
+        working-directory: AgrIA_UI
+
+      - name: SAFECHECK Install Chrome dependencies for Headless testing
+        run: |
+          # 1. Update apt and install utilidades necesarias
+          sudo apt-get update -qq
+          sudo apt-get install -y wget gnupg
+
+          # 2. Iport Google Chrome sign-in key
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /etc/apt/keyrings/google-chrome.gpg
+
+          # 3. Add Chrome repository to source list
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+
+          # 4. update apt to identify new repo
+          sudo apt-get update -qq
+
+          # 5. Install Google Chrome Stable & necessary dependencies
+          sudo apt-get install -y \
+            google-chrome-stable \
+            libgbm-dev \
+            libxss1 \
+            libasound2t64
+
+      - name: 5. Run Angular Tests
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
+        working-directory: AgrIA_UI
+
+
+  # -------------------------
+  # BACKEND TEST JOB
+  # -------------------------
+  test_backend:
+    name: Backend Tests (Python)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libglib2.0-0
+
+      - name: Setup Mamba Environment
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: agria_server_env
+          environment-file: AgrIA_server/environment-docker.yml
+          auto-activate-base: false
+
+      - name: Run Backend Tests
+        shell: bash -l {0}
+        working-directory: AgrIA_server
+        env:
+          # 1. Essential Config
+          PYTHONPATH: .
+          
+          # 2. Mock LLM Credentials
+          GEMINI_API_KEY: "mock_gemini_key_for_ci"
+
+          # 3. Mock Frontend/Backend Configs
+          UI_PORT: "4200"
+          UI_HOST: "localhost"
+          UI_URL: "http://localhost:4200"
+          API_PORT: "5000"
+          API_HOST: "127.0.0.1"
+          API_URL: "http://127.0.0.1:5000"
+
+          # 4. Mock Deployment Vars
+          DOCKER_PORT: "5001"
+          DOCKER_HOST: "backend"
+          DOCKER_BACKEND_URL: "/api/"
+
+          # 5. Mock Database/Storage (MinIO)
+          MINIO_ACCESS_PORT: "9000"
+          MINIO_ENDPOINT: "127.0.0.1:9000"
+          MINIO_ACCESS_KEY: "mock_minio_user"
+          MINIO_SECRET_KEY: "mock_minio_password"
+          bucket_name: "mock-test-bucket"
+
+          # 6. Mock Files
+          GEOMETRY_FILE: "tests/fixtures/dummy_geometry.kml"
+
+          # 7. Mock Copernicus (Fixes your specific crash)
+          COPERNICUS_CLIENT_ID: "mock_copernicus_id"
+          COPERNICUS_CLIENT_SECRET: "mock_copernicus_secret"
+          COPERNICUS_CONFIG_NAME: "mock_copernicus_config"
+        run: |
+          python -m pytest -vv

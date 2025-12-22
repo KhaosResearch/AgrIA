@@ -15,9 +15,9 @@ from rasterio.mask import mask
 
 from .constants import *
 from .utils import lonlat_to_utm_epsg, save_to_png, save_to_tif, get_cloudless_time_indices, make_pixel_faithful_comparison, reorder_bands
-from ...config.constants import RESOLUTION, TEMP_DIR
 
 logger = structlog.get_logger()
+
 
 def get_sr_image(lat: float, lon: float, bands: list, start_date: str, end_date: str, size: int):
     """
@@ -33,42 +33,47 @@ def get_sr_image(lat: float, lon: float, bands: list, start_date: str, end_date:
         sr_image_filepath (str): Local filepath to SR image.
     """
     try:
-        # Ensure sizeis right (minimum for SEN2SR)
+        # Ensure size is right (minimum for SEN2SR)
         logger.debug(f"Image size {size}x{size}px")
         # Download model
         if not os.path.exists(MODEL_DIR) or len(os.listdir(MODEL_DIR)) == 0:
             mlstac.download(
                 file="https://huggingface.co/tacofoundation/sen2sr/resolve/main/SEN2SRLite/NonReference_RGBN_x4/mlm.json",
-                output_dir= MODEL_DIR,
+                output_dir=MODEL_DIR,
             )
-       
+
         # Prepare data
         crs = lonlat_to_utm_epsg(lon, lat)
-        cloudless_image_data, sample_date = download_sentinel_cubo(lat, lon, bands, start_date, end_date, size, crs)
+        cloudless_image_data, sample_date = download_sentinel_cubo(
+            lat, lon, bands, start_date, end_date, size, crs)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        original_s2_numpy = (cloudless_image_data.compute().to_numpy() / 10_000).astype("float32")
+        original_s2_numpy = (cloudless_image_data.compute(
+        ).to_numpy() / 10_000).astype("float32")
         X = torch.from_numpy(original_s2_numpy).float().to(device)
         X = torch.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
 
         # Load
         model = mlstac.load((MODEL_DIR)).compiled_model(device=device)
-        
+
         # Apply model for normal or large size images
-        if  size <= 128:
+        if size <= 128:
             superX = model(X[None]).squeeze(0)
         else:
             superX = sen2sr.predict_large(
                 model=model,
-                X=X, # The input tensor
-                overlap=32, # The overlap between the patches
+                X=X,  # The input tensor
+                overlap=32,  # The overlap between the patches
             )
 
         # Reorder bands ( [NIR, B, G, R] -> [R, G, B, NIR])
-        original_s2_reordered, superX_reordered = reorder_bands(original_s2_numpy, superX)
-        
+        original_s2_reordered, superX_reordered = reorder_bands(
+            original_s2_numpy, superX)
+
         # Save original and super-res images in TIF & PNG
-        save_to_tif(original_s2_reordered, OG_TIF_FILEPATH, cloudless_image_data, crs)
-        save_to_tif(superX_reordered, SR_TIF_FILEPATH, cloudless_image_data, crs)
+        save_to_tif(original_s2_reordered, OG_TIF_FILEPATH,
+                    cloudless_image_data, crs)
+        save_to_tif(superX_reordered, SR_TIF_FILEPATH,
+                    cloudless_image_data, crs)
 
         save_to_png(original_s2_reordered, OG_PNG_FILEPATH, lat)
         save_to_png(superX_reordered, SR_PNG_FILEPATH, lat)
@@ -77,7 +82,8 @@ def get_sr_image(lat: float, lon: float, bands: list, start_date: str, end_date:
         make_pixel_faithful_comparison(original_s2_reordered, superX_reordered)
 
         # Get and save cropped sr parcel image
-        sr_image_filepath = str(crop_parcel_from_sr_tif(SR_TIF_FILEPATH, sample_date))
+        sr_image_filepath = str(
+            crop_parcel_from_sr_tif(SR_TIF_FILEPATH, sample_date))
         return sr_image_filepath
     except Exception as e:
         logger.error(f"An error occurred (get_sr_image SEN2SR): {str(e)}")
@@ -86,6 +92,8 @@ def get_sr_image(lat: float, lon: float, bands: list, start_date: str, end_date:
 # --------------------
 # Sentinel-2 cube
 # --------------------
+
+
 def download_sentinel_cubo(lat: float, lon: float, bands: list, start_date: str, end_date: str, size: int, crs: str, cloud_threshold: float = 0.01, max_retries: int = 3, retry_days_shift: int = 15):
     """
     Download Sentinel's imagery data cubo and uses SCL band to filter the least cloudy data within date range.
@@ -104,8 +112,9 @@ def download_sentinel_cubo(lat: float, lon: float, bands: list, start_date: str,
     """
     for attempt in range(max_retries):
         try:
-            logger.info(f"🌍 Attempt {attempt+1}/{max_retries}: {start_date} → {end_date}")
-            
+            logger.info(
+                f"🌍 Attempt {attempt+1}/{max_retries}: {start_date} → {end_date}")
+
             da = cubo.create(
                 lat=lat,
                 lon=lon,
@@ -119,13 +128,16 @@ def download_sentinel_cubo(lat: float, lon: float, bands: list, start_date: str,
 
             # Find cloudless time index
             scl = da.sel(band="SCL")
-            cloudless_date = get_cloudless_time_indices(scl, cloud_threshold)[-1]
-            cloudless_image_data = da.isel(time=cloudless_date).sel(band=bands[:-1])  # drop SCL band
+            cloudless_date = get_cloudless_time_indices(
+                scl, cloud_threshold)[-1]
+            cloudless_image_data = da.isel(time=cloudless_date).sel(
+                band=bands[:-1])  # drop SCL band
 
             # Get acquisition date and reproject
             acq_date = cloudless_image_data["time"].values
             acq_date_str = np.datetime_as_string(acq_date, unit='D')
-            cloudless_image_data = cloudless_image_data.rio.write_crs(crs).rio.reproject(crs)
+            cloudless_image_data = cloudless_image_data.rio.write_crs(
+                crs).rio.reproject(crs)
 
             logger.info(f"☁️  Cloudless image found on {acq_date_str}!")
             return cloudless_image_data, str(acq_date_str)
@@ -134,10 +146,14 @@ def download_sentinel_cubo(lat: float, lon: float, bands: list, start_date: str,
             logger.warning(f"⚠️  {e}")
             if attempt < max_retries - 1:
                 # Shift the date range backwards by `retry_days_shift` days
-                new_start = datetime.fromisoformat(start_date) - timedelta(days=retry_days_shift)
-                new_end = datetime.fromisoformat(end_date) - timedelta(days=retry_days_shift)
-                start_date, end_date = new_start.strftime("%Y-%m-%d"), new_end.strftime("%Y-%m-%d")
-                logger.debug(f"🔁 Retrying with earlier range: {start_date} → {end_date}")
+                new_start = datetime.fromisoformat(
+                    start_date) - timedelta(days=retry_days_shift)
+                new_end = datetime.fromisoformat(
+                    end_date) - timedelta(days=retry_days_shift)
+                start_date, end_date = new_start.strftime(
+                    "%Y-%m-%d"), new_end.strftime("%Y-%m-%d")
+                logger.debug(
+                    f"🔁 Retrying with earlier range: {start_date} → {end_date}")
                 continue
             else:
                 logger.error(f"❌ No valid images found after all retries.")
@@ -146,7 +162,9 @@ def download_sentinel_cubo(lat: float, lon: float, bands: list, start_date: str,
 # --------------------
 # Cropping SR parcel with polygon
 # --------------------
-def crop_parcel_from_sr_tif(raster_path:str, date): 
+
+
+def crop_parcel_from_sr_tif(raster_path: str, date):
     """
     Crops the parcel from the SR image, using the stored parcel's geometry and`rasterio`
     Arguments:
@@ -155,13 +173,14 @@ def crop_parcel_from_sr_tif(raster_path:str, date):
         out_png_path (str): Path to cropped SR parcel image
     """
     with rasterio.open(raster_path) as src:
-        
+
         raster_crs = src.crs
         gdf = gpd.read_file(GEOJSON_FILEPATH)
         if raster_crs:
             gdf = gdf.to_crs(raster_crs)
             gdf["geometry"] = gdf["geometry"].buffer(1)
-            logger.info(f"Reprojected polygon to match raster CRS: {raster_crs}")
+            logger.info(
+                f"Reprojected polygon to match raster CRS: {raster_crs}")
 
         # Get parcel's geom and apply mask on SR image
         logger.info(f"Cropping parcel's geometry from raster...")
@@ -186,11 +205,12 @@ def crop_parcel_from_sr_tif(raster_path:str, date):
     with rasterio.open(out_tif_path, "w", **out_meta) as dest:
         dest.write(out_image)
 
-    out_png_path= TEMP_DIR / f"{filename}.png"
+    out_png_path = TEMP_DIR / f"{filename}.png"
     save_to_png(out_image, out_png_path, apply_gamma_correction=True)
 
-    logger.info(f"✅ Clipped raster saved to {out_tif_path} and PNG saved to {out_png_path}")
-    
+    logger.info(
+        f"✅ Clipped raster saved to {out_tif_path} and PNG saved to {out_png_path}")
+
     return out_png_path
 
 
@@ -201,7 +221,7 @@ if __name__ == "__main__":
     delta = 20
     now = datetime.today().strftime("%Y-%m-%d")
     look_from = (datetime.today() - timedelta(days=delta)).strftime("%Y-%m-%d")
-    
+
     start_time = time.time()
     get_sr_image(lat, lon, BANDS, look_from, now, 150)
     finish_time = time.time()

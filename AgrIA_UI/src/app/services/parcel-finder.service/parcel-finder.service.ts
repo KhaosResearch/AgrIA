@@ -8,10 +8,9 @@ import { ISigpacLocationData } from '../../models/parcel-locator.model';
 import { CROP_CLASSIFICATION_FILENAME } from '../../config/constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ParcelFinderService {
-  
   private apiUrl = environment.apiUrl;
   private parcelInfoSubject = new BehaviorSubject<IFindParcelresponse | null>(null);
   parcelInfo$ = this.parcelInfoSubject.asObservable();
@@ -19,12 +18,14 @@ export class ParcelFinderService {
   constructor(private http: HttpClient) {}
 
   loadParcelDescription(request: FormData): Observable<string> {
-    return this.http.post<{ response: string }>(`${this.apiUrl}/load-parcel-description`, request)
+    return this.http
+      .post<{ response: string }>(`${this.apiUrl}/load-parcel-description`, request)
       .pipe(map(res => res.response));
   }
 
   findParcel(request: FormData): Observable<IFindParcelresponse> {
-    return this.http.post<{ response: IFindParcelresponse }>(`${this.apiUrl}/find-parcel`, request)
+    return this.http
+      .post<{ response: IFindParcelresponse }>(`${this.apiUrl}/find-parcel`, request)
       .pipe(map(res => res.response));
   }
 
@@ -33,16 +34,14 @@ export class ParcelFinderService {
   }
 
   loadCropClassifications(lang: String): Observable<ICropClassification[]> {
-    return this.http.get<ICropClassification[]>(CROP_CLASSIFICATION_FILENAME + lang +'.json');
+    return this.http.get<ICropClassification[]>(CROP_CLASSIFICATION_FILENAME + lang + '.json');
   }
 
   isCoordInZone(request: FormData): Observable<boolean> {
-    return this.http.post<{ response: boolean }>(`${this.apiUrl}/is-coord-in-zone`, request)
-      .pipe(map(res => res.response));
+    return this.http.post<{ response: boolean }>(`${this.apiUrl}/is-coord-in-zone`, request).pipe(map(res => res.response));
   }
-  
+
   setParcelInfo(data: IFindParcelresponse) {
     this.parcelInfoSubject.next(data);
   }
-  
 }

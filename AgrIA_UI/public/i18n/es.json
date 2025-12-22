@@ -2,7 +2,14 @@
   "nav": {
     "home": "Inicio",
     "parcel": "Buscador de Parcelas",
-    "chat": "Chat"
+    "chat": "Chat",
+    "theme": {
+      "light": "Usar Tema Claro",
+      "dark": "Usar Tema Oscuro"
+    },
+    "lang": {
+      "switch": "Cambiar a Inglés"
+    }
   },
   "home": {
     "hero": {
@@ -53,28 +60,50 @@
       "quickstart" : {
       "title": "Empezar a Usar AgrIA: Buscador de Parcelas",
       "paragraph1": "Para poder aprovechar AgrIA al máximo, ",
-      "paragraphBold": "necesitarás acceder al Buscador de Parcelas. ",
+      "paragraphBold": "el usuario puede acceder al Buscador de Parcelas. ",
       "paragraph2": "Así es cómo se usa:",
       "steps": {
         "1": "Ve a la ventana de 'Buscador de Parcelas'.",
-        "2": "Introduce el código de referncia catastral de tu parcela o finca.",
+        "2": "Seleccione el tipo de búsqueda en las pestañas e introduzca la información necesaria (más información en la ventana específica).",
         "3": "Selecciona la fecha de la que quieres conseguir la imagen.",
         "4": "Pulsa 'Buscar Parcela' y espere a que el sistema obtenga la imagen de su parcela.",
         "5": "Confirme la imagen de su aprcela par apasarla al char de AgrIA junto con la información de clasificación SIGPAC."
       },
-      "exampleTitle": "Ejemplo de ventana de Buscador de Parcelas."
+      "exampleTitle": "Ejemplo de ventana de Buscador de Parcela: Código Catastral."
     },
     "howToUse": {
       "title": "Cómo Interactuar con AgrIA: El Chat",
+      "paragraph1": "Para acceder al módulo de Chat, puede hacer lo siguiente:",
+      "paragraphBold1": "Usar la pestaña 'Chat' desde la barra de navegación: ",
+      "paragraphDetail1": "El usuario puede interactuar con el Chat directamente y hacer consultas sobre temas relacionados con la agricultura y la PAC.",
+      "paragraphBold2": "Usar el Buscador de Parcela y confirmar la parcela especificada: ",
+      "paragraphDetail2": "El Chat tendrá en cuenta los datos de la parcela y emitirá un informe de la misma. El usuarios puede interactuar igualmente después de eso.",
       "exampleTitle": "Ejemplo de interacción por chat de AgrIA"
     },
-    "contact": {
-      "title": "Contáctanos",
-      "description": "¿Tienes alguna pregunta o necesitas más información? No dudes en ponerte en contacto con nosotros.",
-      "namePlaceholder": "Tu Nombre",
-      "emailPlaceholder": "Tu Correo Electrónico",
-      "messagePlaceholder": "Tu Mensaje",
-      "sendButton": "Enviar Mensaje"
+    "transparencyNotice": {
+      "sectionTitle": "Aviso de transparencia y fuentes de AgrIA",
+      "introParagraph": "Este aviso se emite en cumplimiento con los principios de Transparencia y Responsabilidad establecidos en la ",
+      "euAiAct": "Ley de Inteligencia Artificial de la Unión Europea (Reglamento-UE-2024/1689 / AI Act):",
+      "heading1": "Identificación y Naturaleza del Sistema:",
+      "item1_1_title": "Identificación:",
+      "item1_1_text": "El Módulo Asistente de Chat AgrIA es una modificación ajustada del modelo multimodal Gemini de Google.",
+      "item1_2_title": "Naturaleza:",
+      "item1_2_text1": "Todas las interacciones y respuestas son generadas por Inteligencia Artificial. El usuario ",
+      "item1_2_textBold": "no se está comunicando con una persona real",
+      "item1_2_text2": ", y el resultado proporcionado no constituye asesoramiento legal o profesional certificado.",
+      "heading2": "Base de Contexto y Limitaciones:",
+      "item2_1_title": "Fuentes de Contexto:",
+      "item2_1_text": "El sistema utiliza instrucciones específicas para limitar su alcance y ha sido entrenado (o utiliza en su base de contexto) los siguientes documentos clave de política agrícola del ",
+      "fega": "Fondo Español de Garantía Agraria (FEGA)",
+      "fegaLink": "https://www.fega.gob.es/es/pepac-2023-2027/ayudas-directas/ecorregimenes",
+      "item2_1_1_text": ". Estas fuentes son la base de las respuestas proporcionadas:",
+      "item2_1_link1": "Nota aclaratoria Aplicación Eco-regímenes",
+      "item2_1_link2": "Preguntas Frecuentes Eco-regímenes",
+      "item2_1_link3": "IMPORTES UNITARIOS PROVISIONALES CAMPAÑA 2025",
+      "item2_2_title": "Limitación de Capacidad:",
+      "item2_2_text": "El sistema puede generar respuestas incorrectas, desactualizadas o incompletas. Es responsabilidad del usuario verificar la información con fuentes oficiales o expertos cualificados.",
+      "heading3": "Recomendación de Uso:",
+      "paragraph3": "El Módulo AgrIA debe utilizarse únicamente como una herramienta de apoyo e información preliminar, no como la única base para la toma de decisiones en materia agraria o política."
     },
     "footer": {
       "copyright": "© 2025 AgrIA. Todos los derechos reservados.",
@@ -84,7 +113,7 @@
     }
   },
   "parcelFinder": {
-    "cadastralData": "Datos Catastrales",
+    "cadastralData": "Datos Catastrales:",
     "description1": "Introduzca el código de referencia catastral de la parcela que desea consultar. Si no lo conoce, puede buscarlo en el sitio web del catastro o en documentos relacionados con la propiedad.",
     "description2": "Asegúrese de que el código tenga 20 caracteres.",
     "description3Bold": "No se admitirán códigos de referencia catastral urbanos. Si tiene dificultades para encontrar su parcela, búsquela por coordenadas / dibujando sus límites.",
@@ -187,7 +216,7 @@
       "imageName": "Nombre Imagen"
     },
     "chatWithAgria": {
-      "title": "Chat con AgrIA",
+      "title": "AgrIA",
       "agriaMessage1": "¡Hola! Soy tu Asistente de Imágenes Agrícolas, ¡pero puedes llamarme AgrIA! Mi propósito aquí es analizar imágenes satelitales de campos de cultivo para asistirte...",
       "userMessage1": "Hola AgrIA, he subido una imagen de mi campo en la parcela 34. ¿Podrías analizar el uso del agua?",
       "agriaMessage2": "Claro, he analizado la imagen de la parcela 34. Parece que hay áreas con bajo índice de vegetación que podrían indicar un uso ineficiente del agua. Te sugiero...",

@@ -1,6 +1,7 @@
 import random
 from datetime import datetime, timedelta
 
+
 def n_random_dates_between(date1: str, date2: str, n: int):
     """
     Generate n random dates between date1 and date2 (inclusive), formatted as yyyy-mm-dd.

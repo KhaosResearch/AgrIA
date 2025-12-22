@@ -4,9 +4,32 @@
   <img src="./assets/img/logo.png" alt="AgrIA Logo" width="300"/>
 </div>
 
+![License](https://img.shields.io/badge/license-MIT-green)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![Docker](https://img.shields.io/badge/docker-containerized-blue?logo=docker&logoColor=white)
+![CI Status](https://img.shields.io/badge/build-passing-brightgreen?logo=github-actions&logoColor=white)
+
+![Angular](https://img.shields.io/badge/Angular-v20.1.4-DD0031?logo=angular&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-~5.8.3-3178C6?logo=typescript&logoColor=white)
+![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-199900?logo=leaflet&logoColor=white)
+![Angular Material](https://img.shields.io/badge/Material-20.1.4-3f51b5?logo=angular&logoColor=white)
+![RxJS](https://img.shields.io/badge/RxJS-~7.8.0-B7178C?logo=reactivex&logoColor=white)
+![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4?logo=prettier&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-Proxy-009639?logo=nginx&logoColor=white)
+
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.0+-000000?logo=flask&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.4.1-EE4C2C?logo=pytorch&logoColor=white)
+![GeoPandas](https://img.shields.io/badge/GeoPandas-Enabled-139C5A?logo=pandas&logoColor=white)
+![SentinelHub](https://img.shields.io/badge/SentinelHub-Active-blue)
+![Conda](https://img.shields.io/badge/conda-forge-342B029?logo=anaconda&logoColor=white)
+![Flake8](https://img.shields.io/badge/linter-flake8-blueviolet)
+
 AgrIA (Agricultural Image Assistant) is an **integrated image analysis and intelligent chat tool that specializes in agricultural satellite image classification**. Designed to assist farmers and landowners, AgrIA facilitates crop valuation and provides a report that helps them **qualify for various European Union eco-scheme aids within the framework of the Common Agricultural Policy (CAP).** It is currently only applicalbe to Spain's national territory and fields, but allows modification to adapt to other EU member states.
 
 It leverages an Angular-based frontend and a FastAPI Python server logic along with access to Google's Gemini LLM provided an API key and a Super-Resolution module for improved image visualization.
+
+This repository contains the unified source code for both the Frontend UI (`AgrIA_UI`) and the Python Backend services (`AgrIA_server`).
 
 ## Main features:
 - **Parcel Location:** Automatically find your parcel by simply using its cadastral reference, address or drawing/locating it in the map interface.
@@ -22,25 +45,41 @@ In order to run `AgrIA` properly, you will need the following:
 - `Conda` package manager (installment guide available at [conda.io](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)).
 - `Node.js` and `npm` (download tutorial available at [npmjs.com](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)).
     - `Angular CLI` (easy to get if you have `npm` by just using `npm install -g @angular/cli`).
+- Have the `AgrIA_server/.env` file setup and have the `GEOJSON_FILE` constant set (see [`AgrIA_server/README.md`](AgrIA_server/README.md)). This last file is essential if you want access to the MinIO database.
 
 ## Quickstart:
-### Cloning this repository:
-This repository contains the unified source code for both the Frontend UI (`AgrIA_UI`) and the Python Backend services (`AgrIA_server`).
+In order to get AgrIA started, you will need to assign the essential environment variables:
+1. **Copy the environment template file:**
+    ```bash
+    cp .env.example .env
+    ```
+2. **Set the variables:** Depending whether you choose **Option 1** (*User mode*) or **Option 2** (*Dev mode*), configure the variables as you need.
 
+> *NOTE:* The `NON-ESSENTIAL VARIABLES` may be assigned but will only be used for benchmarking purposes (available by modifying the code in *Dev mode*).
+
+### Option 1: Docker (User mode)
+You can easily deploy AgrIA by installing **[Docker](https://docs.docker.com/get-started/get-docker/)** and running the following command:
+```bash
+cd AgrIA
+docker compose up --build
+```
+Be advised, given the specialized Machine Learning dependencies (Pytorch), the first time building the backend might might make the process take considerable time, depending on processing power (10+ minutes). On the other hand, no other additional installation is required this way. This is ideal for those users that want to deploy and use AgrIA
+
+### Option 2: Cloning and running the project (Dev mode)
+Alternatively, you can clone/download the repository files and follow these instructions to run AgrIA while still having access to the code. Ideal for developers.
 ```bash
 git clone https://github.com/KhaosResearch/AgrIA.git
 cd AgrIA
 ```
 ### Setup
 Each component (`AgrIA_UI` & `AgrIA_server`) has their own detailed documentation, but for a quickstart, here are the essentials:
-1. Initialize and run the frontend:
+1. Open a terminal window on root dir (`AgrIA`) and run this command to initialize the frontend:
 ```bash
 cd AgrIA_UI
 npm install
 ng serve
 ```
-2. Have the `AgrIA_server/.env` file and the the `GEOJSON_FILE` ready (see [`AgrIA_server/README.md`](AgrIA_server/README.md))
-3. Open a new terminal window on root dir to setup and run the backend:
+2. Open a new terminal window on root dir to setup and run the backend:
 ```bash
 cd AgrIA_server
 conda env create -f environment.yml -y

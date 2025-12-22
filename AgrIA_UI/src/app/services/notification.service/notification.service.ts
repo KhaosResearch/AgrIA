@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NotificationService {
   // Service to access all MatSnackBar features
@@ -16,7 +16,7 @@ export class NotificationService {
 
   /**
    * Show a notification on the interface.
-   * 
+   *
    * @param messageKey (str) Dict key inside the JSON localization files.
    * @param additionalMessage (str) Additional message context for the notification.
    * @param type (str) Type of notification (`'success' | 'error' | 'info' | 'warning'`).
@@ -46,7 +46,7 @@ export class NotificationService {
 
     // Look up the translation:
     this.translateService.get(`notifications.${messageKey}`).subscribe((translatedMessage: string) => {
-      const message = additionalMessage ? translatedMessage + ' ' + additionalMessage: translatedMessage;
+      const message = additionalMessage ? translatedMessage + ' ' + additionalMessage : translatedMessage;
       this.matSnackBar.open(message, 'Close', {
         duration: duration,
         panelClass: panelClass,

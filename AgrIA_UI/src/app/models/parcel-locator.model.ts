@@ -1,4 +1,4 @@
 export interface ISigpacLocationData {
-    province: string,
-    municipalities: string[],
+  province: string;
+  municipalities: string[];
 }

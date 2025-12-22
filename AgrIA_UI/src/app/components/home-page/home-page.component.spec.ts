@@ -2,15 +2,39 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HomePageComponent } from './home-page.component';
 
+import { provideHttpClient } from '@angular/common/http';
+
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+
+import { Observable, of } from 'rxjs';
+
+/**
+ * Init the TranslateModule with TranslateLoader to empty
+ */
+export class MockTranslateLoader implements TranslateLoader {
+  getTranslation(lang: string): Observable<any> {
+    return of({});
+  }
+}
+
 describe('HomePageComponent', () => {
   let component: HomePageComponent;
   let fixture: ComponentFixture<HomePageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HomePageComponent]
-    })
-    .compileComponents();
+      imports: [
+        TranslateModule.forRoot({
+          loader: { provide: TranslateLoader, useClass: MockTranslateLoader },
+        }),
+      ],
+      providers: [
+        provideHttpClient(), 
+        provideHttpClientTesting()
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(HomePageComponent);
     component = fixture.componentInstance;

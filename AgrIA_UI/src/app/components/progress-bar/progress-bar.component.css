@@ -1,12 +1,6 @@
-:host {
-    --bg-color:#e0e0e0;
-    --completion-color1: #4CAF50;
-    --completion-color2: #22a7ff;
-    --status-text-color: #dc3545;
-}
 .progress-container {
   width: 100%;
-  background-color: var(--bg-color);
+  background-color: var(--color-surface-unfilled);
   border-radius: 5px;
   overflow: hidden;
   position: relative;
@@ -18,7 +12,7 @@
 
 .progress-bar {
   height: 100%;
-  background-color: var(--completion-color2); /* Gradio green-like color */
+  background-color: var(--color-brand-primary); /* Gradio green-like color */
   width: 0%;
   transition: width 0.1s ease-out; /* Smooth transition for progress updates */
   position: absolute;
@@ -54,5 +48,5 @@
 .status-text {
   margin-left: 5px;
   font-size: 1em;
-  color: var(--status-text-color); /* Example color for status */
+  color: var(--color-action-error); /* Example color for status */
 }

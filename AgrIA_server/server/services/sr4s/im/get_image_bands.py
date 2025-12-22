@@ -18,6 +18,7 @@ config = SHConfig(CONFIG_NAME)
 if not config.sh_client_id or not config.sh_client_secret:
     print("Warning! To use Process API, please provide the credentials (OAuth client ID and client secret).")
 
+
 def download_from_sentinel_hub(lat, lon, filename):
     """
     Downloads Sentinel band image _.tif_ files, specifically, B02, B03, B04 and B08.
@@ -30,20 +31,22 @@ def download_from_sentinel_hub(lat, lon, filename):
     """
     start_time = time.time()
     BANDS_DIR.mkdir(parents=True, exist_ok=True)
-    bands=['B02', 'B03', 'B04', 'B08']
-    size = (SIZE,SIZE)
+    bands = ['B02', 'B03', 'B04', 'B08']
+    size = (SIZE, SIZE)
     band_files_list = download_image_bands(lat, lon, size, filename, bands)
     print(f"\nTotal time:\t{(time.time() - start_time)/60:.1f} minutes")
     return band_files_list
-    
+
 # ----------------------------
 # SENTINEL REQUEST
 # ----------------------------
+
+
 def download_sentinel_image(lat, lon, size, filename, evalscript):
     """
     Fetches a Sentinel image for the given lat, lon, size, and zoom level,
     and saves it to the specified filename.
-    
+
     Arguments:
         lat (float): Latitude of the location.
         lon (float): Longitude of the location.
@@ -57,14 +60,16 @@ def download_sentinel_image(lat, lon, size, filename, evalscript):
     date_info, band_ext = filename.split("-")
     year, month = date_info.split("_")
     # Get a range of dates to ensure cloud-free scenes
-    date = datetime(year=int(year), month=int(month), day=int(request_date.get().split("-")[-1]))
+    date = datetime(year=int(year), month=int(month),
+                    day=int(request_date.get().split("-")[-1]))
     date = date if date < datetime.now() else datetime.now() - timedelta(days=1)
     delta = DELTA_DAYS
     initial_date = str((date - timedelta(days=delta)).isoformat())
     final_date = str(date.isoformat())
 
     # Retieve imagen band and save it
-    image = get_cloudless_image(evalscript, bbox, width, height, config, initial_date, final_date)
+    image = get_cloudless_image(
+        evalscript, bbox, width, height, config, initial_date, final_date)
     filepath = BANDS_DIR / filename
     save_tiff(image, filepath, bbox, crs="EPSG:4326")
 
@@ -90,12 +95,15 @@ def get_cloudless_image(evalscript, bbox, width, height, config, initial_date, f
                 evalscript=evalscript,
                 input_data=[
                     SentinelHubRequest.input_data(
-                        DataCollection.SENTINEL2_L2A.define_from("s2l2a", service_url=config.sh_base_url),
-                        time_interval=(current_initial.date().isoformat(), current_final.date().isoformat()),
+                        DataCollection.SENTINEL2_L2A.define_from(
+                            "s2l2a", service_url=config.sh_base_url),
+                        time_interval=(current_initial.date().isoformat(
+                        ), current_final.date().isoformat()),
                         maxcc=current_maxcc,
                     )
                 ],
-                responses=[SentinelHubRequest.output_response("default", MimeType.TIFF)],
+                responses=[SentinelHubRequest.output_response(
+                    "default", MimeType.TIFF)],
                 bbox=bbox,
                 size=(width, height),
                 config=config,
@@ -127,10 +135,11 @@ def get_cloudless_image(evalscript, bbox, width, height, config, initial_date, f
 
     raise RuntimeError("❌ No valid Sentinel-2 image found after all attempts.")
 
+
 def download_image_bands(lat, lon, size, filename=None, bands=["B02", "B03", "B04"]):
     """
     Downloads separate Sentinel image bandsfor the given latitude and longitude.
-    
+
     Arguments:
         lat (float): Latitude of the location.
         lon (float): Longitude of the location.
@@ -142,9 +151,10 @@ def download_image_bands(lat, lon, size, filename=None, bands=["B02", "B03", "B0
     """
     band_files_list = []
     for band in bands:
-        file_path = filename + f"-{band}_{RESOLUTION}m.tif" if filename is not None else f"{str(lat)[:8]}_{str(lon)[:8]}-{band}_{RESOLUTION}m.tif"
+        file_path = filename + \
+            f"-{band}_{RESOLUTION}m.tif" if filename is not None else f"{str(lat)[:8]}_{str(lon)[:8]}-{band}_{RESOLUTION}m.tif"
         print(f"Fetching images for coordinates: {lat}, {lon}")
-        
+
         # Get script that will retrieve  image bands
         evalscript_band = generate_evalscript(
             bands=[band],

@@ -1,21 +1,19 @@
-import { Component, HostBinding, HostListener, inject } from '@angular/core';
+import { Component, HostBinding, HostListener, inject, Renderer2, signal, WritableSignal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DEFAULT_LANG } from '../../config/constants';
 
-
 @Component({
   selector: 'app-navbar',
-  imports: [
-    RouterModule,
-    TranslateModule
-],
+  imports: [RouterModule, TranslateModule],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
   // Initialize isMenuOpen to false, meaning the menu is closed by default
   protected isMenuOpen: boolean = false;
+  // Theme state
+  public isDarkMode: WritableSignal<boolean> = signal(true);
   // Style tracking variables
   private isVisible: boolean = true;
   private lastScrollTop: number = 0;
@@ -25,13 +23,16 @@ export class NavbarComponent {
   // Translation service
   private translateService = inject(TranslateService);
   public currentLanguage: string = DEFAULT_LANG;
+  // Element renderer service
+  private rendererService = inject(Renderer2);
 
   constructor() {
     this.translateService.setDefaultLang(DEFAULT_LANG);
- }
+  }
 
   ngOnInit() {
-    this.updateLanguage()
+    this.updateTheme();
+    this.updateLanguage();
     this.updateVisibility();
   }
 
@@ -42,7 +43,6 @@ export class NavbarComponent {
   @HostBinding('class.visible') get visible() {
     return this.isVisible;
   }
-
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
@@ -85,7 +85,6 @@ export class NavbarComponent {
     this.isVisible = this.isAtTop || this.isHoveringTop;
   }
 
-
   /**
    * Toggles the state of the mobile menu (open/closed).
    * This method is called when the hamburger icon is clicked.
@@ -104,7 +103,7 @@ export class NavbarComponent {
   public closeMenu(): void {
     this.isMenuOpen = false;
   }
-  
+
   public switchLanguage(lang: string) {
     this.translateService.use(lang);
     this.currentLanguage = lang;
@@ -125,4 +124,38 @@ export class NavbarComponent {
     this.translateService.use(this.currentLanguage);
   }
 
+  /**
+   * Checks local storage for theme preference and applies it on component load.
+   */
+  private updateTheme(): void {
+    // Check local storage or fallback to system preference (optional: window.matchMedia)
+    const savedTheme = localStorage.getItem('app_theme');
+
+    // Default to light mode if nothing is saved
+    this.isDarkMode.set(savedTheme === 'dark');
+
+    this.applyTheme(this.isDarkMode());
+  }
+
+  /**
+   * Toggles the theme state and saves the preference to local storage.
+   */
+  public toggleTheme(): void {
+    this.isDarkMode.set(!this.isDarkMode());
+    localStorage.setItem('app_theme', this.isDarkMode() ? 'dark' : 'light');
+    this.applyTheme(this.isDarkMode());
+  }
+
+  /**
+   * Applies or removes the 'dark-theme' class to the global <body> element.
+   * @param isDark - Whether to apply the dark theme (true) or light theme (false).
+   */
+  private applyTheme(isDark: boolean): void {
+    const body = this.rendererService.selectRootElement('body', true);
+    if (isDark) {
+      this.rendererService.addClass(body, 'dark-theme');
+    } else {
+      this.rendererService.removeClass(body, 'dark-theme');
+    }
+  }
 }

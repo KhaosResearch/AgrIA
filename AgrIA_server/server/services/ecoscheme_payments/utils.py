@@ -3,6 +3,7 @@ from decimal import Decimal, ROUND_HALF_UP
 
 from .constants import PLURIANNUALITY_BONUS_PER_HA, ROUNDING_PAYMENT, ROUNDING_RATE
 
+
 def is_valid_rate_for_coefficients(scheme_id, subtype, slope, irrigation):
     """
     Validate if an ecoscheme is compatible with the slope or irrigation coefficients.
@@ -40,12 +41,13 @@ def is_valid_rate_for_coefficients(scheme_id, subtype, slope, irrigation):
     # Other schemes: no restriction
     return True
 
+
 def calculate_payments_for_rate_type(area: Decimal, rate_details: dict, pluri_applicable: bool) -> dict:
     """Calculates Base and Pluriannuality payments for a single area type (Peninsular or Insular)."""
-    
+
     current_rate = Decimal('0.0')
     applied_tier = "N/A"
-    
+
     if 'Flat' in rate_details:
         # Flat Rate
         current_rate = rate_details['Flat']
@@ -61,17 +63,19 @@ def calculate_payments_for_rate_type(area: Decimal, rate_details: dict, pluri_ap
             applied_tier = "Tier 2"
 
     # Payments
-    current_rate = current_rate if "/" not in str(current_rate) else Decimal(str("0"))
+    current_rate = current_rate if "/" not in str(
+        current_rate) else Decimal(str("0"))
     base_payment = area * current_rate
     payment_with_pluri = base_payment
 
     if pluri_applicable:
-        payment_with_pluri = area * (current_rate + PLURIANNUALITY_BONUS_PER_HA)
-    
+        payment_with_pluri = area * \
+            (current_rate + PLURIANNUALITY_BONUS_PER_HA)
+
     payment_with_pluri = Decimal(str(payment_with_pluri))
     current_rate = Decimal(str(current_rate))
     base_payment = Decimal(str(base_payment))
-    
+
     return {
         "Applied_Base_Payment_EUR": float(current_rate.quantize(ROUNDING_RATE, rounding=ROUND_HALF_UP)),
         "Total_Base_Payment_EUR": float(base_payment.quantize(ROUNDING_PAYMENT, rounding=ROUND_HALF_UP)),

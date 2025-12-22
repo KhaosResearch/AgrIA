@@ -56,6 +56,7 @@ def find_from_cadastral_registry(cadastral_ref: str):
     metadata['parcelaInfo']['referencia_cat'] = cadastral_ref
     return geometry, metadata
 
+
 if __name__ == '__main__':
     cadastral_reference = '26002A001000010000EQ'
     find_from_cadastral_registry(cadastral_reference)

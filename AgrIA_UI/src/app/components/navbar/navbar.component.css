@@ -7,15 +7,7 @@
   z-index: 1000;
   transition: transform 0.3s ease-in-out;
   will-change: transform;
-  --navbar-bg-color: #333;
-  --navbar-text-color: #f4f4f4;
-  --navbar-hover-color: #555;
-  --navbar-brand-color: #fff;
-  --btn-primary-bg: #007bff;
-  --btn-primary-text: #fff;
-  --btn-secondary-bg: #6c757d;
-  --btn-secondary-text: #fff;
-  --btn-hover-darken: 10%; /* For hover effects */
+  --color-navbar-btn-hover-darken: 10%; /* For hover effects */
 }
 
 :host(.hidden) {
@@ -31,7 +23,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--navbar-bg-color);
+  background-color: var(--color-surface-navbar);
   padding: 1rem 1.5rem; /* Adjust padding as needed */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   flex-wrap: wrap; /* Allows items to wrap on smaller screens */
@@ -48,9 +40,8 @@
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: var(--navbar-brand-color);
+  color: var(--color-text-navbar);
   font-size: 1.5rem;
-  font-weight: bold;
   white-space: nowrap; /* Prevents logo text from wrapping */
 }
 
@@ -74,7 +65,7 @@
   display: block;
   width: 25px;
   height: 3px;
-  background-color: var(--navbar-text-color);
+  background-color: var(--color-text-navbar);
   margin: 5px 0;
   transition: all 0.3s ease-in-out;
 }
@@ -104,7 +95,7 @@
 }
 
 .nav-link {
-  color: var(--navbar-text-color);
+  color: var(--color-text-navbar);
   text-decoration: none;
   padding: 0.5rem 0; /* Vertical padding */
   transition: color 0.3s ease-in-out;
@@ -112,11 +103,11 @@
 }
 
 .nav-link:hover {
-  color: var(--navbar-hover-color);
+  color: var(--color-surface-navbar-hover);
 }
 
 .nav-link.active {
-  color: var(--navbar-brand-color); /* Highlight active link */
+  color: var(--color-text-navbar); /* Highlight active link */
   font-weight: bold;
 }
 
@@ -128,7 +119,7 @@
   bottom: 0; /* Position just below the text */
   width: 100%;
   height: 2px;
-  background-color: var(--btn-primary-bg); /* Use primary button color for underline */
+  background-color: var(--color-brand-primary); /* Use primary button color for underline */
   transform: scaleX(1);
   transition: transform 0.3s ease-in-out;
 }
@@ -164,49 +155,79 @@
 }
 
 .btn-primary {
-  background-color: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
-  border-color: var(--btn-primary-bg);
+  background-color: var(--color-brand-primary);
+  color: var(--color-text-inverted);
+  border-color: var(--color-brand-primary);
 }
 
 .btn-primary:hover {
-  background-color: color-mix(in srgb, var(--btn-primary-bg) var(--btn-hover-darken), black);
+  background-color: color-mix(in srgb, var(--color-brand-primary) var(--color-navbar-btn-hover-darken), black);
 }
 
 .btn-secondary {
-  background-color: var(--btn-secondary-bg);
-  color: var(--btn-secondary-text);
-  border-color: var(--btn-secondary-bg);
+  background-color: var(--color-brand-secondary);
+  color: var(--color-text-inverted);
+  border-color: var(--color-brand-secondary);
 }
 
 .btn-secondary:hover {
-  background-color: color-mix(in srgb, var(--btn-secondary-bg) var(--btn-hover-darken), black);
+  background-color: color-mix(in srgb, var(--color-brand-secondary) var(--color-navbar-btn-hover-darken), black);
 }
 
-/* --- Language Button Specific Styles --- */
+/* --- Navbar Button Specific Styles --- */
 
 /* Base styles for the language buttons (re-include for clarity if they were removed) */
 /* Adjust padding for buttons with flags to make space for the flag */
+.btn.theme,
 .btn.es,
 .btn.en {
   /* Ensure these are here to position flags correctly */
   background-position: 10px center;
   background-repeat: no-repeat;
   background-size: 20px 15px;
-  padding-left: 40px; /* IMPORTANT: Make space for the flag on the left */
-  
+  max-height: 39px;
+  min-width: 60px;
   /* You might want a slightly different default look for language buttons */
-  background-color: var(--btn-secondary-bg); /* Default light background */
-  color: var(--btn-secondary-text); /* Default text color */
-  border-color: var(--navbar-hover-color); /* Default subtle border */
+  background-color: transparent;
+  color: var(--color-text-navbar); /* Default text color */
 }
+
+.btn.theme {
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+  span {
+    max-width: 20px;
+    font-size: 26px;
+    transform: rotate(-45deg);
+  }
+  &:hover {
+    span {
+      transition: 0.2s ease-in-out;
+      font-size: 32px;
+    }
+  }
+
+}
+
+.btn.es,
+.btn.en {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 40px;
+  }
 
 /* Specific flag images */
 .btn.es {
+  /* padding-left: 40px; */
   background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/89/Bandera_de_Espa%C3%B1a.svg');
 }
 
 .btn.en {
+  /* padding-left: 40px; */
   background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg');
 }
 
@@ -220,7 +241,7 @@
     display: none; /* Hide menu by default on small screens */
     width: 100%;
     flex-direction: column; /* Stack items vertically */
-    background-color: var(--navbar-bg-color); /* Match navbar background */
+    background-color: var(--color-surface-navbar); /* Match navbar background */
     position: absolute;
     top: 100%; /* Position below the navbar */
     left: 0;
@@ -241,6 +262,9 @@
   .nav-item {
     margin: 0.5rem 0; /* Adjust spacing for vertical menu */
     width: 100%;
+    .btn.theme {
+      border: none;
+    }
   }
 
   .nav-link {
@@ -251,7 +275,7 @@
   }
 
   .nav-link:hover {
-    background-color: var(--navbar-hover-color);
+    background-color: var(--color-surface-navbar-hover);
   }
 
   .nav-link.active::after {
@@ -267,5 +291,15 @@
   .btn {
     width: 100%; /* Make buttons full width */
     margin-bottom: 0.5rem; /* Space between stacked buttons */
+  }
+  .btn.theme {
+    span {
+      font-size: 40px;
+    }
+  }
+  .btn.es,
+  .btn.en  {
+    height: 120px;
+    background-size: 80px;
   }
 }

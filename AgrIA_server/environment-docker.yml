@@ -1,0 +1,54 @@
+name: agria_server_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  # Core scientific stack
+  - numpy<2   # Avoid numpy 2 for now due to compatibility issues with torch
+  - pandas
+  # Geospatial stack (conda-forge compiled binaries! much faster/safer than pip wheels)
+  - geopandas
+  - gunicorn  # Added for deployment
+  - shapely
+  - pyproj
+  - rasterio
+  - fiona
+  - gdal
+  # pip available
+  - pip
+  - pip:
+      # Core backend
+      - flake8
+      - autopep8
+      - Flask
+      - flask
+      - flask-cors
+      - google.genai
+      - matplotlib
+      - minio
+      - opencv-python<4.12  # Avoid opencv 4.12 for now due to compatibility issues with torch & numpy
+      - Pillow
+      - protobuf
+      - pytest
+      - pytest-mock
+      - python-dotenv
+      - requests
+      - rioxarray
+      - safetensors
+      - sentinelhub
+      - scikit-image
+      - structlog
+      
+      # PyTorch without CUDA 12.1
+      - torch==2.4.1
+      - torchvision==0.19.1
+      - -f https://download.pytorch.org/whl/torch_stable.html
+
+      # SEN2SR stack
+      - sen2sr
+      - mlstac
+      - git+https://github.com/ESDS-Leipzig/cubo.git
+
+      # Full version only (requires CUDA > 12 & GPU runtime!)
+      # Needs manual: pip install mamba-ssm --no-build-isolation

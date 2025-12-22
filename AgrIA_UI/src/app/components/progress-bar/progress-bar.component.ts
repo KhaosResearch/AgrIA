@@ -5,15 +5,13 @@ import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-progress-bar',
-  imports: [
-    TranslateModule,
-  ],
+  imports: [TranslateModule],
   templateUrl: './progress-bar.component.html',
   styleUrls: ['./progress-bar.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgressBarComponent implements OnInit, OnDestroy {
-  @Input() public durationInSeconds: number = 60; // Max time for the progress bar (default is 60) 
+  @Input() public durationInSeconds: number = 60; // Max time for the progress bar (default is 60)
   @Input() public isProcessing: boolean = false; // Controls if the progress bar is active
 
   public progress: number = 0; // Current progress percentage (0-100)
@@ -48,7 +46,6 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
       this.stopProgress();
       this.startProgress();
     }
-    
   }
 
   startProgress(): void {

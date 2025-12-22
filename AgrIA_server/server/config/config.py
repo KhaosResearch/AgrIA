@@ -1,13 +1,18 @@
 import os
+import structlog
 from dotenv import load_dotenv
+
+logger = structlog.getLogger()
 
 load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-UI_URL = os.getenv("UI_URL", "http://localhost:4200")
 
 if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY is not set in .env")
+    ve = ValueError("Warning: 'GEMINI_API_KEY' was not set correctly in '.env' file. Detected value: {GEMINI_API_KEY}")
+    logger.warning(f"{ve}")
+    logger.warning(f"Set a valid value to access AgrIA's Chat Assistant services!")
+
 
 class Config:
     REFLECTANCE_SCALE = 400.0  # default
@@ -16,4 +21,3 @@ class Config:
     def set_reflectance_scale(cls, value: float):
         cls.REFLECTANCE_SCALE = value
         print("REFLECTANCE_SCALE", value)
-

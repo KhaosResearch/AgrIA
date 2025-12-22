@@ -1,18 +1,94 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================================== */
+/* GLOBAL CSS CUSTOM PROPERTIES (VARIABLES) */
+/* Defined in :root for maximum scope (Light Theme Defaults) */
+/* ============================================================== */
 :root {
-    --success-color: #4CAF50; /* Green for success */
-    --info-color: #22a7ff; /* Blue, similar to the logo */
-    --error-color: #dc3545; /* Red for errors */
-    --warning-color: #FFC107; /* Amber for warnings */
+    /* --- 1. Brand & Action Colors --- */
+    --color-brand-primary: #22a7ff;      /* Links, Logo, Info */
+    --color-brand-secondary: #607D8B;    /* Secondary Nav/Buttons */
+    --color-action-success: #4CAF50;     /* Green: Send/Submit/Success/Status */
+    --color-action-warning: #FFC107;     /* Amber: Suggestions/Warnings/Status */
+    --color-action-error: #dc3545;       /* Red: Clear/Errors/Status */
+
+    /* --- 2. Surface & Text Colors --- */
+    --color-surface-background: #f0f2f5; /* Main Body BG */
+    --color-surface-card: #ffffff;       /* Elevated Card BG */
+    --color-surface-header: #e0e0e0;     /* Section Header BG */
+    --color-surface-input: #f9f9f9;      /* Input Field BG */
+    --color-surface-unfilled: #e0e0e0;   /* Unfilled Progress Bar / Same as Header BG */
+    
+    --color-text-primary: #333;          /* Main Text Color (Dark) */
+    --color-text-secondary: #666;        /* Muted/Low-Contrast Text */
+    --color-text-inverted: #fff;         /* Text on Primary/Dark BG */
+    --color-text-inverted-light:#121212; /* Text Dark2Light */
+
+    /* --- 3. Borders & Shadows --- */
+    --color-border-light: #ddd;          /* Subtle borders */
+    --color-border-dark: #999;           /* Stronger borders/dividers */
+    --shadow-subtle: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    /* --- 4. Structural & Spacing --- */
+    --radius-default: 10px;              /* Standard Corner Radius */
+    --spacing-large: 1.5rem;             /* Standard Padding Unit */
+    --layout-max-width: 1000px;
+    
+    /* Home Page Specific Spacing */
+    --spacing-xl: 2rem;
+    --spacing-mobile: 1.2rem;
+    --spacing-mobile-small: 0.8rem;
+
+    /* --- 5. Navbar Specific (Defaulting to Dark Header for Light Theme) --- */
+    --color-surface-navbar: #f5f5f5;
+    --color-text-navbar: #333 ;
+    --color-surface-navbar-hover: #777;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body.dark-theme {
+    /* --- 1. Surfaces (Light colors become dark) --- */
+    --color-surface-background: #1f1f1f; /* Main Body BG: Very dark, pure black */
+    --color-surface-card: #292929;       /* Elevated Card BG: Slightly lighter dark */
+    --color-surface-header: #2c2c2c;     /* Section Header BG: Medium dark */
+    --color-surface-input: #333333;      /* Input Field BG: Lightest dark surface */
+    --color-surface-unfilled: #2c2c2c;   /* Unfilled Progress Bar */
+
+    /* --- 2. Text (Dark colors become light) --- */
+    --color-text-primary: #f5f5f5;      /* Main Text Color (Light) */
+    --color-text-secondary: #b0b0b0;    /* Muted/Low-Contrast Text */
+    --color-text-inverted: #121212;     /* Text on Primary/Action BG */
+    --color-text-inverted-light: #fff;  /* Text Light2Dark */
+
+    /* --- 3. Borders & Shadows --- */
+    --color-border-light: #383838;
+    --color-border-dark: #444444;
+    --shadow-subtle: 0 2px 5px rgba(0, 0, 0, 0.4);
+    --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.5); /* Stronger shadow in dark mode */
+
+    /* --- 4. Navbar Specific (Matching the card surface) --- */
+    --color-surface-navbar: #333;
+    --color-text-navbar: #f5f5f5;
+    /* --color-surface-navbar-hover: #333333; */
+}
+
+html, body { 
+    background-color: var(--color-surface-background);
+    height: 100%;
+    a {
+        color: var(--color-brand-primary);
+        &:hover {
+            color: var(--color-brand-secondary);
+            transition: 0.3 ease-in-out;
+        }
+    }
+}
+body { 
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 /* Success Snackbar */
 .success-snackbar {
     border-radius: 5pt;
-    background-color: var(--success-color) !important; /* Green */
+    background-color: var(--color-status-success) !important; /* Green */
     color: white !important;
     font-weight: bold;
 }
@@ -20,14 +96,14 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 /* Error Snackbar */
 .error-snackbar {
     border-radius: 5pt;
-    background-color: var(--error-color)!important; /* Red */
+    background-color: var(--color-status-error)!important; /* Red */
     color: white !important;
 }
 
 /* Info Snackbar */
 .info-snackbar {
     border-radius: 5pt;
-    background-color: var(--info-color)!important; /* Blue */
+    background-color: var(--color-status-info)!important; /* Blue */
     color: white !important;
     max-width: 450px;
 }
@@ -35,6 +111,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 /* Warning Snackbar */
 .warning-snackbar {
     border-radius: 5pt;
-    background-color: var(--warning-color) !important; /* Amber/Yellow */
+    background-color: var(--color-status-warning) !important; /* Amber/Yellow */
     color: #333 !important; /* Dark text for contrast */
 }

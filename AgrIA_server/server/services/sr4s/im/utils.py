@@ -8,43 +8,45 @@ from rasterio.transform import from_bounds
 from sentinelhub import BBox, CRS
 from ..constants import LAT_MIN, LAT_MAX, LON_MIN, LON_MAX
 
+
 def get_bbox_from_zoom(lat, lon, size, zoom):
     """
     Compute a bounding box in WGS84 matching Google Maps' zoom level.
-    
+
     lat, lon: center coordinates
     size: (width_px, height_px)
     zoom: Maps' zoom level
     """
     # meters per pixel at this latitude and zoom
     mpp = 156543.03392 * math.cos(math.radians(lat)) / (2 ** zoom)
-    
+
     # total size in meters
     width_m = size[0] * mpp
     height_m = size[1] * mpp
-    
+
     # convert meters to degrees (approx)
     meters_per_degree_lat = 111320.0
     meters_per_degree_lon = 111320.0 * math.cos(math.radians(lat))
-    
+
     width_deg = width_m / meters_per_degree_lon
     height_deg = height_m / meters_per_degree_lat
-    
+
     min_lon = lon - width_deg / 2
     max_lon = lon + width_deg / 2
     min_lat = lat - height_deg / 2
     max_lat = lat + height_deg / 2
-    
+
     return BBox(bbox=[min_lon, min_lat, max_lon, max_lat], crs=CRS.WGS84)
+
 
 def get_zoom_from_bbox(bbox: BBox, size: tuple):
     """
     Given a SentinelHub bbox + image size, compute the Google Maps zoom level
     and the equivalent Google bbox that matches coverage.
-    
+
     bbox: BBox in WGS84
     size: (width_px, height_px)
-    
+
     Returns: (zoom, google_bbox)
     """
     # Extract bbox coordinates
@@ -52,24 +54,26 @@ def get_zoom_from_bbox(bbox: BBox, size: tuple):
     width_deg = max_lon - min_lon
     height_deg = max_lat - min_lat
     lat_center = (min_lat + max_lat) / 2
-    
+
     # Approx conversion: degrees → meters
     meters_per_degree_lat = 111320.0
     meters_per_degree_lon = 111320.0 * math.cos(math.radians(lat_center))
-    
+
     width_m = width_deg * meters_per_degree_lon
     height_m = height_deg * meters_per_degree_lat
-    
+
     # Sentinel resolution (meters per pixel)
     mpp_x = width_m / size[0]
     mpp_y = height_m / size[1]
     mpp = (mpp_x + mpp_y) / 2   # average
-    
+
     # Compute Google zoom
-    zoom_float = math.log2((156543.03392 * math.cos(math.radians(lat_center))) / mpp)
+    zoom_float = math.log2(
+        (156543.03392 * math.cos(math.radians(lat_center))) / mpp)
     zoom = max(0, min(21, round(zoom_float)))  # clamp to [0,21]
-        
-    return zoom #, google_bbox
+
+    return zoom  # , google_bbox
+
 
 def get_bbox_from_center(lat, lon, width_px, height_px, resolution_m):
     """
@@ -103,22 +107,24 @@ def get_bbox_from_center(lat, lon, width_px, height_px, resolution_m):
 
     return BBox(bbox=[min_lon, min_lat, max_lon, max_lat], crs=CRS.WGS84)
 
-def get_n_random_coordinate_pairs(amount:int, bounded_zone = [LAT_MIN, LAT_MAX, LON_MIN, LON_MAX]):
+
+def get_n_random_coordinate_pairs(amount: int, bounded_zone=[LAT_MIN, LAT_MAX, LON_MIN, LON_MAX]):
     """
     Generate random coordinates from a bounded zone.
-    
+
     amount: number of coordinate pairs to generate
-    
+
     Returns: list of (lat, lon) tuples
-    """    
+    """
     coordinates = []
     lat_min, lat_max, lon_min, lon_max = bounded_zone
     for _ in range(amount):
         lat = random.uniform(lat_min, lat_max)
         lon = random.uniform(lon_min, lon_max)
         coordinates.append((lat, lon))
-    
+
     return coordinates
+
 
 def generate_evalscript(
     bands=["B04", "B03", "B02"],
@@ -137,7 +143,7 @@ def generate_evalscript(
     Generate an evalscript for SentinelHub requests. The script is dinamically generated with the values provided.
 
     DOC: https://docs.sentinel-hub.com/api/latest/evalscript/v3/
-    
+
     Arguments:
         bands (list | None): Bands to include, e.g. `"B02"` or `["B02", "B03", "B04"]`.
         units (str | None): Units of the input bands (e.g. `"DN"`, `"REFLECTANCE"`). If None, omitted.
@@ -189,7 +195,8 @@ def generate_evalscript(
     mult = " * 255" if bit_scale == "UINT8" else ""
 
     # apply stretch for each band
-    out_expr = ", ".join([f"{stretch.replace('val', f'sample.{b}')}{mult}" for b in bands])
+    out_expr = ", ".join(
+        [f"{stretch.replace('val', f'sample.{b}')}{mult}" for b in bands])
 
     return f"""
 //VERSION=3
@@ -209,10 +216,11 @@ function evaluatePixel(sample) {{
 }}
 """
 
+
 def save_tiff(image: np.ndarray, filename: str, bbox, crs="EPSG:4326"):
     """
     Save a numpy array as a GeoTIFF with georeferencing info.
-    
+
     Args:
         image (np.ndarray): Image array (H, W) or (H, W, C).
         filename (str): Output file path (.tiff).
@@ -242,6 +250,7 @@ def save_tiff(image: np.ndarray, filename: str, bbox, crs="EPSG:4326"):
             for i in range(count):
                 dst.write(image[:, :, i], i + 1)
 
+
 def perform_image_sanity_check(lat, lon, image_bytes):
     """
     Perform a sanity check over the response's image
@@ -253,7 +262,7 @@ def perform_image_sanity_check(lat, lon, image_bytes):
         has_imagery (bool): If True, there is a valid image in the response.
     """
     has_imagery = True
-    
+
     # # Quick sanity check: if file is too small, probably "no imagery"
     # if len(image_bytes) < 15_000:  # tweak threshold as needed
     #     print(f"No imagery (small file) at {lat},{lon}")
@@ -268,5 +277,5 @@ def perform_image_sanity_check(lat, lon, image_bytes):
     if np.mean(arr) > 230 and std_val < 15:
         print(f"No imagery available for {lat},{lon}")
         has_imagery = False
-    
+
     return has_imagery

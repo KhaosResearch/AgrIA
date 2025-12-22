@@ -1,7 +1,8 @@
-import { IEnvironment } from "../app/models/environment.model";
+import { IEnvironment } from '../app/models/environment.model';
 
 export const environment: IEnvironment = {
   production: true,
-  apiUrl: 'http://127.0.0.1:5000', // Your production API URL
-  apiPort: 5000 // Standard HTTPS port for production
+  isDocker: false,
+  apiPort: 5000, // Standard HTTPS port for production
+  apiUrl: 'http://127.0.0.1:5000', // Your dev API URL
 };

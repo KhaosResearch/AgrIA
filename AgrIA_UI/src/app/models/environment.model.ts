@@ -1,5 +1,6 @@
 export interface IEnvironment {
   production: boolean;
-  apiUrl: string;
+  isDocker: boolean;
   apiPort: number;
+  apiUrl: string;
 }

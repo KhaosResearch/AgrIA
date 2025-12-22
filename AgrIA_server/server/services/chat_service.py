@@ -11,6 +11,7 @@ from ..utils.chat_utils import generate_image_context_data, save_image_and_get_p
 
 logger = structlog.getLogger()
 
+
 def generate_user_response(user_input: str) -> str:
     """
     Sends user input to chat and retrieves output.
@@ -22,6 +23,7 @@ def generate_user_response(user_input: str) -> str:
     response = chat.send_message(user_input,)
     return response.text
 
+
 def get_image_description(file, is_detailed_description):
     """
     Handles the image upload and description generation.
@@ -30,12 +32,14 @@ def get_image_description(file, is_detailed_description):
     filepath = filepath.replace("\\", "/")  # Ensure consistent path format
     image = Image.open(filepath)
     image_context_prompt = "FECHA: *Sin datos*\nCULTIVO: *Sin datos*"
-    image_desc_prompt =  FULL_DESC_TRIGGER +"\n" if is_detailed_description else SHORT_DESC_TRIGGER
+    image_desc_prompt = FULL_DESC_TRIGGER + \
+        "\n" if is_detailed_description else SHORT_DESC_TRIGGER
     image_desc_prompt += image_context_prompt
 
     response = chat.send_message([image, image_desc_prompt],)
 
     return response.text
+
 
 def get_parcel_description(image_date, land_uses, query, image_filename, is_detailed_description, lang):
     """
@@ -52,33 +56,36 @@ def get_parcel_description(image_date, land_uses, query, image_filename, is_deta
     """
     try:
         logger.info("Retrieveing parcel data...")
-        image_context_data = generate_image_context_data(image_date, land_uses, query)
+        image_context_data = generate_image_context_data(
+            image_date, land_uses, query)
         json_data = calculate_ecoscheme_payment(image_context_data[lang], lang)
         with open(TEMP_DIR / "ecoscheme_data.json", "w") as f:
             import json
-            json.dump(json_data,f,indent=4)
+            json.dump(json_data, f, indent=4)
         # Insert image context prompt and read image desc file
-        desc_trigger =  FULL_DESC_TRIGGER if is_detailed_description else SHORT_DESC_TRIGGER
+        desc_trigger = FULL_DESC_TRIGGER if is_detailed_description else SHORT_DESC_TRIGGER
         image_desc_prompt = f"```\n{image_context_data[lang]}\n```"
 
-        image_indication_options ={
+        image_indication_options = {
             'es': "Estas son las características de la parcela cuya imagen te paso. Tenlo en cuenta para tu descripción en español. Comprueba el siguiente prompt para ver si es necesario cambiar el idioma:",
             'en': "These are the parcel's features whose image I am sending you. Take them into account for your description in English. Check next prompt for language change if needed:"
         }
-        image_indication_prompt  = str(f"{desc_trigger}\n{image_indication_options[lang]}\n\n{json_data}")
+        image_indication_prompt = str(
+            f"{desc_trigger}\n{image_indication_options[lang]}\n\n{json_data}")
         # Open image from path
         image_path = TEMP_DIR / str(image_filename).split("?")[0]
         image = Image.open(image_path)
 
         response = {
             "text": chat.send_message([image_indication_prompt, image, image_desc_prompt]).text,
-            "imageDesc":image_context_data
+            "imageDesc": image_context_data
         }
 
         return response
     except Exception as e:
         print(f"Error while getting parcel description:\t{e}")
         raise
+
 
 def get_suggestion_for_chat(chat_history: list[Content], lang: str):
     """
@@ -95,8 +102,10 @@ def get_suggestion_for_chat(chat_history: list[Content], lang: str):
             if part.text is not None:
                 last_message = part.text
                 break
-        summarised_chat = "### CHAT_SUMMARY_START ###\n" + get_summarised_chat(chat_history) + "\n### CHAT_SUMMARY_END ###"
-        last_chat_output = "### LAST_OUTPUT_START ###\n" + str(last_message) + "### LAST_OUTPUT_END ###"
+        summarised_chat = "### CHAT_SUMMARY_START ###\n" + \
+            get_summarised_chat(chat_history) + "\n### CHAT_SUMMARY_END ###"
+        last_chat_output = "### LAST_OUTPUT_START ###\n" + \
+            str(last_message) + "### LAST_OUTPUT_END ###"
         language = "Spanish" if lang == "es" else "English"
         suggestion_prompt = f"Using the summary as context, provide an appropiate 300-character max response in {language} to this chat output. You are acting as a user. Do not use any data not mentioned. Questions are heavily encouraged. Limit the use of expressions such as 'Genial','Excelente', etc..:\n\n"
         suggestion = client.models.generate_content(
@@ -106,6 +115,7 @@ def get_suggestion_for_chat(chat_history: list[Content], lang: str):
         return suggestion.text
     except Exception as e:
         print(f"Error getting suggestion:\t{e}")
+
 
 def get_summarised_chat(chat_history):
     """
@@ -128,6 +138,7 @@ def get_summarised_chat(chat_history):
     except Exception as e:
         print(f"Error while summarising chat:\t{e}")
 
+
 def get_role_and_content(chat_history):
     """
     Extracts role and text content of chat history.
@@ -142,5 +153,6 @@ def get_role_and_content(chat_history):
         role = content.role if content.role is not None else "unknown"
         for part in content.parts:
             if part.text is not None:
-                chat_message_history.append({"role": role, "content": part.text})
+                chat_message_history.append(
+                    {"role": role, "content": part.text})
     return chat_message_history
