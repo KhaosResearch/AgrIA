@@ -11,12 +11,12 @@ from ..benchmark.sr.constants import BM_DATA_DIR, BM_RES_DIR
 from ..config.constants import GET_SR_BENCHMARK, SEN2SR_SR_DIR, SR_BANDS, RESOLUTION
 from ..utils.parcel_finder_utils import *
 
+from .sr4s.im.get_image_bands import request_date
 
 from sen2sr_tools.get_sr_image import get_sr_image
 from sen2sr_tools.constants import BANDS, GEOJSON_FILEPATH
-from .sr4s.im.get_image_bands import request_date
-from .sigpac_tools_v2.find import find_from_cadastral_registry
-from .sigpac_tools_v2.locate import get_cadastral_data_from_coords
+from sigpac_tools.find import find_from_cadastral_registry
+from sigpac_tools.locate import get_geometry_and_metadata_coords
 
 logger = structlog.get_logger()
 
@@ -56,15 +56,12 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
             try:
                 # Retrieve geometry from coordinates
                 lat, lng = coordinates
-                cadastral_ref = get_cadastral_data_from_coords(lat, lng)
-                geometry, metadata = find_from_cadastral_registry(
-                    cadastral_ref)
+                geometry, metadata = get_geometry_and_metadata_coords('parcela', lat, lng)
             except (ValueError, Exception) as e:
                 logger.error(
                     f"Error finding parcel (probably URBAN) with error: {e}")
                 logger.debug(f"Attempting to use coordinates only...")
-                geometry, metadata = get_cadastral_data_from_coords(
-                    lat, lng, use_cadastral_ref=False)
+                geometry, metadata = get_geometry_and_metadata_coords('parcela', lat, lng)
 
     else:
         raise ValueError(

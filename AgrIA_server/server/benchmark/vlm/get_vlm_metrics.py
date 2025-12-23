@@ -15,7 +15,6 @@ from ..sr.utils import copy_file_to_dir
 from ...config.constants import SEN2SR_SR_DIR, TEMP_DIR
 from ...config.llm_client import client
 from ...services.parcel_finder_service import download_sen2sr_parcel_image
-from ...services.sigpac_tools_v2.find import find_from_cadastral_registry
 from ...utils.chat_utils import generate_image_context_data
 from ...utils.parcel_finder_utils import reset_dir
 
@@ -25,6 +24,7 @@ from .llm_setup import generate_system_instructions
 from .utils import n_random_dates_between
 
 from sen2sr_tools.constants import GEOJSON_FILEPATH
+from sigpac_tools.find import find_from_cadastral_registry
 
 SLEEP_SECONDS = 60
 
