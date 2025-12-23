@@ -1,7 +1,8 @@
 import pytest
 
-from conftest import MOCK_CADASTRAL_REF, MOCK_RESPONSE_JSON
-from server.services.sigpac_tools_v2 import locate as sigpac_locate
+from conftest import MOCK_CADASTRAL_REF, MOCK_REG, MOCK_RESPONSE_JSON
+from sigpac_tools import locate as sigpac_locate
+import sigpac_tools.generate as sigpac_generate
 
 
 @pytest.mark.parametrize(
@@ -67,7 +68,7 @@ def test_generate_cadastral_ref_from_coords_scenarios(
     if expected_exception:
         # Expected Failure
         with pytest.raises(expected_exception, match=expected_error_match):
-            sigpac_locate.get_cadastral_data_from_coords(lat, lon, crs)
+            sigpac_locate.get_geometry_and_metadata_coords("parcela", lat, lon, crs)
 
         # Verify mocks were called up to the point of failure
         mock_requests_get.assert_called_once()
@@ -77,8 +78,8 @@ def test_generate_cadastral_ref_from_coords_scenarios(
 
     else:
         # Expected Success
-        cadastral_ref = sigpac_locate.get_cadastral_data_from_coords(
-            lat, lon, crs)
+        cadastral_ref = sigpac_locate.get_geometry_and_metadata_coords(
+            "parcela", lat, lon, crs)
 
         # 1. Check return value
         assert cadastral_ref == MOCK_CADASTRAL_REF

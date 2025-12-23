@@ -1,7 +1,7 @@
 import pytest
 
 from conftest import MOCK_CADASTRAL_REF, MOCK_GEOMETRY, MOCK_METADATA, MOCK_REG
-from server.services.sigpac_tools_v2 import find as sigpac_find
+from sigpac_tools import find as sigpac_find
 
 
 @pytest.mark.parametrize(

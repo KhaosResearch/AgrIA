@@ -3,16 +3,9 @@ import requests
 
 from unittest.mock import MagicMock
 
-import server.services.sigpac_tools_v2.find as sigpac_find
-import server.services.sigpac_tools_v2.locate as sigpac_locate
-import server.services.sigpac_tools_v2.utils as sigpac_utils
-import server.services.sigpac_tools_v2.search as sigpac_search
-import server.utils.parcel_finder_utils as parcel_finder_utils
-from server.services.sigpac_tools_v2.find import find_from_cadastral_registry
-from server.services.sigpac_tools_v2.locate import get_cadastral_data_from_coords
-from server.services.sigpac_tools_v2.utils import read_cadastral_registry
-from server.services.sigpac_tools_v2.search import search
-from server.utils.parcel_finder_utils import build_cadastral_reference
+import sigpac_tools.find as sigpac_find
+import sigpac_tools.generate as sigpac_generate
+import sigpac_tools.utils as sigpac_utils
 
 # --- CONSTANTS FOR MOCK RETURNS ---
 
@@ -154,19 +147,17 @@ def mock_sigpact_tools_v2_dependencies(monkeypatch):
     mock_read_cadastral_registry = MagicMock(return_value=MOCK_REG)
     monkeypatch.setattr(sigpac_find, "read_cadastral_registry",
                         mock_read_cadastral_registry)
-    mock_search = MagicMock(return_value=(MOCK_GEOMETRY, MOCK_METADATA))
-    monkeypatch.setattr(sigpac_find, "search", mock_search)
     mock_find_community = MagicMock(return_value=MOCK_COMMUNITY)
     monkeypatch.setattr(sigpac_utils, "find_community", mock_find_community)
-    mock_get_parcel_metadata_and_geometry = MagicMock(
+    mock_get_geometry_and_metadata_cadastral = MagicMock(
         return_value=(MOCK_GEOMETRY, MOCK_METADATA))
-    monkeypatch.setattr(sigpac_utils, "get_parcel_metadata_and_geometry",
-                        mock_get_parcel_metadata_and_geometry)
+    monkeypatch.setattr(sigpac_find, "get_geometry_and_metadata_cadastral",
+                        mock_get_geometry_and_metadata_cadastral)
 
     # Prepare mockups (locate.py)
     mock_build_cadastral_reference = MagicMock(return_value=MOCK_CADASTRAL_REF)
     monkeypatch.setattr(
-        sigpac_locate, "build_cadastral_reference", mock_build_cadastral_reference)
+        sigpac_generate, "build_cadastral_reference", mock_build_cadastral_reference)
 
     # Prepare mockups (external dependecies)
     mock_response_json = MagicMock(return_value=MOCK_RESPONSE_JSON)
@@ -176,9 +167,8 @@ def mock_sigpact_tools_v2_dependencies(monkeypatch):
 
     yield {
         "mock_read_cadastral_registry": mock_read_cadastral_registry,
-        "mock_search": mock_search,
         "mock_find_community": mock_find_community,
-        "mock_get_parcel_metadata_and_geometry": mock_get_parcel_metadata_and_geometry,
+        "mock_get_geometry_and_metadata_cadastral": mock_get_geometry_and_metadata_cadastral,
         "mock_build_cadastral_reference": mock_build_cadastral_reference,
         "mock_response_json": mock_response_json,
         "mock_requests_get": mock_requests_get
