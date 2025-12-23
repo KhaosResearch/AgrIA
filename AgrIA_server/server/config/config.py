@@ -1,6 +1,10 @@
 import os
 import structlog
+
 from dotenv import load_dotenv
+from .constants import SEN2SR_SR_DIR
+
+os.environ["SEN2SR_OUTPUT_DIR"] = str(SEN2SR_SR_DIR)  # Set ENV VAR for sen2sr_tools package
 
 logger = structlog.getLogger()
 
@@ -12,7 +16,6 @@ if not GEMINI_API_KEY:
     ve = ValueError("Warning: 'GEMINI_API_KEY' was not set correctly in '.env' file. Detected value: {GEMINI_API_KEY}")
     logger.warning(f"{ve}")
     logger.warning(f"Set a valid value to access AgrIA's Chat Assistant services!")
-
 
 class Config:
     REFLECTANCE_SCALE = 400.0  # default

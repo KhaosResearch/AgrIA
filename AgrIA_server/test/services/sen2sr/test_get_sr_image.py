@@ -1,7 +1,7 @@
 import pytest
 import os
 
-import server.services.sen2sr.get_sr_image as get_sr_image
+import sen2sr_tools.get_sr_image as get_sr_image
 from conftest import MOCK_SR_FILEPATH  # The function we are testing
 
 START_DATE = "2024-01-01"

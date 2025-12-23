@@ -5,21 +5,18 @@ import os
 import structlog
 
 from flask import abort
-from .sigpac_tools_v2.find import find_from_cadastral_registry
-from .sigpac_tools_v2.locate import get_cadastral_data_from_coords
 
 from ..benchmark.sr.compare_sr_metrics import compare_sr_metrics
-
 from ..benchmark.sr.constants import BM_DATA_DIR, BM_RES_DIR
-
-from .sen2sr.get_sr_image import get_sr_image
-from .sen2sr.constants import BANDS, GEOJSON_FILEPATH
-from ..services.sr4s.im.utils import get_bbox_from_center
-
 from ..config.constants import GET_SR_BENCHMARK, SEN2SR_SR_DIR, SR_BANDS, RESOLUTION
 from ..utils.parcel_finder_utils import *
 
+
+from sen2sr_tools.get_sr_image import get_sr_image
+from sen2sr_tools.constants import BANDS, GEOJSON_FILEPATH
 from .sr4s.im.get_image_bands import request_date
+from .sigpac_tools_v2.find import find_from_cadastral_registry
+from .sigpac_tools_v2.locate import get_cadastral_data_from_coords
 
 logger = structlog.get_logger()
 
@@ -107,7 +104,12 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
         sigpac_image_name = download_sen2sr_parcel_image(geometry, date)
 
         # If successful, calculate URL and time
-        sigpac_image_url = f"{os.getenv('API_URL')}/uploads/{os.path.basename(sigpac_image_name)}?v={int(time.time())}"
+        sigpac_image_url = (
+            f"{os.getenv('API_URL')}/uploads/"
+            f"{os.path.basename(sigpac_image_name)}"
+            f"?v={int(time.time())}"
+        )
+        print('sigpac_image_url', sigpac_image_url)
         msg2 = f"\nTIME TAKEN (SEN2SR): {datetime.now()-init2}"
 
     except Exception as e:
@@ -159,8 +161,7 @@ def download_sen2sr_parcel_image(geometry, date, delta_days = 15):
         start_date = (formatted_date - timedelta(days=delta_days)
                       ).strftime("%Y-%m-%d")
 
-        sigpac_image_name = os.path.basename(get_sr_image(
-            lat, lon, bands, start_date, end_date, sr_size))
+        sigpac_image_name = get_sr_image(lat, lon, start_date, end_date, bands, sr_size, geometry=geometry)
 
         return sigpac_image_name
     except Exception:

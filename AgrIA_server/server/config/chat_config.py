@@ -15,4 +15,5 @@ def create_chat():
     return chat
 
 
-CHAT = create_chat() if client else None
+# CHAT = create_chat() if client else None
+CHAT = None

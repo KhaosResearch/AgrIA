@@ -6,7 +6,7 @@ import sen2sr
 
 from unittest.mock import MagicMock
 
-import server.services.sen2sr.get_sr_image as get_sr_image
+import sen2sr_tools.get_sr_image as get_sr_image
 
 # --- CONSTANTS FOR MOCK RETURNS ---
 MOCK_CRS = 32630
