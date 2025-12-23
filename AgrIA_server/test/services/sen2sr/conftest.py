@@ -4,6 +4,8 @@ import os
 import torch
 import sen2sr
 
+import numpy as np
+
 from unittest.mock import MagicMock
 
 import sen2sr_tools.get_sr_image as get_sr_image
@@ -11,21 +13,39 @@ import sen2sr_tools.get_sr_image as get_sr_image
 # --- CONSTANTS FOR MOCK RETURNS ---
 MOCK_CRS = 32630
 MOCK_SAMPLE_DATE = "2025-01-01"
-MOCK_SR_FILEPATH = "/temp/sr_image_final.png"
 MOCK_DEVICE = torch.device("cpu")
 
 # Mock Dask Array object with a compute method that returns a NumPy array
-
-
 class MockCloudlessData:
-    """Returns a mock numpy array (e.g., 4 bands x 128 x 128)"""
+    """
+    Simulates an xarray.DataArray returned by cubo.
+    Must support .band, .values, .compute(), and .attrs
+    """
+    def __init__(self):
+        # 1. Add 'band' attribute to mimic xarray coordinates
+        self.band = MagicMock()
+        self.band.values = ["B04", "B08", "B02", "B03"] 
+        
+        # 2. Add 'values' (the actual image data)
+        self.values = torch.rand(4, 128, 128).numpy()
+        
+        # 3. Add dictionary for attributes (proj:epsg, etc)
+        self.attrs = {"epsg": MOCK_CRS}
 
     def compute(self):
-        return MagicMock(to_numpy=lambda: torch.rand(4, 128, 128).numpy())
+        # In real xarray, compute() returns a DataArray with numpy backend.
+        # We return self so the .band attribute is preserved for downstream checks.
+        return self
+    
+    def to_numpy(self):
+        # Helper if code calls .to_numpy() directly
+        return self.values
+
+    # Optional: If your code uses .sel(band=...)
+    def sel(self, **kwargs):
+        return self
 
 # Mock the compiled model object
-
-
 class MockCompiledModel:
     """Simulates model output: 4x upscaled tensor"""
 
@@ -77,9 +97,33 @@ def mock_sen2sr_dependencies(monkeypatch):
     monkeypatch.setattr(
         get_sr_image, "make_pixel_faithful_comparison", MagicMock())
 
-    crop_parcel_mock = MagicMock(return_value=MOCK_SR_FILEPATH)
-    monkeypatch.setattr(
-        get_sr_image, "crop_parcel_from_sr_tif", crop_parcel_mock)
+    # Create a mock image array (3 bands, 128x128)
+    mock_crop_array = np.zeros((3, 128, 128), dtype=np.float32)
+    
+    # Create mock metadata compatible with rasterio
+    mock_crop_meta = {
+        "driver": "GTiff", 
+        "height": 128, 
+        "width": 128, 
+        "count": 3, 
+        "dtype": "float32",
+        "crs": MOCK_CRS,
+        "transform": (10, 0, 0, 0, -10, 0) # Mock transform
+    }
+    
+    # Return (array, metadata)
+    crop_parcel_mock = MagicMock(return_value=(mock_crop_array, mock_crop_meta))
+    monkeypatch.setattr(get_sr_image, "crop_parcel_from_tif", crop_parcel_mock)
+    
+    # Mock the rasterio module's open function to prevent actual file I/O
+    mock_dst = MagicMock()
+    mock_open = MagicMock()
+    
+    # Setup the Context Manager behavior: with rasterio.open(...) as dest:
+    mock_open.return_value.__enter__.return_value = mock_dst
+    
+    # Patch rasterio inside the module under test
+    monkeypatch.setattr(get_sr_image, "rasterio", MagicMock(open=mock_open))
 
     # Yield all the mocks you might want to assert calls on
     yield {

@@ -2,10 +2,19 @@ import pytest
 import os
 
 import sen2sr_tools.get_sr_image as get_sr_image
-from conftest import MOCK_SR_FILEPATH  # The function we are testing
 
+LAT = 40.0
+LON = -3.0
 START_DATE = "2024-01-01"
 END_DATE = "2024-01-16"
+BANDS = ["B04", "B08"]
+GEOMETRY = {
+    "type": "Polygon",
+    "coordinates": [[[LAT, LON], [LAT+0.01, LON+0.01], [LAT, LON]]],
+    "CRS": "epsg:4258"
+    }
+
+MOCK_SR_FILEPATH = "temp/SR_2025-01-01.png"
 
 
 @pytest.mark.parametrize(
@@ -71,11 +80,12 @@ def test_get_sr_image_scenarios(
 
         # ACT
         result_filepath = get_sr_image.get_sr_image(
-            lat=40.0, lon=-3.0, bands=["B04", "B08"], start_date=START_DATE, end_date=END_DATE, size=size
+            lat=LAT, lon=LON, bands=BANDS, start_date=START_DATE, end_date=END_DATE, size=size, geometry=GEOMETRY
         )
-
+        # Get parent dir and file's basename to ignore full path assertion issues
+        result_filepath = "/".join([str(result_filepath.parent).split("/").pop(), str(result_filepath.name)])
         # ASSERT
-        assert result_filepath == MOCK_SR_FILEPATH
+        assert str(result_filepath) == MOCK_SR_FILEPATH
 
         # Check conditional logic: Was predict_large called?
         if predict_large_called:
@@ -91,7 +101,7 @@ def test_get_sr_image_scenarios(
     elif expected_status == 500:
         with pytest.raises(Exception, match=expected_error_msg):
             get_sr_image.get_sr_image(
-                lat=40.0, lon=-3.0, bands=["B04", "B08"], start_date=START_DATE, end_date=END_DATE, size=size
+                lat=LAT, lon=LON, bands=BANDS, start_date=START_DATE, end_date=END_DATE, size=size
             )
 
         # Clean up side effects if they were set
