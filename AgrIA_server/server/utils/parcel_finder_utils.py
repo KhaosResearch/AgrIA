@@ -5,7 +5,6 @@ import shutil
 from flask import jsonify
 from pyproj import Transformer, CRS
 
-from ..services.sigpac_tools_v2.utils import build_cadastral_reference
 
 from ..services.sr4s.im.get_image_bands import download_from_sentinel_hub
 from ..services.sr4s.sr.get_sr_image import process_directory
@@ -33,6 +32,8 @@ import numpy as np
 import os
 import rasterio
 import structlog
+
+from sigpac_tools.generate import build_cadastral_reference
 
 logger = structlog.get_logger()
 
@@ -820,6 +821,8 @@ def check_cadastral_data(cadastral_reference: str, province: str, municipality: 
             return jsonify({'error': 'No cadastral reference nor parcel address location data provided.'}), 400
         else:
             # Build cadastral reference
+            province = province.split('-')[0]
+            municipality = municipality.split('-')[0]
             cadastral_reference = build_cadastral_reference(
                 province, municipality, polygon, parcel_id)
     return cadastral_reference

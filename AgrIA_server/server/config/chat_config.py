@@ -16,3 +16,4 @@ def create_chat():
 
 
 CHAT = create_chat() if client else None
+# CHAT = None

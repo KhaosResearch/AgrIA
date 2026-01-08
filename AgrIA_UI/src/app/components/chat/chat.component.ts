@@ -83,7 +83,13 @@ export class ChatComponent {
           this.parcelImageInfo = response;
         },
         error: err => {
-          this.notificationService.showNotification('chat.load-parcel-finder-data-error', err.error.error, 'error', 10000);
+          let errorKey = 'chat.load-parcel-finder-data-error';
+          let errorMsg = err.error.error;
+          if (err.error.error?.includes('The model is overloaded')) {
+            errorKey = 'chat.model-overloaded-error';
+            errorMsg = '';
+          }
+          this.notificationService.showNotification(errorKey, errorMsg, 'error', 10000);
         },
       });
   }
