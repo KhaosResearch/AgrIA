@@ -276,6 +276,7 @@
     "chat": {
       "load-parcel-finder-data-info": "Cargando datos del Buscador de Parcelas...",
       "load-parcel-finder-data-error": "Fallo al cargar datos del Buscador de Parcelas:\n",
+      "model-overloaded-error": "Error: El modelo IA está sobrecargado en estos momentos. Por favor, vuevla a intentarlo en unos segundos.",
       "load-parcel-finder-data-success": "¡Datos de la Parcela cargados con éxito!",
       "suggestion-info": "Obteniendo respuesta de sugerencia...",
       "suggestion-error": "Fallo al obtener sugerencia:",

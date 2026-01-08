@@ -118,6 +118,7 @@
     "description2": "Make sure the code has 20 characters.",
     "description3Bold": "Urban cadastral reference codes will not be accepted. If you have difficulty finding your parcel, search it via coordinates / drawing parcel limits.",
     "description3": "",
+    "cadastralReference": "Cadastral reference code:",
     "cadastralPlaceholder": "Cadastral Ref. Code",
     "selectDate": "Select approximate date",
     "datePlaceholder": "Date",
@@ -271,6 +272,7 @@
       "chat": {
         "load-parcel-finder-data-info": "Getting parcel finder data...",
         "load-parcel-finder-data-error": "Error while getting parcel finder data:\n",
+        "model-overloaded-error": "Error: The AI model is currently overloaded. Please try after a few seconds.",
         "load-parcel-finder-data-success": "Loaded parcel data successfully!",
         "suggestion-info": "Getting suggested input...",
         "suggestion-error": "Error when getting suggestion:",
