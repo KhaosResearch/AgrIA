@@ -117,14 +117,9 @@ This is a brief overview of each main directory in the project structure:
   - `config`: Holds configuration-related files: from constants used all-over to initialization configuration.
   - `endpoints`: Keeps all endpoints access and methods to a single file for each UI component.
   - `services`: Stores files with all the methods that call external services outside of our project scope.
-    - `sen2sr`: Super-resolution (SR) module for satellite imagery. Handles image retrieving and upscaling (B02, B03, B04, B08 bands) using a deep learning model.
-    - `sigpac_tools_V2`: An updated version of KHAOS Research's [`sigpac-tools`](https://github.com/KhaosResearch/sigpac-tools.git) implementation. Endpoints have been updated and additional functionality has been added.
     - `sr4s`: Previous SR module. Used only for comparisons and benchmarking.
   - `utils`: An assortment of functions and methods that  help all the data processing that mainly comes from endpoint input requests.
-- `tests`: A batery of unit tests to test system's main functions and logic, including:
-  - Endpoints.
-  - Satellite band image retrieval and Super-Resolution.
-  - Land Uses - Ecoschemes Classification Algorithm.
+- `tests`: A batery of unit tests to test system's main functions and logic, including endpoints and Land Use Ecoschemes Classification Algorithm.
 
 ```bash
 Agria_server
@@ -136,10 +131,10 @@ Agria_server
 ├── run.py                                # Application entrypoint used by Gunicorn/Flask.
 │
 ├── assets                                # Stores all server asset files.
-│   ├── geojson_assets                    # Geometry files (+ country BBoxes/polygons). GEOMETRY_FILE can live here.
+│   ├── geojson_assets                    # Geometry files (country BBoxes/polygons). GEOMETRY_FILE can live here.
 │   │   ├── country_example.json
 │   │   ├── spain.json
-│   │   └── *.kml                         # GEOMETRY_FILE
+│   │   └── *.kml                         # GEOMETRY_FILE (suggested location)
 │   └── llm_assets                        # LLM init assets: prompts, context files, and metadata JSON.
 │       ├── context
 │       └── prompts
@@ -168,8 +163,6 @@ Agria_server
 │   │   ├── ecoscheme_payments            # Ecoschemes and CAP logic handler.
 │   │   ├── llm_services.py               # Gemini API calls and Chat logic handler.
 │   │   ├── parcel_finder_service.py      # Searches parcel and retrieves images from CUBO / Sentinel Hub / MinIO
-│   │   ├── sen2sr                        # Satellite SR module using ML (current production).
-│   │   ├── sigpac_tools_v2               # Updated SIGPAC API tools (fork + improvements).
 │   │   └── sr4s                          # Legacy SR module used only for compatibility/benchmarking.
 │   │
 │   └── utils                             # Shared helper utilities for data parsing and internal logic.
@@ -180,13 +173,17 @@ Agria_server
 │
 ├── temp                                  # Temporary working directory for SR and parcel outputs.
 └── test                                  # Unit and integration tests for endpoints and logic.
+    ├── conftest.py
     ├── endpoints
     │   ├── conftest.py
     │   ├── test_chat.py
     │   └── test_parcel_finder.py
     └── services
-        ├── ecoschemes_payment
-        ├── sen2sr
-        └── sigpac_tools_v2
+        └── ecoschemes_payment
+            ├── conftest.py
+            ├── test_classification.py
+            ├── test_main.py
+            ├── test_rules.py
+            └── test_utils.py
 ```
 
