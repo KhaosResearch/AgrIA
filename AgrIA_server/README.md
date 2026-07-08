@@ -27,7 +27,8 @@ You will also need to install `mamba` locally like this:
 ```
 pip install mamba --no-build-isolation
 ```
->NOTE: this package requires NVIDIA CUDA Toolkit: `sudo apt install nvidia-cuda-toolkit`
+>[!NOTE]
+>This package requires NVIDIA CUDA Toolkit: `sudo apt install nvidia-cuda-toolkit`
 After that, manually install `sen2sr` if needed:
 ```
 pip install sen2sr mlstac git+https://github.com/ESDS-Leipzig/cubo.git -q
@@ -90,10 +91,10 @@ COPERNICUS_CONFIG_NAME=any-config-name
 **To get credentials to access the MinIO image database, contact [KHAOS Research](https://khaos.uma.es/?page_id=101) group.**
 
 ### SR Module Dependencies
-The current implementation of the SR module is derived from the [SEN2SR](https://github.com/ESAOpenSR/SEN2SR.git) repository, developed by the [ESAOpenSR](https://opensr.eu/) teamby the [ESAOpenSR](https://opensr.eu/) team. Modifications have been made from its original source. For more documentation, please refer to it.
+The current implementation of the SR module is derived from the [SEN2SR](https://github.com/ESAOpenSR/SEN2SR.git) repository, developed by the [ESAOpenSR](https://opensr.eu/) team. Modifications have been made to its original source. For more documentation, please refer to previous links.
 
->### NOTE:
-> At the time of development, `torch` package would not work with `numpy`'s latest version. Downgrades had to be made to the `numpy` package and the `opencv-python` package as a consequence. The SR module requires `torch`, `rasterio`, `Pillow`, `opencv-python<4.12` and `numpy<2`. These are included in the provided `environment.yml`. If you install the project manually, ensure these packages are present in the correct version.
+>[!NOTE]
+>At the time of development, `torch` package would not work with `numpy`'s latest version. Downgrades had to be made to the `numpy` package and the `opencv-python` package as a consequence. The SR module requires `torch`, `rasterio`, `Pillow`, `opencv-python<4.12` and `numpy<2`. These are included in the provided `environment.yml`. If you install the project manually, ensure these packages are present in the correct version.
 
 
 ## Server initialization:

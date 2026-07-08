@@ -95,10 +95,12 @@ def get_cloudless_image(evalscript, bbox, width, height, config, initial_date, f
                 evalscript=evalscript,
                 input_data=[
                     SentinelHubRequest.input_data(
-                        DataCollection.SENTINEL2_L2A.define_from(
-                            "s2l2a", service_url=config.sh_base_url),
-                        time_interval=(current_initial.date().isoformat(
-                        ), current_final.date().isoformat()),
+                        data_collection=DataCollection.SENTINEL2_L2A.define_from(
+                            "s2l2a",
+                            service_url=config.sh_base_url),
+                        time_interval=(
+                            current_initial.date().isoformat(),
+                            current_final.date().isoformat()),
                         maxcc=current_maxcc,
                     )
                 ],

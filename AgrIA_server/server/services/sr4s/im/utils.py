@@ -107,7 +107,6 @@ def get_bbox_from_center(lat, lon, width_px, height_px, resolution_m):
 
     return BBox(bbox=[min_lon, min_lat, max_lon, max_lat], crs=CRS.WGS84)
 
-
 def get_n_random_coordinate_pairs(amount: int, bounded_zone=[LAT_MIN, LAT_MAX, LON_MIN, LON_MAX]):
     """
     Generate random coordinates from a bounded zone.
