@@ -10,7 +10,7 @@ def create_chat():
         config=types.GenerateContentConfig(
             system_instruction=generate_system_instructions()
         ),
-        history=set_initial_history()
+        history=set_initial_history(),
     )
     return chat
 

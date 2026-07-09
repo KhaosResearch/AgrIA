@@ -83,9 +83,9 @@ def ergas(sr, gt, ratio=2):
     gt = gt.astype(np.float64)
     sr = sr.astype(np.float64)
     mean_gt = np.mean(gt, axis=(0, 1))
-    mse = np.mean((sr - gt)**2, axis=(0, 1))
+    mse = np.mean((sr - gt) ** 2, axis=(0, 1))
     # Avoid divide by zero for mean_gt
-    denom = (mean_gt**2 + EPS)
+    denom = mean_gt**2 + EPS
     return 100.0 * ratio * np.sqrt(np.mean(mse / denom))
 
 
@@ -98,8 +98,7 @@ def resize_image(img, target_shape):
     bands = img.shape[-1]
     out = np.zeros((Ht, Wt, bands), dtype=np.float32)
     for b in range(bands):
-        out[..., b] = cv2.resize(
-            img[..., b], (Wt, Ht), interpolation=cv2.INTER_CUBIC)
+        out[..., b] = cv2.resize(img[..., b], (Wt, Ht), interpolation=cv2.INTER_CUBIC)
     return out
 
 
@@ -124,14 +123,17 @@ def detect_and_normalize(sr, gt, auto_normalize=True):
         sr_b = sr[..., b]
         gt_min, gt_max = float(np.nanmin(gt_b)), float(np.nanmax(gt_b))
         sr_min, sr_max = float(np.nanmin(sr_b)), float(np.nanmax(sr_b))
-        per_band_stats.append({
-            "band": b,
-            "gt_min": gt_min, "gt_max": gt_max,
-            "sr_min": sr_min, "sr_max": sr_max
-        })
+        per_band_stats.append(
+            {
+                "band": b,
+                "gt_min": gt_min,
+                "gt_max": gt_max,
+                "sr_min": sr_min,
+                "sr_max": sr_max,
+            }
+        )
         # compute ratio safely
-        ratios.append((sr_max / (gt_max + EPS))
-                      if (gt_max + EPS) != 0 else np.inf)
+        ratios.append((sr_max / (gt_max + EPS)) if (gt_max + EPS) != 0 else np.inf)
 
     median_ratio = float(np.median(ratios))
     # Heuristics to decide mapping
@@ -140,7 +142,12 @@ def detect_and_normalize(sr, gt, auto_normalize=True):
 
     if auto_normalize:
         # If GT looks like [0..1] and SR is on a much larger numeric scale OR the median ratio is huge/small -> map
-        if median_ratio > 5.0 or median_ratio < 0.2 or np.nanmax([s["sr_max"] for s in per_band_stats]) > 1000 and np.nanmax([s["gt_max"] for s in per_band_stats]) <= 1.5:
+        if (
+            median_ratio > 5.0
+            or median_ratio < 0.2
+            or np.nanmax([s["sr_max"] for s in per_band_stats]) > 1000
+            and np.nanmax([s["gt_max"] for s in per_band_stats]) <= 1.5
+        ):
             # map per-band
             sr_mapped = np.empty_like(sr, dtype=np.float32)
             for b in range(bands):
@@ -151,7 +158,8 @@ def detect_and_normalize(sr, gt, auto_normalize=True):
                 if (smax - smin) < EPS:
                     # constant band in SR: set to GT mean (avoid divide by zero)
                     sr_mapped[..., b] = np.full(
-                        sr[..., b].shape, np.nanmean(gt[..., b]), dtype=np.float32)
+                        sr[..., b].shape, np.nanmean(gt[..., b]), dtype=np.float32
+                    )
                     warnings.append(f"band_{b}_constant_sr; set to gt_mean")
                 else:
                     sr_norm = (sr[..., b] - smin) / (smax - smin)

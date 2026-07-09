@@ -4,86 +4,89 @@ from flask import Blueprint, request, jsonify
 from server.services.chat_service import *
 
 logger = structlog.get_logger()
-chat_bp = Blueprint('chat', __name__)
+chat_bp = Blueprint("chat", __name__)
 
 
-@chat_bp.route('/hello-world', methods=['GET'])
+@chat_bp.route("/hello-world", methods=["GET"])
 def hello_world():
-    return jsonify({'response': "Hello, World!"})
+    return jsonify({"response": "Hello, World!"})
 
 
-@chat_bp.route('/send-user-input', methods=['POST'])
+@chat_bp.route("/send-user-input", methods=["POST"])
 def send_user_input():
     try:
-        user_input = request.form.get('userInput')
+        user_input = request.form.get("userInput")
         if not user_input:
-            return jsonify({'error': 'No user input provided'}), 400
+            return jsonify({"error": "No user input provided"}), 400
 
         response_text = generate_user_response(user_input)
 
-        return jsonify({'response': response_text})
+        return jsonify({"response": response_text})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@chat_bp.route('/send-image', methods=['POST'])
+@chat_bp.route("/send-image", methods=["POST"])
 def send_image():
     try:
-        file = request.files.get('image')
-        is_detailed_description: bool = "true" in str(
-            request.form.get("isDetailedDescription")).lower()
+        file = request.files.get("image")
+        is_detailed_description: bool = (
+            "true" in str(request.form.get("isDetailedDescription")).lower()
+        )
         if not file:
-            return jsonify({'error': 'No image file provided'}), 400
+            return jsonify({"error": "No image file provided"}), 400
 
         response_text = get_image_description(file, is_detailed_description)
 
-        return jsonify({'response': response_text})
+        return jsonify({"response": response_text})
     except Exception as e:
         logger.exception("Error sending image:\n")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@chat_bp.route('/load-parcel-data-to-chat', methods=['POST'])
+@chat_bp.route("/load-parcel-data-to-chat", methods=["POST"])
 def send_parcel_info_to_chat():
     try:
-        if request.form.get('imageDate'):
-            image_date = request.form.get('imageDate').split("/")[-1]
+        if request.form.get("imageDate"):
+            image_date = request.form.get("imageDate").split("/")[-1]
         else:
             raise ValueError("No image date provided")
-        land_uses = json.loads(request.form.get('landUses'))
-        query = json.loads(request.form.get('query'))
-        image_filename = request.form.get('imageFilename')
-        is_detailed_description: bool = "true" in str(
-            request.form.get("isDetailedDescription")).lower()
-        lang = request.form.get('lang')
+        land_uses = json.loads(request.form.get("landUses"))
+        query = json.loads(request.form.get("query"))
+        image_filename = request.form.get("imageFilename")
+        is_detailed_description: bool = (
+            "true" in str(request.form.get("isDetailedDescription")).lower()
+        )
+        lang = request.form.get("lang")
 
         response = get_parcel_description(
-            image_date, land_uses, query, image_filename, is_detailed_description, lang)
+            image_date, land_uses, query, image_filename, is_detailed_description, lang
+        )
 
-        return jsonify({'response': response})
+        return jsonify({"response": response})
     except (Exception, ValueError) as e:
         logger.exception("Error loading parcel to chat:\n")
         status_code = 400 if isinstance(e, ValueError) else 500
-        return jsonify({'error': str(e)}), status_code
+        return jsonify({"error": str(e)}), status_code
 
 
-@chat_bp.route('/get-input-suggestion', methods=['POST'])
+@chat_bp.route("/get-input-suggestion", methods=["POST"])
 def get_input_suggestion():
     try:
-        lang = request.form.get('lang')
+        lang = request.form.get("lang")
         if chat.get_history():
             chat_history = chat.get_history()
         else:
             raise ValueError("No valid history provided.")
         response = get_suggestion_for_chat(chat_history, lang)
-        return jsonify({'response': response})
+        return jsonify({"response": response})
     except (Exception, ValueError) as e:
         logger.exception("Error getting suggestion:\n")
         status_code = 400 if isinstance(e, ValueError) else 500
-        return jsonify({'error': str(e)}), status_code
+        return jsonify({"error": str(e)}), status_code
 
 
-@chat_bp.route('/load-active-chat-history', methods=['GET'])
+@chat_bp.route("/load-active-chat-history", methods=["GET"])
 def load_active_chat_history():
     try:
         if chat.get_history():
@@ -91,8 +94,8 @@ def load_active_chat_history():
         else:
             raise ValueError("No valid history provided.")
         response = get_role_and_content(chat_history)
-        return jsonify({'response': response})
+        return jsonify({"response": response})
     except (Exception, ValueError) as e:
         logger.exception("Error getting suggestion:\n")
         status_code = 400 if isinstance(e, ValueError) else 500
-        return jsonify({'error': str(e)}), status_code
+        return jsonify({"error": str(e)}), status_code

@@ -10,12 +10,12 @@ from ...utils.parcel_finder_utils import reset_dir
 
 
 # Fixed constant for the pluriannuality bonus (€25.00/ha) as per instructions
-PLURIANNUALITY_BONUS_PER_HA = Decimal('25.00')
+PLURIANNUALITY_BONUS_PER_HA = Decimal("25.00")
 
 # Define rounding constants
-ROUNDING_RATE = Decimal('0.000001')  # 6 decimals for applied rate
-ROUNDING_AREA = Decimal('0.0001')   # 4 decimals for total area
-ROUNDING_PAYMENT = Decimal('0.01')  # 2 decimals for total payments
+ROUNDING_RATE = Decimal("0.000001")  # 6 decimals for applied rate
+ROUNDING_AREA = Decimal("0.0001")  # 4 decimals for total area
+ROUNDING_PAYMENT = Decimal("0.01")  # 2 decimals for total payments
 
 logger = structlog.get_logger()
 
@@ -137,7 +137,7 @@ def demo():
 
         TOTAL ELIGIBLE SURFACE (ha): 31.177
 
-        """
+        """,
         },
         "es": {
             "26002A001000010000EQ": """FECHA DE IMAGEN: 2025-6-6
@@ -247,8 +247,8 @@ def demo():
         - Coef. de Regadío: 0.0%
 
         SUPERFICIE ADMISIBLE TOTAL (ha): 31.177
-        """
-        }
+        """,
+        },
     }
 
     languages = ["EN", "ES"]
@@ -262,7 +262,7 @@ def demo():
         for key in data_dict.keys():
             output_dict = calculate_ecoscheme_payment(data_dict[key], lang)
             out_path = CLASSIFICATION_OUT_DIR / f"{key}_example_{lang}.json"
-            with open(out_path, 'w') as file:
+            with open(out_path, "w") as file:
                 json.dump(output_dict, file, indent=4)
             logger.info(f"Ecoscheme classification saved to {out_path}")
         logger.debug(f"Current Lang:\t{lang}")

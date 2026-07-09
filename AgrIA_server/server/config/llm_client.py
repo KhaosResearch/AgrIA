@@ -19,4 +19,5 @@ def init_client(
         max_retries=max_retries,
     )
 
+
 client = init_client()
