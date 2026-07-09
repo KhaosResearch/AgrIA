@@ -24,15 +24,15 @@ jobs:
         run: |
           # 1. Get the list of commits
           COMMIT_LIST=$(git log --pretty=format:"* %s" ${{ github.event.pull_request.base.sha }}..HEAD)
-          
-          # 2. Format the final output string, including the header
-          FORMATTED_LIST="## 📦 Commits Included in this PR:\n\n${COMMIT_LIST}"
-          
-          # 3. Use the special GITHUB_ENV file to make the variable available globally
-          #    NOTE: We must use the multiline syntax here as well!
-          echo "FORMATTED_LIST<<EOF" >> $GITHUB_ENV
-          echo "${FORMATTED_LIST}" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+
+          # 2. Export as a multiline environment variable
+          {
+            echo "FORMATTED_LIST<<EOF"
+            echo "## 📦 Commits Included in this PR:"
+            echo
+            echo "$COMMIT_LIST"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
         shell: bash
 
       - name: 🔄 Update Pull Request Description
@@ -51,7 +51,7 @@ jobs:
             
             if (currentBody && currentBody.includes(header)) {
               // If the header exists, replace the old list with the new one
-              const regex = new RegExp(`${header}[\\s\\S]*?(\n\\s*---|$|##)`, 'm');
+              const regex = new RegExp(`${header}[\\s\\S]*?(?=\\n---|\\n## |$)`);
               newBody = currentBody.replace(regex, commitList + '\n\n---');
             } else {
               
