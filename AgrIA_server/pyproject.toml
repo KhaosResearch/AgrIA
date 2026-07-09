@@ -1,7 +1,7 @@
 [project]
 name = "agria-server"
 version = "0.1.0"
-requires-python = ">=3.11"
+requires-python = ">=3.12,<3.13"
 
 dependencies = [
     "numpy<2",
@@ -19,7 +19,6 @@ dependencies = [
     "pyproj",
     "rasterio",
     "fiona",
-    "gdal",
     "torch~=2.4.0",
     "torchvision",
     "matplotlib",
@@ -30,6 +29,8 @@ dependencies = [
     "sentinelhub",
     "safetensors",
     "protobuf",
+    "langchain-openai>=1.3.4",
+    "ruff>=0.15.20",
 ]
 
 [project.optional-dependencies]

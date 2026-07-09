@@ -10,6 +10,11 @@ logger = structlog.getLogger()
 
 load_dotenv()
 
+# LLM CREDENTIALS & MODEL
+LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "")
+LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
+LLM_MODEL_NAME = os.environ.get("LLM_MODEL_NAME", "")
+
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not GEMINI_API_KEY:
