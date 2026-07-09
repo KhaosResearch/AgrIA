@@ -125,11 +125,15 @@ def get_suggestion_for_chat(chat_history: list[Content], lang: str):
             + "### LAST_OUTPUT_END ###"
         )
         language = "Spanish" if lang == "es" else "English"
-        suggestion_prompt = f"Using the summary as context, provide an appropiate 300-character max response in {language} to this chat output. You are acting as a user. Do not use any data not mentioned. Questions are heavily encouraged. Limit the use of expressions such as 'Genial','Excelente', etc..:\n\n"
-        suggestion = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=[suggestion_prompt, summarised_chat, last_chat_output],
-        )
+        system_prompt = "You are acting as a user. Do not use any data not mentioned. Questions are heavily encouraged. Limit the use of expressions such as 'Genial/Great','Excelente/Excellent', etc..:\n\n"
+        suggestion_prompt = f"Using the summary as context, provide an appropiate 300-character max response in {language} to this chat output."
+
+        msg = [
+            ("system", system_prompt),
+            ("human", "\n".join(suggestion_prompt, summarised_chat, last_chat_output)),
+        ]
+        suggestion = client.invoke(msg)
+
         return suggestion.text
     except Exception as e:
         print(f"Error getting suggestion:\t{e}")
@@ -145,13 +149,14 @@ def get_summarised_chat(chat_history):
     """
     try:
         chat_message_history = get_role_and_content(chat_history)
-        summarised_chat = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=[
-                "Summarise this chat history in 100 words aprox. If too long, make emphasis on the last 5 items of the chat:",
-                str(chat_message_history),
-            ],
-        )
+        system_prompt = "You are an expert chat summarizer. Retain the most important parts and higligh all nuances needed to carry on with a conversation."
+        instruction = "Summarise this chat history in 100-200 words aprox. Make emphasis on the last 5 chat entries:"
+        msg = [
+            ("system", system_prompt),
+            ("human", "\n".join(instruction, str(chat_message_history))),
+        ]
+        summarised_chat = client.invoke(msg)
+
         return summarised_chat.text
     except Exception as e:
         print(f"Error while summarising chat:\t{e}")

@@ -6,10 +6,8 @@ from ..config.constants import (
     BASE_CONTEXT_PATH,
     BASE_PROMPTS_PATH,
     CONTEXT_DOCUMENTS_FILE,
-    FULL_DESC_TRIGGER,
     MIME_TYPES,
     PROMPT_LIST_FILE,
-    SHORT_DESC_TRIGGER,
 )
 from ..services.llm_services import upload_context_document
 from google.genai.types import Content, Part

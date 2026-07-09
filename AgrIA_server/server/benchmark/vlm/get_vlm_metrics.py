@@ -1,4 +1,5 @@
 # Setup VLM
+import base64
 from collections import defaultdict
 import json
 import os
@@ -10,6 +11,8 @@ from datetime import datetime, timedelta
 from PIL import Image
 from google import genai
 from google.genai import types
+from langchain_core.messages import HumanMessage, SystemMessage
+from pathlib import Path
 
 from ..sr.utils import copy_file_to_dir
 from ...config.constants import SEN2SR_SR_DIR, TEMP_DIR
@@ -152,8 +155,6 @@ def get_llm_full_desc(
     image_filepath: str,
     parcel_desc: str,
     lang: str = LANG,
-    classification_filepath: str = OG_CLASSIFICATION_FILEPATH,
-    is_vlm_only: bool = False,
 ):
     if not lang:
         lang = LANG
@@ -173,9 +174,16 @@ def get_llm_full_desc(
     prompt = prompt_en if lang == "en" else prompt_es if lang == "es" else prompt
     logger.debug(f'Prompt generated:\n"{prompt[:150]}..."')
 
-    image = Image.open(image_filepath)
+    image_path = Path(image_filepath)
+    image_bytes = image_path.read_bytes()
+    encoded_image = base64.b64encode(image_bytes).decode("utf-8")
+    
     logger.debug(f"Image loaded for inference")
-
+    
+    # Determine mime type dynamically
+    ext = image_path.suffix.lower().replace(".", "")
+    mime_type = f"image/{ext}" if ext in ["png", "jpeg", "jpg", "webp"] else "image/jpeg"
+    
     sys_ins = (
         FULL_DESC_SYS_INSTR_EN
         if lang == "en"
@@ -186,11 +194,22 @@ def get_llm_full_desc(
 
     # logger.debug(f"LLM instructions: {sys_ins}")
 
-    llm_response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        config=types.GenerateContentConfig(system_instruction=sys_ins),
-        contents=[image, prompt],
-    )
+    messages = [
+        SystemMessage(content=sys_ins),
+        HumanMessage(
+            content=[
+                {"type": "text", "text": prompt},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:{mime_type};base64,{encoded_image}"
+                    },
+                },
+            ]
+        ),
+    ]
+    llm_response = client.invoke(messages)
+    
     logger.debug(
         f"AgrIA's response:\n---BEGIN\n{llm_response.text[:300]}\n...\n...{llm_response.text[300:]}\n---END"
     )
