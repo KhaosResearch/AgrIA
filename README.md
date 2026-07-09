@@ -1,7 +1,7 @@
 # Agricultural Imaging Assistant (AgrIA)
 
 <div align="center">
-  <img src="./assets/img/logo.png" alt="AgrIA Logo" width="300"/>
+  <img src="./docs/assets/img/logo.png" alt="AgrIA Logo" width="300"/>
 </div>
 
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -55,7 +55,8 @@ In order to get AgrIA started, you will need to assign the essential environment
     ```
 2. **Set the variables:** Depending whether you choose **Option 1** (*User mode*) or **Option 2** (*Dev mode*), configure the variables as you need.
 
-> *NOTE:* The `NON-ESSENTIAL VARIABLES` may be assigned but will only be used for benchmarking purposes (available by modifying the code in *Dev mode*).
+> [!NOTE]
+> The `NON-ESSENTIAL VARIABLES` may be assigned but will only be used for benchmarking purposes (available by modifying the code in *Dev mode*).
 
 ### Option 1: Docker (User mode)
 You can easily deploy AgrIA by installing **[Docker](https://docs.docker.com/get-started/get-docker/)** and running the following command:
@@ -96,7 +97,7 @@ In order to find the parcel, users have 3 options:
 
 The following diagram details AgrIA`s parcel finding pipeline when both image and metadata are returned.:
 
-<img src="./assets/img/AgrIA_diagram.png" alt="AgrIA's process Diagram" style="display: block; margin-left: auto; margin-right: auto;">
+<img src="./docs/assets/img/AgrIA_diagram.png" alt="AgrIA's process Diagram" style="display: block; margin-left: auto; margin-right: auto;">
 
 ### Diagram explanation
 #### Land use automatic extraction (Spain only)
@@ -111,7 +112,7 @@ The following diagram details AgrIA`s parcel finding pipeline when both image an
 
 <center>
 
-![Upscaled Output](assets/examples/example.png)
+![Upscaled Output](docs/assets/examples/example.png)
 
 </center>
 

@@ -9,7 +9,7 @@ parcel_finder_bp = Blueprint('find_parcel', __name__)
 
 
 @parcel_finder_bp.route('/load-parcel-description', methods=['POST'])
-def load_parcel_descriptio():
+def load_parcel_description():
     """
     Loads and returns dinamically the correct parcel description file.
     Returns:

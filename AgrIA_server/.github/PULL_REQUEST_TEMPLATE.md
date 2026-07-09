@@ -1,19 +1,36 @@
-## ✅ Checklist
+## Description
 
-- [ ] My code follows the repository's coding standards.
-- [ ] I have included necessary documentation updates.
-- [ ] I have run local tests to ensure functionality.
+<!-- Briefly describe changes implemented -->
 
----
+## Change type
 
-## 🚀 Changes Summary
+<!-- Mark with an [x] the change type -->
 
-_See commits._
+- [ ] 🐛 Bug fix (fix)
+- [ ] ✨ New Feature (feat)
+- [ ] 📚 Documentation (docs)
+- [ ] 🎨 Styling (style)
+- [ ] ♻️ Refactoring (refactor)
+- [ ] ⚡ Performance improvement (perf)
+- [ ] ✅ Tests (test)
+- [ ] 🔧 Build/CI (build/ci)
+- [ ] 🗑️ Chore (chore)
 
----
+## Checklist
 
-## 🧩 Context & Rationale
+- [ ] My code follows project styling guidelines
+- [ ] I have performed a self-revision of all of my code
+- [ ] I have commented my code properly, specially in difficult-to-understand parts
+- [ ] I have updated all necessary documentation
+- [ ] I have added test to prove my fix/feature works properly
+- [ ] All existing test pass locally
 
-*Why was this change needed? What problem does it solve?*
+## Is this a breaking change?
 
-_NaN._
+- [ ] Yes, this is a breaking change
+
+<!-- If so, describe impact and necessary migration -->
+
+## Additional info
+
+<!-- Any relevant additional info -->

@@ -4,7 +4,7 @@ import { LangChangeEvent, TranslateModule, TranslateService } from '@ngx-transla
 import { ChatAssistantComponent } from './chat-assistant/chat-assistant.component';
 import { Router } from '@angular/router';
 import { ParcelFinderService } from '../../services/parcel-finder.service/parcel-finder.service';
-import { ChatService } from '../../services/chat.services/chat.service';
+import { ChatService } from '../../services/chat.service/chat.service';
 import { IChatParcelResponse } from '../../models/chat.model';
 import { Subscription, take } from 'rxjs';
 import { IFindParcelresponse } from '../../models/parcel-finder.model';

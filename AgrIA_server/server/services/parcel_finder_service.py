@@ -128,7 +128,7 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
 
 def download_sen2sr_parcel_image(geometry, date, delta_days = 15):
     """
-    Download and super-resolve parcel image cropped from Sentinel imagery cubo data.
+    Download and super-resolve parcel image cropped from Sentinel CUBO imagery data.
 
     Arguments:
         geometry (dict): Geometry containing the parcel/image's limits.
