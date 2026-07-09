@@ -8,7 +8,7 @@ from .config import GEMINI_API_KEY, LLM_API_KEY, LLM_BASE_URL, LLM_MODEL_NAME
 def init_client(
     base_url: str = LLM_BASE_URL,
     api_key: str = LLM_API_KEY,
-    temperature: float = 0.1,
+    temperature: float = 0.4,
     max_retries: int = 2,
 ):
     return ChatOpenAI(

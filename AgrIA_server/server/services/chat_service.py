@@ -108,12 +108,7 @@ def get_suggestion_for_chat(chat_history: list[Content], lang: str):
         suggestion (str): Suggestion for the user to input.
     """
     try:
-        last_user_content_entry = chat_history[-1]
-        last_message = ""
-        for part in last_user_content_entry.parts:
-            if part.text is not None:
-                last_message = part.text
-                break
+        last_message = chat_history[-1] if chat_history[-1] else ""
         summarised_chat = (
             "### CHAT_SUMMARY_START ###\n"
             + get_summarised_chat(chat_history)
@@ -130,7 +125,7 @@ def get_suggestion_for_chat(chat_history: list[Content], lang: str):
 
         msg = [
             ("system", system_prompt),
-            ("human", "\n".join(suggestion_prompt, summarised_chat, last_chat_output)),
+            ("human", "\n".join([suggestion_prompt, summarised_chat, last_chat_output])),
         ]
         suggestion = client.invoke(msg)
 
@@ -153,7 +148,7 @@ def get_summarised_chat(chat_history):
         instruction = "Summarise this chat history in 100-200 words aprox. Make emphasis on the last 5 chat entries:"
         msg = [
             ("system", system_prompt),
-            ("human", "\n".join(instruction, str(chat_message_history))),
+            ("human", "\n".join([instruction, str(chat_message_history)])),
         ]
         summarised_chat = client.invoke(msg)
 
@@ -163,18 +158,52 @@ def get_summarised_chat(chat_history):
 
 
 def get_role_and_content(chat_history):
-    """
-    Extracts role and text content of chat history.
+    """Extracts role and text content of the local chat history.
+
     Args:
-        chat_history (list[genai.types.Content]): Chat history.
+        chat_history (list): List of LangChain Message objects (SystemMessage,
+          HumanMessage, AIMessage).
+
     Returns:
-        chat_message_history (list[dict:{role:str, content:str}]): Chat history formatted.
+        chat_message_history (list[dict:{role:str, content:str}]): Chat history
+          formatted.
     """
-    # Get only role and text content from chat_history
     chat_message_history = []
-    for content in chat_history:
-        role = content.role if content.role is not None else "unknown"
-        for part in content.parts:
-            if part.text is not None:
-                chat_message_history.append({"role": role, "content": part.text})
+
+    # Map LangChain internal types back to Google's standard roles
+    role_mapping = {
+        "human": "user",
+        "ai": "model",
+        "system": "system",  # If your frontend doesn't show system prompts, you can filter this out
+    }
+
+    for message in chat_history:
+        # Determine the role string
+        role = role_mapping.get(message.type, "unknown")
+
+        # Skip system instructions if your UI code only expects 'user' and 'model'
+        if role == "system":
+            continue
+
+        # Extract content
+        if isinstance(message.content, str):
+            # Normal text message
+            if message.content.strip():
+                chat_message_history.append(
+                    {"role": role, "content": message.content}
+                )
+
+        elif isinstance(message.content, list):
+            # Multimodal message (contains text blocks and image base64 blocks)
+            combined_text = []
+            for block in message.content:
+                if isinstance(block, dict) and block.get("type") == "text":
+                    combined_text.append(block.get("text", ""))
+
+            if combined_text:
+                text_content = "\n".join(combined_text)
+                chat_message_history.append(
+                    {"role": role, "content": text_content}
+                )
+
     return chat_message_history

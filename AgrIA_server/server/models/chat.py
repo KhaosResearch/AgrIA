@@ -19,6 +19,11 @@ class LocalChat:
             # If set_initial_history() returns standard LangChain messages, add them here
             self.history.add_messages(history_init)
 
+    def get_history(self):
+        """Replicates the history tracking endpoint expected by chat.py."""
+        # Returns the underlying list of LangChain messages
+        return self.history.messages
+
     def _process_input_item(self, item):
         """Converts local inputs (strings, files, or PIL Images) into OpenAI-compatible structures."""
         # 1. Handle Text
@@ -74,7 +79,7 @@ class LocalChat:
         self.history.add_message(user_msg)
 
         # Get all compiled messages up to this point
-        all_messages = self.history.get_messages()
+        all_messages = self.history.messages
 
         # Execute API call to local LLM backend
         response = self.client.invoke(all_messages)

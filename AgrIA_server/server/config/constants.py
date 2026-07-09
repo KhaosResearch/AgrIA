@@ -3,7 +3,7 @@ import json
 
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 
-MODEL_NAME = "gemini-2.5-flash-lite"
+GEMINI_MODEL_NAME = "gemini-2.5-flash-lite"
 
 BASE_GEOJSON_PATH = Path(ROOT_DIR / "assets/geojson_assets")
 

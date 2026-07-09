@@ -22,7 +22,7 @@ export class ChatAssistantComponent {
     },
   ];
   // Index of the first message after chat sanitizaion
-  private firstIndex: number = 8;
+  private firstIndex: number = 0;
   // Miliscendos delay to display Chat Assistant's replies
   private milisecondsDisplay: number = 3;
   // HTML element to automatically scroll to the bototm

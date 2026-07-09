@@ -2,6 +2,8 @@ import json
 import os
 import structlog
 
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+
 from ..config.constants import (
     BASE_CONTEXT_PATH,
     BASE_PROMPTS_PATH,
@@ -159,122 +161,87 @@ def load_documents_from_json(
 
 
 def set_initial_history(documents_json_path: str = CONTEXT_DOCUMENTS_FILE):
-    """
-    Constructs the initial history for a chat session, including examples & context documents.
+    """Constructs the initial LangChain message history session, injecting context
 
-    Args:
-        documents_json_path: The path to the JSON file containing paths to context documents.
-
-    Returns:
-        A list representing the conversation history, ready to be used with a chat instance.
+    documents dynamically without heavy vector search overhead.
     """
     initial_history = []
-    document_parts = []
-    upload_success = 0
+    doc_paths_list = []
 
     try:
         doc_paths_list = load_documents_from_json(documents_json_path)
-    except FileNotFoundError:
-        logger.exception(
-            f"Error: Document JSON file not found at {documents_json_path}"
-        )
-        doc_paths_list = []
     except Exception as e:
         logger.exception(f"Error loading documents from JSON: {e}")
-        doc_paths_list = []
 
     if doc_paths_list:
-        prompt = "Use the following files as context documents for the task. You may display tables and quote or reference information directly from these documents:\n"
-        upload_success = upload_context_files(
-            document_parts, doc_paths_list[:3], prompt
-        )
-        prompt = "Use the following files examples of user input (JSON) and your output (MD) when prompted for a parcel description with that input:\n"
-        upload_success += upload_context_files(
-            document_parts, doc_paths_list[3:], prompt
-        )
+        # 1. Gather CAP Guideline Docs (Files 0 to 2)
+        cap_prompt = "Use the following files as context documents for the task. You may display tables and quote or reference information directly from these documents:\n\n"
+        cap_context = upload_context_files(doc_paths_list[:3])
 
-        llm_answer = "Apologies, it appears there has been an error during the document upload process and I have not got access to the files. I will do my best to answer any queries though."
-        if upload_success > 0:
-            logger.info(f"Successfully uploaded and prepared {upload_success} files.")
-            # Append all document parts as a single 'user' turn
-            initial_history.append(Content(role="user", parts=document_parts))
-            # Model's optional "OK" response to the context
-            llm_answer = "Okay, I have received the context documents, format examples and clasification file and I will use them for our conversation."
-        else:
-            logger.warning(
-                "No documents were successfully uploaded to include in the initial history."
+        if cap_context:
+            initial_history.append(HumanMessage(content=cap_prompt + cap_context))
+
+        # 2. Gather Markdown/JSON Template Examples (Files 3 onwards)
+        example_prompt = "Use the following files as examples of user input (JSON) and your output (MD) when prompted for a parcel description with that input:\n\n"
+        example_context = upload_context_files(doc_paths_list[3:])
+
+        if example_context:
+            initial_history.append(
+                HumanMessage(content=example_prompt + example_context)
             )
 
-        initial_history.append(Content(role="model", parts=[Part(text=llm_answer)]))
+        # Replicate legacy acknowledgements using LangChain AIMessage classes
+        initial_history.append(
+            SystemMessage(
+                content="Okay, I have received the context documents, format examples, and classification file and I will use them for our conversation."
+            )
+        )
 
-    user_input_intro = "Recuerda que debes hablar en el mismo idioma que el usuario, ya esa español, inglés u otro. Ahora preséntate."
+    # 3. Chat Intro Sequence
+    user_input_intro = "Recuerda que debes hablar en el mismo idioma que el usuario, ya sea español, inglés u otro. Ahora preséntate."
     model_output_intro = (
         "¡Hola!\n\nSoy tu Asistente de Imágenes Agrícolas, ¡pero puedes llamarme **AgrIA**!\n\n"
         "Mi propósito aquí es **analizar imágenes satelitales de campos de cultivo** para "
-        "asistir a los agricultores en el análisis del su **uso del espacio y los recursos, "
+        "asistir a los agricultores en el análisis de su **uso del espacio y los recursos, "
         "así como las prácticas agrícolas**, con el fin de **asesorarles a reunir los requisitos "
         "para las subvenciones del Comité Europeo de Política Agrícola Común (CAP)**.\n\n"
         "¡Sólo tienes que subir una imagen satelital de tus campos de cultivo y nos pondremos manos a la obra!\n\n"
         "Si tiene alguna pregunta, también puede escribir en el cuadro de texto."
     )
 
-    initial_history.append(Content(role="user", parts=[Part(text=user_input_intro)]))
-    initial_history.append(Content(role="model", parts=[Part(text=model_output_intro)]))
+    initial_history.append(HumanMessage(content=user_input_intro))
+    initial_history.append(AIMessage(content=model_output_intro))
 
-    logger.debug(f"Initial history prepared with {len(initial_history)} turns.")
     return initial_history
 
 
-def upload_context_files(document_parts, doc_paths_list, prompt):
-    document_parts.append(Part(text=prompt))
-    upload_success = 0
+def upload_context_files(doc_paths_list) -> str:
+    """Aggregates local document data into a compiled context block string."""
+    compiled_text = ""
+
     for doc_path in doc_paths_list:
         if not doc_path:
             continue
+
+        filename = os.path.basename(doc_path)
         file_extension = doc_path.split(".")[-1].lower()
-        if file_extension == "json":
-            # --- Special handling for JSON ---
-            try:
-                # Read JSON content as a string
-                with open(doc_path, "r", encoding="utf-8") as f:
-                    json_content = f.read()
 
-                # Append a descriptive text part and the JSON content itself as text
-                document_parts.append(
-                    Part(
-                        text=f"Example JSON User Input ({os.path.basename(doc_path)}):\n{json_content}"
+        try:
+            # Reusing your original approach for JSON but expanding it to Markdown
+            if file_extension in ["json", "md", "txt"]:
+                content = upload_context_document(doc_path)
+                if content:
+                    compiled_text += (
+                        f"\n--- START OF FILE: {filename} ---\n"
                     )
+                    compiled_text += content
+                    compiled_text += f"\n--- END OF FILE: {filename} ---\n"
+                    logger.info(f"Successfully included file content: {filename}")
+            else:
+                logger.warning(
+                    f"Skipping unsupported non-text context file: {filename}"
                 )
-                upload_success += 1
-                logger.info(
-                    f"Successfully included JSON content as text: {os.path.basename(doc_path)}"
-                )
+        except Exception as e:
+            logger.exception(f"Error packing file data {doc_path}: {e}")
 
-            except Exception as e:
-                logger.exception(f"Error reading JSON file {doc_path}: ")
-            # --- End JSON handling ---
-
-        else:
-            # --- Existing handling for other file types (e.g., .md, images) ---
-            mime_type = MIME_TYPES.get(file_extension, "application/octet-stream")
-            try:
-                uploaded_doc = upload_context_document(doc_path)
-                if uploaded_doc and uploaded_doc.uri:
-                    logger.info(
-                        f"Successfully uploaded document. {os.path.basename(doc_path)} URI: {uploaded_doc.uri}"
-                    )
-                    document_parts.append(
-                        Part(text=f"Document: {os.path.basename(doc_path)}")
-                    )
-                    document_parts.append(
-                        Part.from_uri(file_uri=uploaded_doc.uri, mime_type=mime_type)
-                    )
-                    upload_success += 1
-                else:
-                    logger.warning(
-                        f"Warning: Failed to get URI for uploaded document: {doc_path}"
-                    )
-            except Exception as e:
-                logger.exception(f"Error uploading document {doc_path}: ")
-
-    return upload_success
+    return compiled_text
