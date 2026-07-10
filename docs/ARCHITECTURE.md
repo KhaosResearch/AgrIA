@@ -17,7 +17,7 @@ Through and integrated image analysis and intelligent chat tool that specializes
 
 The following diagram displays the core processes involved:
 
-<img src="../assets/img/AgrIA_diagram.png" alt="AgrIA's process Diagram" style="display: block; margin-left: auto; margin-right: auto;">
+<img src="./assets/img/AgrIA_diagram.png" alt="AgrIA's process Diagram" style="display: block; margin-left: auto; margin-right: auto;">
 
 
 ## Components Diagram
@@ -25,11 +25,15 @@ The following diagram displays the core processes involved:
 graph TD
     subgraph Frontend [AgrIA_UI]
         App[App Component] --> Nav[Navbar Component]
-        App --> Home[Home Page Component]
         
-        Home --> Chat[Chat Component]
-        Home --> Parcel[Parcel Finder Component]
-                
+        Nav --> Home
+        Nav --> Chat[Chat Component]
+        Nav --> Parcel[Parcel Finder Component]
+        
+        subgraph homepage [Homepage View]
+            Home[Home Page Component]
+        end
+
         subgraph Parcel_System [Parcel Finder View]
             Parcel --> ParcelCad[Parcel Cadastral]
             Parcel --> ParcelLoc[Parcel Locator]

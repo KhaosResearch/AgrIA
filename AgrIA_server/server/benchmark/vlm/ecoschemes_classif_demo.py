@@ -22,7 +22,6 @@ logger = structlog.get_logger()
 
 # Example usage
 def demo():
-
     init_time = datetime.now()
 
     cad_ref_dict = {

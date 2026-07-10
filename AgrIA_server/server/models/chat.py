@@ -7,8 +7,9 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
 
 class LocalChat:
-
-    def __init__(self, client, model_name: str, system_instruction: str, history_init=None):
+    def __init__(
+        self, client, model_name: str, system_instruction: str, history_init=None
+    ):
         self.client = client
         self.model_name = model_name
         self.history = InMemoryChatMessageHistory()
@@ -49,9 +50,7 @@ class LocalChat:
         if isinstance(item, (str, Path)) and Path(item).exists():
             path = Path(item)
             if path.suffix.lower() in [".png", ".jpg", ".jpeg", ".webp"]:
-                encoded_image = base64.b64encode(path.read_bytes()).decode(
-                    "utf-8"
-                )
+                encoded_image = base64.b64encode(path.read_bytes()).decode("utf-8")
                 mime = (
                     f"image/{path.suffix.lower().replace('.', '')}"
                     if path.suffix.lower() != ".jpg"
@@ -89,7 +88,6 @@ class LocalChat:
 
         # Replicate the `.text` attribute behavior to prevent code breaking downstream
         class ResponseWrapper:
-
             def __init__(self, text):
                 self.text = text
 

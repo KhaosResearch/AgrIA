@@ -125,7 +125,10 @@ def get_suggestion_for_chat(chat_history: list[Content], lang: str):
 
         msg = [
             ("system", system_prompt),
-            ("human", "\n".join([suggestion_prompt, summarised_chat, last_chat_output])),
+            (
+                "human",
+                "\n".join([suggestion_prompt, summarised_chat, last_chat_output]),
+            ),
         ]
         suggestion = client.invoke(msg)
 
@@ -189,9 +192,7 @@ def get_role_and_content(chat_history):
         if isinstance(message.content, str):
             # Normal text message
             if message.content.strip():
-                chat_message_history.append(
-                    {"role": role, "content": message.content}
-                )
+                chat_message_history.append({"role": role, "content": message.content})
 
         elif isinstance(message.content, list):
             # Multimodal message (contains text blocks and image base64 blocks)
@@ -202,8 +203,6 @@ def get_role_and_content(chat_history):
 
             if combined_text:
                 text_content = "\n".join(combined_text)
-                chat_message_history.append(
-                    {"role": role, "content": text_content}
-                )
+                chat_message_history.append({"role": role, "content": text_content})
 
     return chat_message_history

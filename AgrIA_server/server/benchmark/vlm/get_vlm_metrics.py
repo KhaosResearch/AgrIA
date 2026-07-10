@@ -177,13 +177,15 @@ def get_llm_full_desc(
     image_path = Path(image_filepath)
     image_bytes = image_path.read_bytes()
     encoded_image = base64.b64encode(image_bytes).decode("utf-8")
-    
+
     logger.debug(f"Image loaded for inference")
-    
+
     # Determine mime type dynamically
     ext = image_path.suffix.lower().replace(".", "")
-    mime_type = f"image/{ext}" if ext in ["png", "jpeg", "jpg", "webp"] else "image/jpeg"
-    
+    mime_type = (
+        f"image/{ext}" if ext in ["png", "jpeg", "jpg", "webp"] else "image/jpeg"
+    )
+
     sys_ins = (
         FULL_DESC_SYS_INSTR_EN
         if lang == "en"
@@ -201,15 +203,13 @@ def get_llm_full_desc(
                 {"type": "text", "text": prompt},
                 {
                     "type": "image_url",
-                    "image_url": {
-                        "url": f"data:{mime_type};base64,{encoded_image}"
-                    },
+                    "image_url": {"url": f"data:{mime_type};base64,{encoded_image}"},
                 },
             ]
         ),
     ]
     llm_response = client.invoke(messages)
-    
+
     logger.debug(
         f"AgrIA's response:\n---BEGIN\n{llm_response.text[:300]}\n...\n...{llm_response.text[300:]}\n---END"
     )

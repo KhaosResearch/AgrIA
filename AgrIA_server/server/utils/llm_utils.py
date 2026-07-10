@@ -231,9 +231,7 @@ def upload_context_files(doc_paths_list) -> str:
             if file_extension in ["json", "md", "txt"]:
                 content = upload_context_document(doc_path)
                 if content:
-                    compiled_text += (
-                        f"\n--- START OF FILE: {filename} ---\n"
-                    )
+                    compiled_text += f"\n--- START OF FILE: {filename} ---\n"
                     compiled_text += content
                     compiled_text += f"\n--- END OF FILE: {filename} ---\n"
                     logger.info(f"Successfully included file content: {filename}")

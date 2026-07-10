@@ -715,7 +715,6 @@ def crop_directory(valid_files, geometry, geometry_id, output_dir, fmt="tif"):
 
 
 def get_geojson_data(geometry, metadata):
-
     geojson_data = {
         "type": "FeatureCollection",
         "features": [{"type": "Feature", "geometry": geometry, "properties": metadata}],

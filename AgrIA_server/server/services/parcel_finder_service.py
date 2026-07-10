@@ -148,8 +148,7 @@ def get_parcel_image(
 
 
 def download_sen2sr_parcel_image(geometry, date, delta_days=15):
-    """
-    Download and super-resolve parcel image cropped from Sentinel CUBO imagery data.
+    """Download and super-resolve parcel image cropped from Sentinel CUBO imagery data.
 
     Arguments:
         geometry (dict): Geometry containing the parcel/image's limits.
@@ -175,6 +174,31 @@ def download_sen2sr_parcel_image(geometry, date, delta_days=15):
         formatted_date = datetime(year=int(year), month=int(month), day=int(day))
         end_date = formatted_date.strftime("%Y-%m-%d")
         start_date = (formatted_date - timedelta(days=delta_days)).strftime("%Y-%m-%d")
+
+        # =========================================================================
+        # 🛠️ RUNTIME PATCH: Intercept sen2sr_tools returning a NumPy array for date
+        # =========================================================================
+        orig_download = getattr(get_sr_image, "download_sentinel_cubo", None)
+        if not orig_download:
+            # Depending on how sen2sr_tools structured its internals, find the module function
+            import sen2sr_tools.get_sr_image as sr_mod
+
+            orig_func = sr_mod.download_sentinel_cubo
+
+            def patched_download(*args, **kwargs):
+                cube_data, sample_date = orig_func(*args, **kwargs)
+                # If sample_date is wrapped in a NumPy array or object, flatten it to a clean string
+                if isinstance(sample_date, (np.ndarray, np.datetime64)) or not hasattr(
+                    sample_date, "split"
+                ):
+                    if hasattr(sample_date, "item"):
+                        sample_date = sample_date.item()
+                    # Clean any trailing time/dtype info to match 'YYYY-MM-DD'
+                    sample_date = str(sample_date)[:10]
+                return cube_data, sample_date
+
+            sr_mod.download_sentinel_cubo = patched_download
+        # =========================================================================
 
         sigpac_image_name = get_sr_image(
             lat, lon, start_date, end_date, bands, sr_size, geometry=geometry
