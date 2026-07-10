@@ -5,9 +5,11 @@ from google.genai.types import Content
 
 from .ecoscheme_payments.main import calculate_ecoscheme_payment
 from ..config.chat_config import CHAT as chat
+from ..config.llm_client import vlm_client
 from ..config.constants import FULL_DESC_TRIGGER, SHORT_DESC_TRIGGER, TEMP_DIR
 from ..config.llm_client import client
 from ..utils.chat_utils import generate_image_context_data, save_image_and_get_path
+from ..utils.llm_utils import get_aux_image_description
 
 logger = structlog.getLogger()
 
@@ -85,11 +87,24 @@ def get_parcel_description(
         # Open image from path
         image_path = TEMP_DIR / str(image_filename).split("?")[0]
         image = Image.open(image_path)
+        if vlm_client is not None:
+            print("Analyzing image layout using auxiliary Gemma-4-31B-it engine...")
+            # Trigger your auxiliary vision model
+            extracted_visual_description = get_aux_image_description(
+                image_obj=image, custom_prompt=image_indication_prompt
+            )
+
+            # Reconstruct the text chain to Hermes using the extracted description string
+            hermes_payload = [
+                image_indication_prompt,
+                f"Visual Analysis Report of Parcel: {extracted_visual_description}",
+                image_desc_prompt,
+            ]
+        else:
+            hermes_payload = [image_indication_prompt, image_desc_prompt]
 
         response = {
-            "text": chat.send_message(
-                [image_indication_prompt, image, image_desc_prompt]
-            ).text,
+            "text": chat.send_message(hermes_payload).text,
             "imageDesc": image_context_data,
         }
 

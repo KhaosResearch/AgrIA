@@ -1,9 +1,14 @@
+import base64
 import json
 import os
 import structlog
 
+from google.genai.types import Content, Part
+from io import BytesIO
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+from langchain_openai import ChatOpenAI
 
+from ..config.llm_client import vlm_client
 from ..config.constants import (
     BASE_CONTEXT_PATH,
     BASE_PROMPTS_PATH,
@@ -12,7 +17,6 @@ from ..config.constants import (
     PROMPT_LIST_FILE,
 )
 from ..services.llm_services import upload_context_document
-from google.genai.types import Content, Part
 
 logger = structlog.get_logger()
 
@@ -243,3 +247,36 @@ def upload_context_files(doc_paths_list) -> str:
             logger.exception(f"Error packing file data {doc_path}: {e}")
 
     return compiled_text
+
+
+def get_aux_image_description(image_obj, custom_prompt=None):
+    """Auxiliary routine utilizing Gemma-4-31B-it to extract visual details."""
+    try:
+        # 2. Encode image to Base64 data URI format for standard OpenAI API compatibility
+        buffered = BytesIO()
+        image_obj.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        image_data_url = f"data:image/png;base64,{img_str}"
+
+        # 3. Formulate the extraction directive
+        prompt_text = (
+            custom_prompt
+            if custom_prompt
+            else "Describe this satellite crop image. Detail parcel boundaries, distinct zones, ground textures, and visible agricultural features in 250 words or less."
+        )
+
+        message_content = [
+            {"type": "text", "text": prompt_text},
+            {"type": "image_url", "image_url": {"url": image_data_url}},
+        ]
+
+        # 4. Invoke vision response
+        print("Sending info!")
+        response = vlm_client.invoke([HumanMessage(content=message_content)])
+        print("Response!", response)
+
+        return response.content
+
+    except Exception as e:
+        print(f"Vision analysis fallback triggered: {e}")
+        return "[Visual representation provided but description extraction failed]"

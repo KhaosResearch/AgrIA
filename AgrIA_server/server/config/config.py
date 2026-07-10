@@ -17,6 +17,11 @@ LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "")
 LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
 LLM_MODEL_NAME = os.environ.get("LLM_MODEL_NAME", "")
 
+# AUX VLM CREDENTIALS & MODEL
+VLM_BASE_URL = os.environ.get("VLM_BASE_URL", "")
+VLM_API_KEY = os.environ.get("VLM_API_KEY", "")
+VLM_MODEL_NAME = os.environ.get("VLM_MODEL_NAME", None)
+
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not GEMINI_API_KEY:
