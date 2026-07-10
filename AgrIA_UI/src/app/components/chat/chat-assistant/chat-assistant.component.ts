@@ -75,7 +75,24 @@ export class ChatAssistantComponent {
     let sanitized_history = response.slice(index);
 
     // Remove image descriptions requests data
-    sanitized_history = sanitized_history.filter(msg => !msg.content.includes('###DESCRIBE'));
+    // Locate the message containing the DESCRIBE tag and slice out the prefix data
+    sanitized_history = sanitized_history.map(msg => {
+      if (msg.content.includes('###DESCRIBE')) {
+        // Split by line break + 3 backticks
+        const parts = msg.content.split('\n```');
+        
+        if (parts.length > 1) {
+          // Join everything after the first split point back together (in case there are multiple code blocks)
+          // and prepend the 3 backticks we stripped during the split action
+          return {
+            ...msg,
+            content: '```' + parts.slice(1).join('\n```')
+          };
+        }
+      }
+      return msg;
+    });
+    
     return sanitized_history;
   }
 
