@@ -1,126 +1,98 @@
 import os
+
 from datetime import datetime
+from fastapi import APIRouter, Form, HTTPException
+from fastapi.responses import FileResponse
+from typing import Optional
+
 from ..config.constants import TEMP_DIR
-from ..utils.parcel_finder_utils import (
-    check_cadastral_data,
-    is_coord_in_zones,
-    reset_dir,
-)
+from ..utils.parcel_finder_utils import check_cadastral_data, is_coord_in_zones, reset_dir
 from ..services.parcel_finder_service import get_parcel_image
-from flask import Blueprint, make_response, request, jsonify, send_from_directory
 
-parcel_finder_bp = Blueprint("find_parcel", __name__)
+router = APIRouter()
 
-
-@parcel_finder_bp.route("/load-parcel-description", methods=["POST"])
-def load_parcel_description():
-    """
-    Loads and returns dinamically the correct parcel description file.
-    Returns:
-        response (dict): Contains the image description of the text file.
-    """
+@router.post("/load-parcel-description")
+def load_parcel_description(lang: str = Form("es")):
     try:
-        lang = request.form.get("lang")
         parcel_desc_file = os.path.join(TEMP_DIR, f"parcel_desc-{lang}.txt")
         content = "..."
 
         if os.path.exists(parcel_desc_file):
-            print("Loading parcel description file:", parcel_desc_file)
             with open(parcel_desc_file, "r", encoding="utf-8") as file:
                 content = file.read()
-            print(content)
-        return jsonify({"response": content}), 200
-
+        return {"response": content}
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))
 
-
-@parcel_finder_bp.route("/find-parcel", methods=["POST"])
-def find_parcel():
-    """
-    Handles a request to find a parcel by its cadastral reference and date.
-    This endpoint expects a POST request with form data containing:
-        - 'cadastralReference': The cadastral reference of the parcel to search for.
-        - 'selectedDate': The date for which the parcel data is requested.
-    The function performs the following steps:
-        1. Validates the presence of required form data.
-        2. Retrieves the parcel's geometry and metadata using the cadastral reference.
-        3. Integrates with the L1BSR super-resolution pre-trained model to obtain a super-resolved image for the parcel and date.
-        4. Sends super-resolved image to the upload directory.
-        5. Constructs a response containing the cadastral reference, geometry, image URL, and metadata.
-    Returns:
-        response: A JSON response with the parcel data or an error message and appropriate HTTP status code.
-    """
+@router.post("/find-parcel")
+def find_parcel(
+    selectedDate: str = Form(...),
+    isFromCadastralReference: str = Form("False"),
+    cadastralReference: Optional[str] = Form(None),
+    parcelGeometry: Optional[str] = Form("None"),
+    parcelMetadata: Optional[str] = Form(None),
+    coordinates: Optional[str] = Form(None),
+    province: Optional[str] = Form(None),
+    municipality: Optional[str] = Form(None),
+    polygon: Optional[str] = Form(None),
+    parcelId: Optional[str] = Form(None),
+):
     reset_dir(TEMP_DIR, [".png"])
     init = datetime.now()
     try:
-        cadastral_reference = request.form.get("cadastralReference")
-        selected_date = request.form.get("selectedDate")
-        is_from_cadastral_reference = "True" in request.form.get(
-            "isFromCadastralReference"
-        )
-        parcel_geometry = (
-            None
-            if request.form.get("parcelGeometry") == "None"
-            else request.form.get("parcelGeometry")
-        )
-        parcel_metadata = request.form.get("parcelMetadata")
-        coordinates = (
-            None
-            if request.form.get("coordinates") is None
-            else list(map(float, request.form.get("coordinates").split(",")))
-        )
-        province = request.form.get("province")
-        municipality = request.form.get("municipality")
-        polygon = request.form.get("polygon")
-        parcel_id = request.form.get("parcelId")
+        is_from_cadastral_reference = "True" in isFromCadastralReference
+        actual_geometry = None if parcelGeometry == "None" else parcelGeometry
+        
+        actual_coords = None
+        if coordinates and coordinates != "None":
+            actual_coords = list(map(float, coordinates.split(",")))
+
+        actual_cad_ref = cadastralReference
         if is_from_cadastral_reference:
-            cadastral_reference = check_cadastral_data(
-                cadastral_reference, province, municipality, polygon, parcel_id
+            actual_cad_ref = check_cadastral_data(
+                cadastralReference, province, municipality, polygon, parcelId
             )
 
-        if not selected_date:
-            return jsonify({"error": "No date provided"}), 400
-
-        # Get image and store it for display
         geometry, metadata, url_image_address = get_parcel_image(
-            cadastral_reference,
-            selected_date,
+            actual_cad_ref,
+            selectedDate,
             is_from_cadastral_reference,
-            parcel_geometry,
-            parcel_metadata,
-            coordinates,
+            actual_geometry,
+            parcelMetadata,
+            actual_coords,
         )
 
-        response = {
-            "cadastralReference": cadastral_reference,
-            "geometry": geometry,
-            "imagePath": url_image_address,
-            "metadata": metadata,
-        }
         print(f"\nTOTAL TIME TAKEN: {datetime.now() - init}\n")
-        return jsonify({"response": response})
+        return {
+            "response": {
+                "cadastralReference": actual_cad_ref,
+                "geometry": geometry,
+                "imagePath": url_image_address,
+                "metadata": metadata,
+            }
+        }
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))
 
-
-@parcel_finder_bp.route("/is-coord-in-zone", methods=["POST"])
-def is_coord_in_zone():
+@router.post("/is-coord-in-zone")
+def is_coord_in_zone(lat: float = Form(...), lng: float = Form(...)):
     try:
-        lat = float(request.form.get("lat"))
-        lng = float(request.form.get("lng"))
-    except (TypeError, ValueError):
-        return jsonify({"error": "Invalid or missing coordinates"}), 400
+        return {"response": is_coord_in_zones(lng, lat)}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Invalid coordinates calculation")
 
-    return jsonify({"response": is_coord_in_zones(lng, lat)}), 200
-
-
-@parcel_finder_bp.route("/uploads/<filename>")
-def uploaded_file(filename):
-    response = make_response(
-        send_from_directory(os.path.join(os.getcwd(), TEMP_DIR), filename)
+# FastAPI handles serving directory static media assets safely using FileResponse
+@router.get("/uploads/{filename}")
+def uploaded_file(filename: str):
+    file_path = os.path.join(os.getcwd(), TEMP_DIR, filename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+        
+    return FileResponse(
+        file_path,
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        }
     )
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    return response
