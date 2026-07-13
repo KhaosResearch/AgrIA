@@ -28,24 +28,54 @@ def generate_user_response(user_input: str) -> str:
     return response.text
 
 
-def get_image_description(file, is_detailed_description):
+def get_image_description(file, filename, lang, is_detailed_description):
     """
     Handles the image upload and description generation.
     """
-    filepath = save_image_and_get_path(file)
+    filepath = save_image_and_get_path(file, filename)
     filepath = filepath.replace("\\", "/")  # Ensure consistent path format
     image = Image.open(filepath)
-    image_context_prompt = "FECHA: *Sin datos*\nCULTIVO: *Sin datos*"
+    image_context_prompt = {
+        "en":"DATE: *No Data*\nLAND USE: *No Data*",
+        "es":"FECHA: *Sin datos*\nCULTIVO: *Sin datos*"
+    }
     image_desc_prompt = (
         FULL_DESC_TRIGGER + "\n" if is_detailed_description else SHORT_DESC_TRIGGER
     )
-    image_desc_prompt += image_context_prompt
 
-    response = chat.send_message(
-        [image, image_desc_prompt],
-    )
+    image_desc_prompt += f"\n```{image_context_prompt[lang]}\n```"
 
-    return response.text
+    if vlm_client is not None:
+        image_path = TEMP_DIR / str(filename).split("?")[0]
+        image = Image.open(image_path)
+
+        print("Analyzing image layout using auxiliary Multi-modal Language Model engine...")
+       
+        # Trigger your auxiliary vision model
+        extracted_visual_description = get_aux_image_description(
+            image_obj=image, lang=lang
+        )
+
+        # Reconstruct the text chain to Hermes using the extracted description string
+        hermes_payload = [
+            f"Visual Analysis Report of Parcel: {extracted_visual_description}",
+            image_desc_prompt,
+        ]
+        response = {
+            "text": chat.send_message(hermes_payload).text,
+            "imageDesc": image_context_prompt[lang],
+        }
+    else:
+        text = {
+            "es": "Lo siento, no puedo procesa imágenes directamente sin mis funcionalidades auxiliares de lectura de archivos.\nSi necesitas que te ayude a evaluar una parcela, por favor, usa el módulo de **Buscador de Parcelas**.",
+            "en": "Sorry, I can't process images directly without my file reading auxiliary features.\nIf you need help assessing a parcel, please use the **Parcel Finder** module."
+        }
+        response = {
+            "text": text[lang],
+            "imageDesc": image_context_prompt[lang],
+        }
+
+    return response.get("text", "")
 
 
 def get_parcel_description(
@@ -75,7 +105,7 @@ def get_parcel_description(
         desc_trigger = (
             FULL_DESC_TRIGGER if is_detailed_description else SHORT_DESC_TRIGGER
         )
-        image_desc_prompt = f"```\n{image_context_data[lang]}\n```"
+        image_desc_prompt = f"\n```{image_context_data[lang]}\n```"
 
         image_indication_options = {
             "es": "Estas son las características de la parcela cuya imagen te paso. Tenlo en cuenta para tu descripción en español. Comprueba el siguiente prompt para ver si es necesario cambiar el idioma:",
@@ -88,7 +118,7 @@ def get_parcel_description(
         image_path = TEMP_DIR / str(image_filename).split("?")[0]
         image = Image.open(image_path)
         if vlm_client is not None:
-            print("Analyzing image layout using auxiliary Gemma-4-31B-it engine...")
+            print("Analyzing image layout using auxiliary Multi-modal Language Model engine...")
             # Trigger your auxiliary vision model
             extracted_visual_description = get_aux_image_description(
                 image_obj=image, lang=lang
@@ -96,8 +126,8 @@ def get_parcel_description(
 
             # Reconstruct the text chain to Hermes using the extracted description string
             hermes_payload = [
-                image_indication_prompt,
                 f"Visual Analysis Report of Parcel: {extracted_visual_description}",
+                image_indication_prompt,
                 image_desc_prompt,
             ]
         else:

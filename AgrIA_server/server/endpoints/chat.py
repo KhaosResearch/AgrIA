@@ -24,12 +24,12 @@ def send_user_input(userInput: str = Form(...)):
 @router.post("/send-image")
 def send_image(
     image: UploadFile = File(...), 
-    isDetailedDescription: str = Form("false")
+    isDetailedDescription: str = Form("false"),
+    lang: str = Form("en"),
 ):
     try:
         is_detailed_description = "true" in isDetailedDescription.lower()
-        # image.file maps to a standard file descriptor object compatible with your existing service
-        response_text = get_image_description(image.file, is_detailed_description)
+        response_text = get_image_description(image.file, image.filename, lang, is_detailed_description)
         return {"response": response_text}
     except Exception as e:
         logger.exception("Error sending image:\n")

@@ -4,6 +4,7 @@ import { ChatAssistantService } from '../../../services/chat-assistant.service/c
 import { MarkdownModule } from 'ngx-markdown';
 import { NotificationService } from '../../../services/notification.service/notification.service';
 import DOMPurify from 'dompurify';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-chat-assistant',
@@ -31,6 +32,8 @@ export class ChatAssistantComponent {
   public chatAssistantService: ChatAssistantService = inject(ChatAssistantService);
   // Service for notifications
   private notificationService = inject(NotificationService);
+  // Translation service
+  private translateService = inject(TranslateService);
 
   ngOnInit() {
     if (this.chatHistory.length <= 1) {
@@ -80,7 +83,7 @@ export class ChatAssistantComponent {
       if (msg.content.includes('###DESCRIBE')) {
         // Split by line break + 3 backticks
         const parts = msg.content.split('\n```');
-        
+
         if (parts.length > 1) {
           // Join everything after the first split point back together (in case there are multiple code blocks)
           // and prepend the 3 backticks we stripped during the split action
@@ -130,6 +133,7 @@ export class ChatAssistantComponent {
     const formData = new FormData();
     formData.append('image', imageFile);
     formData.append('isDetailedDescription', String(isDetailedDescription));
+    formData.append('lang', String(this.translateService.currentLang));
 
     this.chatAssistantService.sendImage(formData).subscribe({
       next: (responseText: string) => {

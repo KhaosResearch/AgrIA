@@ -1,22 +1,30 @@
 import os
+import shutil
+
+from fastapi import UploadFile
+
 from server.config.constants import TEMP_DIR
 
 
-def save_image_and_get_path(file) -> str:
+def save_image_and_get_path(file: UploadFile, filename: str) -> str:
     """
     Stores file in server's local temp dir
     Arguments:
-        file (File): Image file to store.
+        file (UploadFile): Image file wrapper containing metadata and stream.
+        filename (str): Temp image filename.
     Returns:
         filepath (str): Path of the stored image.
     """
     upload_dir = TEMP_DIR
     os.makedirs(upload_dir, exist_ok=True)
-    filename = file.filename
+    
     filepath = os.path.join(upload_dir, filename)
-    file.save(filepath)
+    
+    # Save file
+    with open(filepath, "wb") as buffer:
+        shutil.copyfileobj(file._file, buffer)
+        
     return filepath
-
 
 def generate_image_context_data(image_date, land_uses, query) -> str:
     """
