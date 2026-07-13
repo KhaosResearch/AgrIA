@@ -7,6 +7,7 @@ from .endpoints.chat import router as chat_router
 from .endpoints.parcel_finder import router as parcel_finder_router
 from .utils.parcel_finder_utils import reset_dir
 
+
 def create_app(ui_url: str = UI_URL) -> FastAPI:
     app = FastAPI(title="AgrIA Server")
 

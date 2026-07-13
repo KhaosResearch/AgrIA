@@ -17,14 +17,15 @@ def save_image_and_get_path(file: UploadFile, filename: str) -> str:
     """
     upload_dir = TEMP_DIR
     os.makedirs(upload_dir, exist_ok=True)
-    
+
     filepath = os.path.join(upload_dir, filename)
-    
+
     # Save file
     with open(filepath, "wb") as buffer:
         shutil.copyfileobj(file._file, buffer)
-        
+
     return filepath
+
 
 def generate_image_context_data(image_date, land_uses, query) -> str:
     """

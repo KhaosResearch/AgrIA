@@ -249,8 +249,8 @@ def upload_context_files(doc_paths_list) -> str:
 
 def get_aux_image_description(image_obj, lang=None):
     """Auxiliary multi-source routine extracting visual details.
-    
-    Seamlessly forks traffic dynamically between a local deployed VLM framework 
+
+    Seamlessly forks traffic dynamically between a local deployed VLM framework
     (LangChain OpenAI standard API format) and the official Google Gemini Cloud API.
     """
     try:
@@ -260,7 +260,7 @@ def get_aux_image_description(image_obj, lang=None):
         # Formulate the visual analysis directive
         prompt_text = {
             "en": "Describe this satellite crop image. Detail parcel boundaries, distinct zones, ground textures, and visible agricultural features in 60 words or less.",
-            "es": "Describe esta imagen satélite de cultivos. Detalla los límites de la parcela, zonas distintivas, texturas de suelo y característica agrícolas visibles en 60 palabras o menos."
+            "es": "Describe esta imagen satélite de cultivos. Detalla los límites de la parcela, zonas distintivas, texturas de suelo y característica agrícolas visibles en 60 palabras o menos.",
         }
 
         # Fallback Routing to Cloud Gemini API Engine
@@ -268,8 +268,7 @@ def get_aux_image_description(image_obj, lang=None):
             logger.debug("Routing vision task via Google Cloud Gemini API Engine...")
             # The native Google SDK reads PIL Image objects directly out of the box!
             response = vlm_client.models.generate_content(
-                model="gemini-3.5-flash",
-                contents=[image_obj, prompt_text[lang]]
+                model="gemini-3.5-flash", contents=[image_obj, prompt_text[lang]]
             )
             logger.debug(f"Cloud Response Received!\n{response.text}")
             return response.text

@@ -6,10 +6,15 @@ from fastapi.responses import FileResponse
 from typing import Optional
 
 from ..config.constants import TEMP_DIR
-from ..utils.parcel_finder_utils import check_cadastral_data, is_coord_in_zones, reset_dir
+from ..utils.parcel_finder_utils import (
+    check_cadastral_data,
+    is_coord_in_zones,
+    reset_dir,
+)
 from ..services.parcel_finder_service import get_parcel_image
 
 router = APIRouter()
+
 
 @router.post("/load-parcel-description")
 def load_parcel_description(lang: str = Form("es")):
@@ -23,6 +28,7 @@ def load_parcel_description(lang: str = Form("es")):
         return {"response": content}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/find-parcel")
 def find_parcel(
@@ -42,7 +48,7 @@ def find_parcel(
     try:
         is_from_cadastral_reference = "True" in isFromCadastralReference
         actual_geometry = None if parcelGeometry == "None" else parcelGeometry
-        
+
         actual_coords = None
         if coordinates and coordinates != "None":
             actual_coords = list(map(float, coordinates.split(",")))
@@ -74,6 +80,7 @@ def find_parcel(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/is-coord-in-zone")
 def is_coord_in_zone(lat: float = Form(...), lng: float = Form(...)):
     try:
@@ -81,18 +88,19 @@ def is_coord_in_zone(lat: float = Form(...), lng: float = Form(...)):
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid coordinates calculation")
 
+
 # FastAPI handles serving directory static media assets safely using FileResponse
 @router.get("/uploads/{filename}")
 def uploaded_file(filename: str):
     file_path = os.path.join(os.getcwd(), TEMP_DIR, filename)
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
-        
+
     return FileResponse(
         file_path,
         headers={
             "Cache-Control": "no-cache, no-store, must-revalidate",
             "Pragma": "no-cache",
-            "Expires": "0"
-        }
+            "Expires": "0",
+        },
     )
