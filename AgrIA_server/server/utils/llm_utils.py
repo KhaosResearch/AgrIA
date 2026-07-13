@@ -3,17 +3,15 @@ import json
 import os
 import structlog
 
-from google.genai.types import Content, Part
+from google.genai import Client as GeminiGenAIClient
 from io import BytesIO
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
-from langchain_openai import ChatOpenAI
 
 from ..config.llm_client import vlm_client
 from ..config.constants import (
     BASE_CONTEXT_PATH,
     BASE_PROMPTS_PATH,
     CONTEXT_DOCUMENTS_FILE,
-    MIME_TYPES,
     PROMPT_LIST_FILE,
 )
 from ..services.llm_services import upload_context_document
@@ -249,34 +247,49 @@ def upload_context_files(doc_paths_list) -> str:
     return compiled_text
 
 
-def get_aux_image_description(image_obj, custom_prompt=None):
-    """Auxiliary routine utilizing Gemma-4-31B-it to extract visual details."""
+def get_aux_image_description(image_obj, lang=None):
+    """Auxiliary multi-source routine extracting visual details.
+    
+    Seamlessly forks traffic dynamically between a local deployed VLM framework 
+    (LangChain OpenAI standard API format) and the official Google Gemini Cloud API.
+    """
     try:
-        # 2. Encode image to Base64 data URI format for standard OpenAI API compatibility
+        if vlm_client is None:
+            return "[No active vision language model client initialized]"
+
+        # Formulate the visual analysis directive
+        prompt_text = {
+            "en": "Describe this satellite crop image. Detail parcel boundaries, distinct zones, ground textures, and visible agricultural features in 60 words or less.",
+            "es": "Describe esta imagen satélite de cultivos. Detalla los límites de la parcela, zonas distintivas, texturas de suelo y característica agrícolas visibles en 60 palabras o menos."
+        }
+
+        # Fallback Routing to Cloud Gemini API Engine
+        if isinstance(vlm_client, GeminiGenAIClient):
+            logger.debug("Routing vision task via Google Cloud Gemini API Engine...")
+            # The native Google SDK reads PIL Image objects directly out of the box!
+            response = vlm_client.models.generate_content(
+                model="gemini-3.5-flash",
+                contents=[image_obj, prompt_text[lang]]
+            )
+            logger.debug(f"Cloud Response Received!\n{response.text}")
+            return response.text
+
+        # Standard Open-Weights VLM (LangChain / OpenAI Base64 Protocol)
+        logger.debug("Routing vision task via Local Deployed API Gateway Context...")
         buffered = BytesIO()
         image_obj.save(buffered, format="PNG")
         img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
         image_data_url = f"data:image/png;base64,{img_str}"
-
-        # 3. Formulate the extraction directive
-        prompt_text = (
-            custom_prompt
-            if custom_prompt
-            else "Describe this satellite crop image. Detail parcel boundaries, distinct zones, ground textures, and visible agricultural features in 250 words or less."
-        )
 
         message_content = [
             {"type": "text", "text": prompt_text},
             {"type": "image_url", "image_url": {"url": image_data_url}},
         ]
 
-        # 4. Invoke vision response
-        print("Sending info!")
         response = vlm_client.invoke([HumanMessage(content=message_content)])
-        print("Response!", response)
-
+        logger.debug("Local Response Received!", response)
         return response.content
 
     except Exception as e:
-        print(f"Vision analysis fallback triggered: {e}")
+        logger.error(f"Vision analysis fallback triggered: {e}")
         return "[Visual representation provided but description extraction failed]"

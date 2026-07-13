@@ -1,7 +1,7 @@
 from .config import LLM_MODEL_NAME
 
 from .llm_client import client
-from ..models.chat import LocalChat
+from ..models.chat_models import LocalChat
 from ..utils.llm_utils import generate_system_instructions, set_initial_history
 
 

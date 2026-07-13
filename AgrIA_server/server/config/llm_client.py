@@ -25,3 +25,5 @@ client = init_client()
 vlm_client = None
 if all(v not in (None, "") for v in (VLM_BASE_URL, VLM_API_KEY, VLM_MODEL_NAME)):
     vlm_client = init_client(VLM_BASE_URL, VLM_API_KEY, VLM_MODEL_NAME)
+elif GEMINI_API_KEY not in [None, ""]:
+    vlm_client = genai.Client(api_key=GEMINI_API_KEY)

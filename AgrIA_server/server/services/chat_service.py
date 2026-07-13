@@ -91,7 +91,7 @@ def get_parcel_description(
             print("Analyzing image layout using auxiliary Gemma-4-31B-it engine...")
             # Trigger your auxiliary vision model
             extracted_visual_description = get_aux_image_description(
-                image_obj=image, custom_prompt=image_indication_prompt
+                image_obj=image, lang=lang
             )
 
             # Reconstruct the text chain to Hermes using the extracted description string
