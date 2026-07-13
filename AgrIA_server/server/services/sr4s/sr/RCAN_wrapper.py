@@ -59,7 +59,16 @@ class CALayer(nn.Module):
 
 
 class RCAB(nn.Module):
-    def __init__(self, conv, n_feat, kernel_size, reduction, bias=True, bn=False, act=nn.ReLU(True)):
+    def __init__(
+        self,
+        conv,
+        n_feat,
+        kernel_size,
+        reduction,
+        bias=True,
+        bn=False,
+        act=nn.ReLU(True),
+    ):
         super(RCAB, self).__init__()
         modules_body = []
         for i in range(2):
@@ -71,36 +80,55 @@ class RCAB(nn.Module):
         modules_body.append(CALayer(n_feat, reduction))
         self.body = nn.Sequential(*modules_body)
 
-    def forward(self, x): return self.body(x) + x
+    def forward(self, x):
+        return self.body(x) + x
 
 
 class ResidualGroup(nn.Module):
     def __init__(self, conv, n_feat, kernel_size, reduction, n_resblocks):
         super(ResidualGroup, self).__init__()
         modules_body = [
-            RCAB(conv, n_feat, kernel_size, reduction,
-                 bias=True, bn=False, act=nn.ReLU(True))
+            RCAB(
+                conv,
+                n_feat,
+                kernel_size,
+                reduction,
+                bias=True,
+                bn=False,
+                act=nn.ReLU(True),
+            )
             for _ in range(n_resblocks)
         ]
         modules_body.append(conv(n_feat, n_feat, kernel_size))
         self.body = nn.Sequential(*modules_body)
 
-    def forward(self, x): return self.body(x) + x
+    def forward(self, x):
+        return self.body(x) + x
 
 
 class RCAN(nn.Module):
     def __init__(self, n_colors, conv=default_conv):
         super(RCAN, self).__init__()
-        n_resgroups, n_resblocks, n_feats, kernel_size, reduction, scale = 10, 20, 64, 3, 16, 2
+        n_resgroups, n_resblocks, n_feats, kernel_size, reduction, scale = (
+            10,
+            20,
+            64,
+            3,
+            16,
+            2,
+        )
         modules_head = [conv(n_colors, n_feats, kernel_size)]
         modules_body = [
-            ResidualGroup(conv, n_feats, kernel_size,
-                          reduction, n_resblocks=n_resblocks)
+            ResidualGroup(
+                conv, n_feats, kernel_size, reduction, n_resblocks=n_resblocks
+            )
             for _ in range(n_resgroups)
         ]
         modules_body.append(conv(n_feats, n_feats, kernel_size))
-        modules_tail = [Upsampler(conv, scale, n_feats, act=False), conv(
-            n_feats, n_colors, kernel_size)]
+        modules_tail = [
+            Upsampler(conv, scale, n_feats, act=False),
+            conv(n_feats, n_colors, kernel_size),
+        ]
         self.head = nn.Sequential(*modules_head)
         self.body = nn.Sequential(*modules_body)
         self.tail = nn.Sequential(*modules_tail)

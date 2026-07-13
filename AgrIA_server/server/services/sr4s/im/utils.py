@@ -18,7 +18,7 @@ def get_bbox_from_zoom(lat, lon, size, zoom):
     zoom: Maps' zoom level
     """
     # meters per pixel at this latitude and zoom
-    mpp = 156543.03392 * math.cos(math.radians(lat)) / (2 ** zoom)
+    mpp = 156543.03392 * math.cos(math.radians(lat)) / (2**zoom)
 
     # total size in meters
     width_m = size[0] * mpp
@@ -65,11 +65,10 @@ def get_zoom_from_bbox(bbox: BBox, size: tuple):
     # Sentinel resolution (meters per pixel)
     mpp_x = width_m / size[0]
     mpp_y = height_m / size[1]
-    mpp = (mpp_x + mpp_y) / 2   # average
+    mpp = (mpp_x + mpp_y) / 2  # average
 
     # Compute Google zoom
-    zoom_float = math.log2(
-        (156543.03392 * math.cos(math.radians(lat_center))) / mpp)
+    zoom_float = math.log2((156543.03392 * math.cos(math.radians(lat_center))) / mpp)
     zoom = max(0, min(21, round(zoom_float)))  # clamp to [0,21]
 
     return zoom  # , google_bbox
@@ -107,7 +106,10 @@ def get_bbox_from_center(lat, lon, width_px, height_px, resolution_m):
 
     return BBox(bbox=[min_lon, min_lat, max_lon, max_lat], crs=CRS.WGS84)
 
-def get_n_random_coordinate_pairs(amount: int, bounded_zone=[LAT_MIN, LAT_MAX, LON_MIN, LON_MAX]):
+
+def get_n_random_coordinate_pairs(
+    amount: int, bounded_zone=[LAT_MIN, LAT_MAX, LON_MIN, LON_MAX]
+):
     """
     Generate random coordinates from a bounded zone.
 
@@ -195,7 +197,8 @@ def generate_evalscript(
 
     # apply stretch for each band
     out_expr = ", ".join(
-        [f"{stretch.replace('val', f'sample.{b}')}{mult}" for b in bands])
+        [f"{stretch.replace('val', f'sample.{b}')}{mult}" for b in bands]
+    )
 
     return f"""
 //VERSION=3

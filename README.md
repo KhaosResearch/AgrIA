@@ -4,6 +4,8 @@
   <img src="./docs/assets/img/logo.png" alt="AgrIA Logo" width="300"/>
 </div>
 
+<center>
+
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Docker](https://img.shields.io/badge/docker-containerized-blue?logo=docker&logoColor=white)
@@ -24,6 +26,9 @@
 ![SentinelHub](https://img.shields.io/badge/SentinelHub-Active-blue)
 ![Conda](https://img.shields.io/badge/conda-forge-342B029?logo=anaconda&logoColor=white)
 ![Flake8](https://img.shields.io/badge/linter-flake8-blueviolet)
+
+
+</center>
 
 AgrIA (Agricultural Image Assistant) is an **integrated image analysis and intelligent chat tool that specializes in agricultural satellite image classification**. Designed to assist farmers and landowners, AgrIA facilitates crop valuation and provides a report that helps them **qualify for various European Union eco-scheme aids within the framework of the Common Agricultural Policy (CAP).** It is currently only applicalbe to Spain's national territory and fields, but allows modification to adapt to other EU member states.
 

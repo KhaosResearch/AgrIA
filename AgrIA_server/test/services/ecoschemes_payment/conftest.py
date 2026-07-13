@@ -18,7 +18,7 @@ def dummy_rules_data():
                 "Pluriannuality": "N/A",  # No bonus
                 "Peninsular": {"Tier_1": "27.27", "Tier_2": "27.27"},
                 "Insular": {"Tier_1": "49.27", "Tier_2": "49.27"},
-            }
+            },
         },
         # P3/P4 - Rotation/No-Till (Irrigated)
         {
@@ -30,7 +30,7 @@ def dummy_rules_data():
                 # Tier 2 assumed lower
                 "Peninsular": {"Tier_1": "141.742439", "Tier_2": "100.00"},
                 "Insular": {"Tier_1": "221.742439", "Tier_2": "180.00"},
-            }
+            },
         },
         # P5(B) - Biodiversity Spaces (Under Water)
         {
@@ -41,7 +41,7 @@ def dummy_rules_data():
                 "Pluriannuality": "N/A",
                 "Peninsular": "145.098595",  # Flat Rate
                 "Insular": "0.0",
-            }
+            },
         },
         # P6/P7 - Plant Cover (Flat Woody Crops)
         {
@@ -52,15 +52,16 @@ def dummy_rules_data():
                 "Pluriannuality": "Applicable",  # Bonus applies
                 "Peninsular": {"Tier_1": "59.12", "Tier_2": "41.384"},
                 "Insular": {"Tier_1": "99.12", "Tier_2": "81.384"},
-            }
+            },
         },
         # Non-Eligible Scheme (Includes all non-eligible LUs from the sample)
         {
             "Ecoscheme": "Non-Eligible Scheme",
             "Land_Uses": "FO, CA, IM, ED, ZU",
-            "Rates": {}
-        }
+            "Rates": {},
+        },
     ]
+
 
 # --- Parsed Data Fixture (Simulating dictionary after parsing the input string) ---
 
@@ -69,20 +70,45 @@ def dummy_rules_data():
 def parsed_data_fixture():
     """Provides the dictionary structure of parsed input land uses based on the new sample."""
     return {
-        "TA": {"area": Decimal("22.7474"), "irrigation_coef": "83.0%", "slope_coef": ""},
-        "VI": {"area": Decimal("9.3441"), "irrigation_coef": "89.88%", "slope_coef": "1.01%"},
+        "TA": {
+            "area": Decimal("22.7474"),
+            "irrigation_coef": "83.0%",
+            "slope_coef": "",
+        },
+        "VI": {
+            "area": Decimal("9.3441"),
+            "irrigation_coef": "89.88%",
+            "slope_coef": "1.01%",
+        },
         "FO": {"area": Decimal("3.4562"), "irrigation_coef": "80.0%", "slope_coef": ""},
         "AG": {"area": Decimal("0.4099"), "irrigation_coef": "0.0%", "slope_coef": ""},
-        "PA": {"area": Decimal("0.1257"), "irrigation_coef": "100.0%", "slope_coef": ""},
-        "PS": {"area": Decimal("0.2272"), "irrigation_coef": "100.0%", "slope_coef": ""},
-        "PR": {"area": Decimal("4.0175"), "irrigation_coef": "100.0%", "slope_coef": ""},
+        "PA": {
+            "area": Decimal("0.1257"),
+            "irrigation_coef": "100.0%",
+            "slope_coef": "",
+        },
+        "PS": {
+            "area": Decimal("0.2272"),
+            "irrigation_coef": "100.0%",
+            "slope_coef": "",
+        },
+        "PR": {
+            "area": Decimal("4.0175"),
+            "irrigation_coef": "100.0%",
+            "slope_coef": "",
+        },
         "CA": {"area": Decimal("0.4838"), "irrigation_coef": "0.0%", "slope_coef": ""},
         "IM": {"area": Decimal("1.9813"), "irrigation_coef": "0.0%", "slope_coef": ""},
         "MT": {"area": Decimal("2.6999"), "irrigation_coef": "20.0%", "slope_coef": ""},
         "ED": {"area": Decimal("0.0894"), "irrigation_coef": "0.0%", "slope_coef": ""},
         "ZU": {"area": Decimal("0.0086"), "irrigation_coef": "0.0%", "slope_coef": ""},
-        "FY": {"area": Decimal("0.1422"), "irrigation_coef": "100.0%", "slope_coef": "1.7%"},
+        "FY": {
+            "area": Decimal("0.1422"),
+            "irrigation_coef": "100.0%",
+            "slope_coef": "1.7%",
+        },
     }
+
 
 # --- Input Data String Fixture (For end-to-end test) ---
 

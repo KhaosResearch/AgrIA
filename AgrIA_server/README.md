@@ -46,7 +46,9 @@ You will need to rename the `.env_example` file to `.env` and complete it with y
 #--------------------------------------
 
 # LLM variable
-GEMINI_API_KEY= # YOUR_API_KEY
+LLM_BASE_URL="http://address:port/v1/"          # The endpoint pointing to the inference server
+LLM_API_KEY="llm-api-key"                       # API Key required by the server 
+LLM_MODEL_NAME="llm-model-name"                 # The specific model identifier from the /v1/models list
 
 # Frontend config (default values)
 UI_PORT=4200
@@ -67,11 +69,20 @@ DOCKER_PORT=5001
 DOCKER_HOST=backend
 DOCKER_BACKEND_URL=/api/
 ```
+>[!WARNING]
+> The Visual Language Model setup will be used to describe the images for the main model (in case is text-only). The Gemini API key is set as a fallback VLM.
+> **If none of this has been set, uploading files manually will not work and parcel images will be mainly for reference and not used by the model**.
 The folowing are legacy variables, but needed if you want to use the benchmark pipelines:
 ```bash
 # --------------------------------------
 # OPTIONAL VARIABLES
 #--------------------------------------
+
+# Aux Visual Language Model config
+GEMINI_API_KEY=  # YOUR_API_KEY
+VLM_BASE_URL="http://address:port/v1/"
+VLM_API_KEY="vlm-api-key"
+VLM_MODEL_NAME="vlm-model-name"
 
 # Contact authors to gain access to these database credentials and geometry files
 MINIO_ACCESS_PORT=0000

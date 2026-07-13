@@ -1,8 +1,9 @@
 from pathlib import Path
 import json
+
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 
-MODEL_NAME = "gemini-2.5-flash-lite"
+GEMINI_MODEL_NAME = "gemini-2.5-flash-lite"
 
 BASE_GEOJSON_PATH = Path(ROOT_DIR / "assets/geojson_assets")
 
@@ -11,7 +12,7 @@ BASE_PROMPTS_PATH = Path(ROOT_DIR / "assets/LLM_assets/prompts")
 CONTEXT_DOCUMENTS_FILE = "context_document_links.json"
 PROMPT_LIST_FILE = "prompt_list.json"
 
-TEMP_DIR = Path(ROOT_DIR / 'temp/')
+TEMP_DIR = Path(ROOT_DIR / "temp/")
 
 EXCLUSIVITY_RULE = """\n\n
 **CRITICAL EXCLUSIVITY DIRECTIVE FOR CALCULATION:**
@@ -34,27 +35,45 @@ If the 'Rates' object contains 'Tier_1' (`Tramo_1` in Spanish) and 'Tier_2' (`Tr
     3.  If the 'Pluriannuality' field is 'Applicable', add the fixed bonus of **25.00 €/ha** (as defined in the system instructions) to the Total Area for the 'Total with Pluriannuality' column.
 """
 
-FULL_DESC_TRIGGER = '###DESCRIBE_LONG_IMAGE###'
-SHORT_DESC_TRIGGER = '###DESCRIBE_SHORT_IMAGE###'
+FULL_DESC_TRIGGER = "###DESCRIBE_LONG_IMAGE###"
+SHORT_DESC_TRIGGER = "###DESCRIBE_SHORT_IMAGE###"
 
 MIME_TYPES = {
-    'txt': 'text/plain',
-    'md': 'text/markdown',
-    'pdf': 'application/pdf',
-    'json': 'application/json',
-    'csv': 'text/csv',
-    'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'jpg': 'image/jpeg',
-    'png': 'image/png',
+    "txt": "text/plain",
+    "md": "text/markdown",
+    "pdf": "application/pdf",
+    "json": "application/json",
+    "csv": "text/csv",
+    "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "jpg": "image/jpeg",
+    "png": "image/png",
 }
 
 SPAIN_JSON = Path(BASE_GEOJSON_PATH / "spain.json")
-with open(SPAIN_JSON, 'r') as file:
+with open(SPAIN_JSON, "r") as file:
     SPAIN_ZONES = json.load(file)
 
-ANDALUSIA_TILES = ["29SPC", "29SQC", "30STH", "30SUH", "30SVH", "30SWH", "30SXH", "30SYH", "30SXG",
-                   "30SWG", "30SVG", "30SUG", "30STG", "29SQB", "29SPB", "30STF", "30SUF",
-                   "30SVF", "30SWF"]
+ANDALUSIA_TILES = [
+    "29SPC",
+    "29SQC",
+    "30STH",
+    "30SUH",
+    "30SVH",
+    "30SWH",
+    "30SXH",
+    "30SYH",
+    "30SXG",
+    "30SWG",
+    "30SVG",
+    "30SUG",
+    "30STG",
+    "29SQB",
+    "29SPB",
+    "30STF",
+    "30SUF",
+    "30SVF",
+    "30SWF",
+]
 
 SR_BANDS = ["B02", "B03", "B04", "B08"]
 BANDS_DIR = TEMP_DIR / "bands"
@@ -68,4 +87,6 @@ SEN2SR_SR_DIR = TEMP_DIR / "sr_2.5m"
 GET_SR_BENCHMARK = False
 
 if GET_SR_BENCHMARK:
-    print("⚠️  WARNING: SUPER-RES BENCHMARK IS ACTIVE. This will execute both SR4S and SEN2SR pipelines (in that order), which will slow down all parcel fetching processes. To deactivate it, set the `GET_SR_BENCHMARK` to `False` in the `Agria_server/server/config/constants.py` file")
+    print(
+        "⚠️  WARNING: SUPER-RES BENCHMARK IS ACTIVE. This will execute both SR4S and SEN2SR pipelines (in that order), which will slow down all parcel fetching processes. To deactivate it, set the `GET_SR_BENCHMARK` to `False` in the `Agria_server/server/config/constants.py` file"
+    )
