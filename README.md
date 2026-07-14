@@ -19,14 +19,15 @@
 ![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4?logo=prettier&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-Proxy-009639?logo=nginx&logoColor=white)
 
-![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-3.0+-000000?logo=flask&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.4.1-EE4C2C?logo=pytorch&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![API](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.9.1-EE4C2C?logo=pytorch&logoColor=white)
 ![GeoPandas](https://img.shields.io/badge/GeoPandas-Enabled-139C5A?logo=pandas&logoColor=white)
 ![SentinelHub](https://img.shields.io/badge/SentinelHub-Active-blue)
-![Conda](https://img.shields.io/badge/conda-forge-342B029?logo=anaconda&logoColor=white)
-![Flake8](https://img.shields.io/badge/linter-flake8-blueviolet)
+![uv](https://img.shields.io/badge/package_manager-uv-DE5FE9?logo=uv&logoColor=white)
+![Ruff](https://img.shields.io/badge/linter-ruff-blueviolet)
 
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 
 </center>
 
