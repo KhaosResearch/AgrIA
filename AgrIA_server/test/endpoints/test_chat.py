@@ -19,7 +19,7 @@ def test_hello_world(client):
 
     # --- ASSERT --- #
     assert response.status_code == 200
-    assert response.get_json()["response"] == MOCK_RESPONSE
+    assert response.json()["response"] == MOCK_RESPONSE
 
 
 @pytest.mark.parametrize(
@@ -57,9 +57,9 @@ def test_send_user_input_scenarios(
     # --- ASSERT --- #
     assert response.status_code == expected_status
     if expected_status != 200:
-        assert response.get_json()["error"] == expected_response
+        assert response.json()["error"] == expected_response
     else:
-        assert response.get_json()["response"] == expected_response
+        assert response.json()["response"] == expected_response
 
 
 @pytest.mark.parametrize(
@@ -99,24 +99,29 @@ def test_send_image_scenarios(
 
     # --- ARRANGE --- #
     # Prepare mockups
-    monkeypatch.setattr(chat, "get_image_description", lambda x, y: expected_response)
+    monkeypatch.setattr(
+        chat,
+        "get_image_description",
+        lambda file, filename, lang, is_detailed: expected_response,
+    )
 
     # Prepare input
     data = {
-        "image": (file_data, image_filename),
         "isDetailedDescription": is_detailed_desc,
     }
 
-    # --- ACT --- #
-    # 'multipart/form-data' is necessary for file uploads
-    response = client.post("/send-image", data=data, content_type="multipart/form-data")
+    files = {}
+    if file_data is not None:
+        files = {"image": (image_filename, file_data)}
 
+    # --- ACT --- #
+    response = client.post("/send-image", data=data, files=files)
     # --- ASSERT --- #
     assert response.status_code == expected_status
     if expected_status != 200:
-        assert response.get_json()["error"] == expected_response
+        assert response.json()["error"] == expected_response
     else:
-        assert response.get_json()["response"] == expected_response
+        assert response.json()["response"] == expected_response
 
 
 @pytest.mark.parametrize(
@@ -167,6 +172,7 @@ def test_send_image_scenarios(
             "No image date provided",  # The expected 400 error message
             id="Failure_MissingDate",
         ),
+        # 4. Failure: Missing all fields ('imageDate' is checked first and will jump before checking the others)
         pytest.param(
             "Failure: Missing all data (400)",
             {},
@@ -189,7 +195,7 @@ def test_send_parcel_info_to_chat_scenarios(
 
     # --- ASSERT --- #
     assert response.status_code == expected_status
-    response_json = response.get_json()
+    response_json = response.json()
 
     if expected_status == 200:
         assert response_json["response"] == expected_response
@@ -255,9 +261,9 @@ def test_get_input_suggestion_scenarios(
     # --- ASSERT --- #
     assert response.status_code == expected_status
     if expected_status != 200:
-        assert response.get_json()["error"] == expected_response
+        assert response.json()["error"] == expected_response
     else:
-        assert response.get_json()["response"] == expected_response
+        assert response.json()["response"] == expected_response
 
 
 @pytest.mark.parametrize(
@@ -294,7 +300,7 @@ def test_load_active_chat_history_scenarios(
     monkeypatch.setattr(chat, "get_role_and_content", mock_get_role_and_content)
 
     # Prepare inputs
-    data = {}  # No need for input. THis is a GET method. history is fetched directly from chat
+    # No need for input. This is a GET method. History is fetched directly from chat
 
     # --- ACT --- #
     response = client.get("/load-active-chat-history")
@@ -302,6 +308,6 @@ def test_load_active_chat_history_scenarios(
     # --- ASSERT --- #
     assert response.status_code == expected_status
     if expected_status != 200:
-        assert response.get_json()["error"] == expected_response
+        assert response.json()["error"] == expected_response
     else:
-        assert response.get_json()["response"] == expected_response
+        assert response.json()["response"] == expected_response

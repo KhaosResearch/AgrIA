@@ -4,14 +4,23 @@ import structlog
 from typing import Optional
 from fastapi import APIRouter, Form, UploadFile, File, HTTPException
 
-from server.services.chat_service import *
+from server.config.chat_config import CHAT as chat
+from server.services.chat_service import (
+    generate_user_response,
+    get_image_description,
+    get_parcel_description,
+    get_role_and_content,
+    get_suggestion_for_chat,
+)
 
 logger = structlog.get_logger()
 router = APIRouter()
 
+
 @router.get("/hello-world")
 def hello_world():
     return {"response": "Hello, World!"}
+
 
 @router.post("/send-user-input")
 def send_user_input(userInput: str = Form(...)):
@@ -21,19 +30,23 @@ def send_user_input(userInput: str = Form(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/send-image")
 def send_image(
-    image: UploadFile = File(...), 
+    image: UploadFile = File(...),
     isDetailedDescription: str = Form("false"),
     lang: str = Form("en"),
 ):
     try:
         is_detailed_description = "true" in isDetailedDescription.lower()
-        response_text = get_image_description(image.file, image.filename, lang, is_detailed_description)
+        response_text = get_image_description(
+            image.file, image.filename, lang, is_detailed_description
+        )
         return {"response": response_text}
     except Exception as e:
         logger.exception("Error sending image:\n")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/load-parcel-data-to-chat")
 def send_parcel_info_to_chat(
@@ -42,7 +55,7 @@ def send_parcel_info_to_chat(
     query: str = Form(...),
     imageFilename: Optional[str] = Form(None),
     isDetailedDescription: str = Form("false"),
-    lang: str = Form("es")
+    lang: str = Form("es"),
 ):
     try:
         image_date = imageDate.split("/")[-1]
@@ -51,7 +64,12 @@ def send_parcel_info_to_chat(
         is_detailed_description = "true" in isDetailedDescription.lower()
 
         response = get_parcel_description(
-            image_date, parsed_land_uses, parsed_query, imageFilename, is_detailed_description, lang
+            image_date,
+            parsed_land_uses,
+            parsed_query,
+            imageFilename,
+            is_detailed_description,
+            lang,
         )
         return {"response": response}
     except ValueError as e:
@@ -59,6 +77,7 @@ def send_parcel_info_to_chat(
     except Exception as e:
         logger.exception("Error loading parcel to chat:\n")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/get-input-suggestion")
 def get_input_suggestion(lang: str = Form("es")):
@@ -73,6 +92,7 @@ def get_input_suggestion(lang: str = Form("es")):
     except Exception as e:
         logger.exception("Error getting suggestion:\n")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/load-active-chat-history")
 def load_active_chat_history():

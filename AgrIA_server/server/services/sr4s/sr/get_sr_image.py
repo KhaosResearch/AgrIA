@@ -1,13 +1,14 @@
-from datetime import datetime
-import os
-import glob
-from pathlib import Path
 import cv2
+import glob
 import numpy as np
+import os
 import time
 import torch
 import rasterio
+import structlog
 
+from datetime import datetime
+from pathlib import Path
 from PIL import Image
 
 from ....benchmark.sr.constants import BM_DATA_DIR
@@ -17,6 +18,8 @@ from ....benchmark.sr.utils import copy_file_to_dir
 
 from .utils import percentile_stretch, stack_bgrn, make_grid
 from .L1BSR_wrapper import L1BSR
+
+logger = structlog.get_logger(__file__)
 
 CURR_SCRIPT_DIR = Path(__file__).resolve().parent
 
@@ -109,7 +112,7 @@ def process_directory(input_dir, output_dir=SR5M_DIR, save_as_tif=True):
         filename, __ = os.path.splitext(base)
         prefix_parts = filename.split(f"-{band}", 1)[0].split("_")
         sr_prefix = f"SR_{prefix_parts[0]}_{prefix_parts[1]}"
-        og_prefix = f"GT_SR4S"
+        og_prefix = "GT_SR4S"
         if sr_prefix not in groups:
             groups[sr_prefix] = {}
         groups[sr_prefix][band] = f
@@ -118,7 +121,7 @@ def process_directory(input_dir, output_dir=SR5M_DIR, save_as_tif=True):
     for sr_prefix, band_files in groups.items():
         missing = set(SR_BANDS) - set(band_files.keys())
         if missing:
-            print(f"Skipping {sr_prefix}, missing bands: {missing}")
+            logger.debug(f"Skipping {sr_prefix}, missing bands: {missing}")
             continue
 
         b02 = rasterio.open(band_files["B02"]).read(1)
@@ -151,7 +154,7 @@ def process_directory(input_dir, output_dir=SR5M_DIR, save_as_tif=True):
         out_png = os.path.join(output_dir, f"{sr_prefix}.png")
         sr_image_path = out_png
         save_rgb_png(sr_u16, out_png)
-        print(f"Saved PNG: {out_png}")
+        logger.debug(f"Saved PNG: {out_png}")
 
         # Save TIF
         if save_as_tif or GET_SR_BENCHMARK:
@@ -159,9 +162,9 @@ def process_directory(input_dir, output_dir=SR5M_DIR, save_as_tif=True):
             timestamp = str(time.time())
             og_out_tif = os.path.join(BM_DATA_DIR, f"{timestamp}_{og_prefix}.tif")
             save_multiband_tif(sr_u16, band_files["B02"], sr_out_tif)
-            print(f"Saved TIF: {sr_out_tif}")
+            logger.debug(f"Saved TIF: {sr_out_tif}")
             save_multiband_tif(img_bgrn, band_files["B02"], og_out_tif)
-            print(f"Saved TIF: {og_out_tif}")
+            logger.debug(f"Saved TIF: {og_out_tif}")
             if GET_SR_BENCHMARK:
                 copy_file_to_dir(sr_out_tif, is_sr4s=True)
 
@@ -179,7 +182,7 @@ def process_directory(input_dir, output_dir=SR5M_DIR, save_as_tif=True):
             ncols=2,
         )
         Image.fromarray(grid).save(comp_png)
-        print(f"Saved comparison grid: {comp_png}")
+        logger.debug(f"Saved comparison grid: {comp_png}")
 
-        print(f"\nTotal time taken:\t{datetime.now() - start_time}")
+        logger.debug(f"\nTotal time taken:\t{datetime.now() - start_time}")
     return sr_image_path

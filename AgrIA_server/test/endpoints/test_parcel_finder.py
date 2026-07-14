@@ -4,6 +4,7 @@ import pytest
 from flask import make_response
 from unittest.mock import MagicMock, mock_open
 
+from server.config.constants import TEMP_DIR
 from server.endpoints import parcel_finder
 
 # Define mock return values once
@@ -101,9 +102,9 @@ def test_load_parcel_description_scenarios(
     assert response.status_code == expected_status
 
     if expected_status == 200:
-        assert response.get_json()["response"] == desc_response
+        assert response.json()["response"] == desc_response
     else:
-        assert response.get_json()["error"] == desc_response
+        assert response.json()["error"] == desc_response
 
 
 # --- FIND PARCEL ---
@@ -143,7 +144,7 @@ def test_load_parcel_description_scenarios(
             },
             400,
             "error",
-            "No date provided",
+            "No image date provided",
             None,
             id="Failure_MissingDate",
         ),
@@ -182,9 +183,9 @@ def test_load_parcel_description_scenarios(
         pytest.param(
             "Failure: Missing ALL data (500 - Iterable)",
             {},  # Empty data
-            500,
+            400,
             "error",
-            "argument of type 'NoneType' is not iterable",
+            "No image date provided",  # Will check the date first
             None,
             id="Failure_MissingAllData",
         ),
@@ -220,7 +221,7 @@ def test_find_parcel_scenarios(
     assert response.status_code == expected_status
 
     # Extract the response content
-    response_json = response.get_json()
+    response_json = response.json()
     actual_content = response_json.get(expected_content_key)
 
     # Assert on exact match or partial match for error messages
@@ -268,10 +269,10 @@ def test_is_coord_in_zone_scenarios(
 
     if expected_status == 200:
         # Assert the success response structure
-        assert response.get_json()["response"] == expected_response
+        assert response.json()["response"] == expected_response
     else:
         # Assert the error message structure
-        assert response.get_json()["error"] == expected_response
+        assert response.json()["error"] == expected_response
 
 
 # --- UPLOAD IMAGE FILE ---
@@ -310,11 +311,22 @@ def test_uploaded_file_scenarios(
     """Tests various scenarios for serving files from the /uploads endpoint."""
 
     # --- ARRANGE ---
-    # Patch the send_from_directory function with the specific mock for this scenario
-    monkeypatch.setattr(parcel_finder, "send_from_directory", mock_func)
+    # Generate mock file data
+    upload_dir = TEMP_DIR
+    os.makedirs(upload_dir, exist_ok=True)
+    temp_file_path = os.path.join(upload_dir, filename)
+
+    if expected_status == 200:
+        # Write dummy file
+        with open(temp_file_path, "w") as f:
+            f.write(expected_content_match)
 
     # --- ACT ---
-    response = client.get(f"/uploads/{filename}")
+    try:
+        response = client.get(f"/uploads/{filename}")
+    finally:
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
 
     # --- ASSERT ---
     assert response.status_code == expected_status
@@ -328,10 +340,10 @@ def test_uploaded_file_scenarios(
         assert response.headers["Expires"] == "0"
 
         # Check the content
-        assert response.data.decode("utf-8") == expected_content_match
+        assert response.text == expected_content_match
 
     # Check the content for 404/500 errors (if you expect a specific error message body)
     elif expected_status in (404, 500):
         # Note: Flask's default error pages may have different structures (JSON vs HTML).
         # We check if the expected error string is contained in the response body.
-        assert expected_content_match in response.data.decode("utf-8")
+        assert expected_content_match.lower() in response.text.lower()

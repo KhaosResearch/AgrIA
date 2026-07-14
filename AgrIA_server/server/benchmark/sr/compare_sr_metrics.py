@@ -1,6 +1,9 @@
 import rasterio
+import structlog
+
 import numpy as np
 import pandas as pd
+
 from skimage.metrics import (
     structural_similarity as ssim,
     peak_signal_noise_ratio as psnr,
@@ -10,7 +13,17 @@ import os
 import glob
 
 from .constants import BM_DATA_DIR, BM_SR_DIR, BM_RES_DIR
-from .utils import *
+from .utils import (
+    detect_and_normalize,
+    EPS,
+    ergas,
+    extract_timestamp,
+    find_closest_sr,
+    resize_image,
+    spectral_angle_mapper,
+)
+
+logger = structlog.get_logger(__file__)
 
 
 def compare_sr_metrics(gt_dir: str = BM_DATA_DIR, sr_dir: str = BM_SR_DIR):
@@ -20,7 +33,7 @@ def compare_sr_metrics(gt_dir: str = BM_DATA_DIR, sr_dir: str = BM_SR_DIR):
     if not gt_files or not sr_files:
         raise FileNotFoundError("Missing ground truth or SR files")
 
-    print(f"Found {len(gt_files)} ground truths and {len(sr_files)} SR images.")
+    logger.info(f"Found {len(gt_files)} ground truths and {len(sr_files)} SR images.")
 
     paired = {}
 
@@ -29,7 +42,7 @@ def compare_sr_metrics(gt_dir: str = BM_DATA_DIR, sr_dir: str = BM_SR_DIR):
         gt_name = os.path.basename(gt_path)
         ts_gt = extract_timestamp(gt_name)
         if ts_gt is None:
-            print(f"⚠️ Skipping {gt_name} (no timestamp found)")
+            logger.warning(f"⚠️ Skipping {gt_name} (no timestamp found)")
             continue
 
         sr_sen2sr = find_closest_sr(ts_gt, sr_files, "SEN2SR")
@@ -45,10 +58,12 @@ def compare_sr_metrics(gt_dir: str = BM_DATA_DIR, sr_dir: str = BM_SR_DIR):
         for model_name in ["SEN2SR", "SR4S"]:
             sr_path = files[model_name]
             if not sr_path or not os.path.exists(sr_path):
-                print(f"⚠️ Missing {model_name} for timestamp {ts}")
+                logger.warning(f"⚠️ Missing {model_name} for timestamp {ts}")
                 continue
 
-            print(f"\n🚀 Benchmarking {model_name} for {os.path.basename(gt_path)} ...")
+            logger.info(
+                f"\n🚀 Benchmarking {model_name} for {os.path.basename(gt_path)} ..."
+            )
             row = compute_metrics_for_pair(
                 gt_path, sr_path, model_name=model_name, ratio=2, auto_normalize=True
             )
@@ -62,8 +77,8 @@ def compare_sr_metrics(gt_dir: str = BM_DATA_DIR, sr_dir: str = BM_SR_DIR):
 
     df = pd.DataFrame(all_rows)
     df.to_csv(csv_path, index=False)
-    print(f"\n✅ Combined benchmark complete for all pairs.")
-    print(f"📁 Saved combined results to: {csv_path}")
+    logger.info("\n✅ Combined benchmark complete for all pairs.")
+    logger.info(f"📁 Saved combined results to: {csv_path}")
     print(
         df[
             [
@@ -116,7 +131,7 @@ def compute_metrics_for_pair(
         # Band match check
         if sr.shape[-1] != gt_bands:
             row["Warnings"] = f"band_mismatch ({sr.shape[-1]} vs {gt_bands})"
-            print("⚠️", row["Warnings"])
+            logger.warning(f"⚠️ {row['Warnings']}")
             return row
         row["Bands_match"] = True
 
@@ -147,7 +162,7 @@ def compute_metrics_for_pair(
             row["SSIM"] = float(
                 ssim(gt, sr_mapped, channel_axis=2, data_range=data_range)
             )
-        except Exception as e:
+        except Exception:
             try:
                 row["SSIM"] = float(
                     ssim(gt, sr_mapped, multichannel=True, data_range=data_range)
@@ -160,10 +175,10 @@ def compute_metrics_for_pair(
         row["SAM_rad"] = float(spectral_angle_mapper(gt, sr_mapped))
         row["ERGAS"] = float(ergas(sr_mapped, gt, ratio=ratio))
 
-        print(f"✅ {model_name} | PSNR={row['PSNR']:.3f} SSIM={row['SSIM']:.4f}")
+        logger.info(f"✅ {model_name} | PSNR={row['PSNR']:.3f} SSIM={row['SSIM']:.4f}")
 
     except Exception as e:
         row["Warnings"] = f"error_processing:{e}"
-        print("❌ Error processing", sr_path, e)
+        logger.error(f"❌ Error processing: {sr_path} {e}")
 
     return row

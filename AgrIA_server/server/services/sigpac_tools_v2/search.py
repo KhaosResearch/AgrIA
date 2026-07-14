@@ -55,4 +55,4 @@ if __name__ == "__main__":
     data = {"community": 2, "province": 6, "municipality": 2, "polygon": 1, "parcel": 1}
 
     geojson = search(data)
-    print("GEOJSON:", geojson)
+    logger.debug(f"GEOJSON: {geojson}")

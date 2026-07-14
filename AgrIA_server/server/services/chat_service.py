@@ -36,8 +36,8 @@ def get_image_description(file, filename, lang, is_detailed_description):
     filepath = filepath.replace("\\", "/")  # Ensure consistent path format
     image = Image.open(filepath)
     image_context_prompt = {
-        "en":"DATE: *No Data*\nLAND USE: *No Data*",
-        "es":"FECHA: *Sin datos*\nCULTIVO: *Sin datos*"
+        "en": "DATE: *No Data*\nLAND USE: *No Data*",
+        "es": "FECHA: *Sin datos*\nCULTIVO: *Sin datos*",
     }
     image_desc_prompt = (
         FULL_DESC_TRIGGER + "\n" if is_detailed_description else SHORT_DESC_TRIGGER
@@ -49,8 +49,10 @@ def get_image_description(file, filename, lang, is_detailed_description):
         image_path = TEMP_DIR / str(filename).split("?")[0]
         image = Image.open(image_path)
 
-        print("Analyzing image layout using auxiliary Multi-modal Language Model engine...")
-       
+        logger.info(
+            "Analyzing image layout using auxiliary Multi-modal Language Model engine..."
+        )
+
         # Trigger your auxiliary vision model
         extracted_visual_description = get_aux_image_description(
             image_obj=image, lang=lang
@@ -68,7 +70,7 @@ def get_image_description(file, filename, lang, is_detailed_description):
     else:
         text = {
             "es": "Lo siento, no puedo procesa imágenes directamente sin mis funcionalidades auxiliares de lectura de archivos.\nSi necesitas que te ayude a evaluar una parcela, por favor, usa el módulo de **Buscador de Parcelas**.",
-            "en": "Sorry, I can't process images directly without my file reading auxiliary features.\nIf you need help assessing a parcel, please use the **Parcel Finder** module."
+            "en": "Sorry, I can't process images directly without my file reading auxiliary features.\nIf you need help assessing a parcel, please use the **Parcel Finder** module.",
         }
         response = {
             "text": text[lang],
@@ -118,7 +120,9 @@ def get_parcel_description(
         image_path = TEMP_DIR / str(image_filename).split("?")[0]
         image = Image.open(image_path)
         if vlm_client is not None:
-            print("Analyzing image layout using auxiliary Multi-modal Language Model engine...")
+            logger.info(
+                "Analyzing image layout using auxiliary Multi-modal Language Model engine..."
+            )
             # Trigger your auxiliary vision model
             extracted_visual_description = get_aux_image_description(
                 image_obj=image, lang=lang
@@ -140,8 +144,8 @@ def get_parcel_description(
 
         return response
     except Exception as e:
-        print(f"Error while getting parcel description:\t{e}")
-        raise
+        logger.error(f"Error while getting parcel description:\t{e}")
+        raise e
 
 
 def get_suggestion_for_chat(chat_history: list[Content], lang: str):
@@ -179,7 +183,8 @@ def get_suggestion_for_chat(chat_history: list[Content], lang: str):
 
         return suggestion.text
     except Exception as e:
-        print(f"Error getting suggestion:\t{e}")
+        logger.error(f"Error getting suggestion:\t{e}")
+        raise e
 
 
 def get_summarised_chat(chat_history):
@@ -202,7 +207,8 @@ def get_summarised_chat(chat_history):
 
         return summarised_chat.text
     except Exception as e:
-        print(f"Error while summarising chat:\t{e}")
+        logger.error(f"Error while summarising chat:\t{e}")
+        raise e
 
 
 def get_role_and_content(chat_history):

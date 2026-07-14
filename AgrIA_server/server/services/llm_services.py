@@ -1,5 +1,7 @@
-# agria_server/server/services/llm_services.py
 import pathlib
+import structlog
+
+logger = structlog.get_logger(__file__)
 
 
 def upload_context_document(context_file_path: str) -> str | None:
@@ -17,6 +19,6 @@ def upload_context_document(context_file_path: str) -> str | None:
             # Simple placeholder text fallback for non-text files
             return f"[Local File Reference: {path.name}]"
         except Exception as e:
-            print(f"Error reading local document context: {e}")
+            logger.error(f"Error reading local document context: {e}")
             return None
     return None

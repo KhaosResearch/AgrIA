@@ -1,9 +1,12 @@
 import os
 import shutil
+import structlog
 
 from fastapi import UploadFile
 
 from server.config.constants import TEMP_DIR
+
+logger = structlog.get_logger(__file__)
 
 
 def save_image_and_get_path(file: UploadFile, filename: str) -> str:
@@ -17,14 +20,15 @@ def save_image_and_get_path(file: UploadFile, filename: str) -> str:
     """
     upload_dir = TEMP_DIR
     os.makedirs(upload_dir, exist_ok=True)
-    
+
     filepath = os.path.join(upload_dir, filename)
-    
+
     # Save file
     with open(filepath, "wb") as buffer:
         shutil.copyfileobj(file._file, buffer)
-        
+
     return filepath
+
 
 def generate_image_context_data(image_date, land_uses, query) -> str:
     """
@@ -82,13 +86,13 @@ def generate_image_context_data(image_date, land_uses, query) -> str:
                 total=round(total_surface, 3)
             )
             desc_file = TEMP_DIR / f"parcel_desc-{lang}.txt"
-            print(f"\nGenerating file: {desc_file}")
+            logger.debug(f"\nGenerating file: {desc_file}")
             with open(desc_file, "w") as file:
                 file.write(results[lang])
 
         return results
     except Exception as e:
-        print("Error while getting image context data: " + e)
+        logger.error(f"Error while getting image context data: {e}")
 
 
 def get_coefficients(query, land_use) -> float:

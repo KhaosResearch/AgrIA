@@ -96,10 +96,10 @@ def download_tile_bands(utm_zones, year, month, bands, geometry):
     set_reflectance_scale(is_zone_in_andalusia)
 
     if is_zone_in_andalusia:
-        print("Parcel located in Andalusia...")
+        logger.debug("Parcel located in Andalusia...")
         band_files_list = download_from_minio(utm_zones, year_month_pairs, bands)
     else:
-        print("Getting parcel outside of Andalusia...")
+        logger.debug("Getting parcel outside of Andalusia...")
         # Download image bands using Sentinel Hub
         parcel_center = shape(geometry).representative_point()
         band_files_list = download_from_sentinel_hub(
@@ -152,7 +152,7 @@ def download_from_minio(utm_zones, year_month_pairs, bands):
                                 )
                                 download_tasks.append((task, local_file_path))
                 except S3Error as exc:
-                    print(f"Error when accessing {composites_path}: {exc}")
+                    logger.error(f"Error when accessing {composites_path}: {exc}")
         # Run all download tasks and append resulting local file paths
         for task, local_file_path in download_tasks:
             task.result()
@@ -207,7 +207,7 @@ def merge_tifs(input_dir, year, band, month_number):
     band_files = [f for f in all_files if band in Path(f).name]
 
     if not band_files:
-        print(f"⚠️ No files found for band {band} in {input_dir}")
+        logger.warning(f"⚠️ No files found for band {band} in {input_dir}")
         return None
 
     out_path = MERGED_BANDS_DIR
@@ -259,21 +259,21 @@ def reproject_tiles(input_dir):
         os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith(".tif")
     ]
     if not files:
-        print("No .tif files found in:", input_dir)
+        logger.warning(f"No .tif files found in: {input_dir}")
         return None
 
     crs_groups = defaultdict(list)
 
     for f in files:
         with rasterio.open(f) as src:
-            print(f"File: {f} CRS: {src.crs}")
+            logger.debug(f"File: {f} CRS: {src.crs}")
             crs_groups[str(src.crs)].append(f)
 
     # If all files share the same CRS → use directly
     if len(crs_groups) == 1:
         all_files = files
     else:
-        print("Multiple CRS detected, reprojection needed...")
+        logger.debug("Multiple CRS detected, reprojection needed...")
         # Pick the CRS of the first file as the target
         with rasterio.open(files[0]) as src:
             target_crs = src.crs
@@ -298,7 +298,7 @@ def reproject_tiles(input_dir):
 
                     # Create new path for reprojected version
                     reprojected_path = f.replace(".tif", "_reprojected.tif")
-                    print(f"Reprojecting {f} → {reprojected_path}")
+                    logger.debug(f"Reprojecting {f} → {reprojected_path}")
 
                     with rasterio.open(reprojected_path, "w", **kwargs) as dst:
                         for i in range(1, src.count + 1):
@@ -360,7 +360,7 @@ def get_rgb_composite(cropped_parcel_band_paths, geojson_data):
     if get_sr_image:
         # Apply SR upscaling (x10)
         input_dir = Path(cropped_parcel_band_paths[0]).parent
-        print(f"\nProcessing {input_dir} directory for SR upscale...\n")
+        logger.info(f"\nProcessing {input_dir} directory for SR upscale...\n")
         sr_tif_path = process_directory(input_dir)
         sr_tif = os.path.join(
             SR5M_DIR, os.path.splitext(os.path.basename(sr_tif_path))[0] + ".tif"
@@ -377,7 +377,7 @@ def get_rgb_composite(cropped_parcel_band_paths, geojson_data):
             fmt="png",
         )
 
-        print(f"SR parcel cropped and saved at: {cropped_sr}")
+        logger.info(f"SR parcel cropped and saved at: {cropped_sr}")
 
         png_paths.append(cropped_sr)
     else:
@@ -567,11 +567,11 @@ def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
         return cropped_parcel_files
 
     except FileNotFoundError as e:
-        print(str(e))
-        raise
+        logger.error(str(e))
+        raise e
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
-        raise
+        logger.error(f"An error occurred: {str(e)}")
+        raise e
 
 
 def crop_raster_to_geometry(
@@ -599,7 +599,7 @@ def crop_raster_to_geometry(
             geometry = geometry.to_crs(src.crs)
 
         if geometry.is_empty.any():
-            print(f"Parcel geometry is empty for {image_path}")
+            logger.warning(f"Parcel geometry is empty for {image_path}")
             return None
 
         # Rasterio expects list of shapes
@@ -805,7 +805,6 @@ def merge_and_convert_to_geometry(feature_collection: dict) -> dict:
     merged = unary_union(polygons)
 
     # Step 3: Return as plain geometry dict (not Feature or FeatureCollection)
-    del transformer
     return mapping(merged)
 
 
@@ -1017,7 +1016,7 @@ def is_coord_in_zones(lon: float, lat: float, zones_json: dict = SPAIN_ZONES) ->
                 if min_lon <= lon <= max_lon and min_lat <= lat <= max_lat:
                     is_in_zone = True
             except (ValueError, TypeError) as e:
-                print(
+                logger.warning(
                     f"Warning: Zone '{zone_id}' has an invalid BBox format. Skipping zone: {e}"
                 )
 
@@ -1031,7 +1030,7 @@ def is_coord_in_zones(lon: float, lat: float, zones_json: dict = SPAIN_ZONES) ->
                     is_in_zone = True
             except Exception as e:
                 # Log the warning but continue checking other zones
-                print(
+                logger.warning(
                     f"Warning: Zone '{zone_id}' has an invalid Polygon geometry. Skipping zone: {e}"
                 )
         i += 1

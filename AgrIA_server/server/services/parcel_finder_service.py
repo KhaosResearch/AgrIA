@@ -2,14 +2,30 @@ from datetime import datetime, timedelta
 import json
 import time
 import os
+import numpy as np
 import structlog
 
 from flask import abort
 
 from ..benchmark.sr.compare_sr_metrics import compare_sr_metrics
 from ..benchmark.sr.constants import BM_DATA_DIR, BM_RES_DIR
-from ..config.constants import GET_SR_BENCHMARK, SEN2SR_SR_DIR, SR_BANDS, RESOLUTION
-from ..utils.parcel_finder_utils import *
+from ..config.constants import (
+    GET_SR_BENCHMARK,
+    SEN2SR_SR_DIR,
+    SR_BANDS,
+    RESOLUTION,
+    TEMP_DIR,
+)
+from ..utils.parcel_finder_utils import (
+    cut_from_geometry,
+    download_tile_bands,
+    get_geojson_data,
+    get_rgb_composite,
+    get_tiles_polygons,
+    polygon_pixel_size,
+    reset_dir,
+    shape,
+)
 
 from .sr4s.im.get_image_bands import request_date
 
@@ -70,7 +86,7 @@ def get_parcel_image(
                 )
             except (ValueError, Exception) as e:
                 logger.error(f"Error finding parcel (probably URBAN) with error: {e}")
-                logger.debug(f"Attempting to use coordinates only...")
+                logger.debug("Attempting to use coordinates only...")
                 geometry, metadata = get_geometry_and_metadata_coords(
                     "parcela", lat, lng
                 )
@@ -125,7 +141,6 @@ def get_parcel_image(
             f"{os.path.basename(sigpac_image_name)}"
             f"?v={int(time.time())}"
         )
-        print("sigpac_image_url", sigpac_image_url)
         msg2 = f"\nTIME TAKEN (SEN2SR): {datetime.now() - init2}"
 
     except Exception as e:
@@ -206,7 +221,7 @@ def download_sen2sr_parcel_image(geometry, date, delta_days=15):
 
         return sigpac_image_name
     except Exception:
-        logger.exception(f"Error while getting the SEN2SR image: ")
+        logger.exception("Error while getting the SEN2SR image: ")
         raise
 
 
@@ -233,8 +248,8 @@ def download_parcel_image(
         # Upload and fetch latest image
         sigpac_image_url = f"{os.getenv('API_URL')}/uploads/{os.path.basename(sigpac_image_name)}?v={int(time.time())}"
         return sigpac_image_url.split("?")[0]
-    except Exception as e:
-        logger.exception(f"An error occurred (download_parcel_image):\n")
+    except Exception:
+        logger.exception("An error occurred (download_parcel_image):\n")
         raise
 
 
@@ -264,7 +279,7 @@ def get_rgb_parcel_image(cadastral_reference, geojson_data, rgb_images_path):
         )
         if len(unique_formats) > 1:
             raise ValueError(
-                f"Unsupported format. You must upload images in one unique format."
+                "Unsupported format. You must upload images in one unique format."
             )
 
         # Crop the parcel outline using the geomatry available
@@ -283,6 +298,6 @@ def get_rgb_parcel_image(cadastral_reference, geojson_data, rgb_images_path):
         )
 
         return out_dir, png_paths, rgb_tif_paths
-    except Exception as e:
-        logger.exception(f"An error occurred (get_rgb_parcel_image):\n")
+    except Exception:
+        logger.exception("An error occurred (get_rgb_parcel_image):\n")
         raise

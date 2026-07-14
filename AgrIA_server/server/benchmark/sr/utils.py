@@ -3,11 +3,14 @@ import os
 import re
 import numpy as np
 import shutil
+import structlog
 import time
 
 from .constants import BM_SR_DIR, BM_DATA_DIR
 
 EPS = 1e-10
+
+logger = structlog.get_logger(__file__)
 
 
 def copy_file_to_dir(src, dest_dir=BM_SR_DIR, is_sr4s: bool = False):
@@ -23,7 +26,7 @@ def copy_file_to_dir(src, dest_dir=BM_SR_DIR, is_sr4s: bool = False):
     __, ext = os.path.splitext(src)
     if type(is_sr4s) is not bool:
         dest_dir = BM_DATA_DIR
-        name = f"GT_SEN2SR"
+        name = "GT_SEN2SR"
     else:
         name = "SR4S" if is_sr4s else "SEN2SR"
     timestamp = str(time.time())
@@ -39,7 +42,7 @@ def copy_file_to_dir(src, dest_dir=BM_SR_DIR, is_sr4s: bool = False):
     #        counter += 1
     # Copy the file to the resolved destination path
     shutil.copy2(src, dest_path)
-    print(f"\nFile copied for benchmark to: {dest_path}\n")
+    logger.debug(f"\nFile copied for benchmark to: {dest_path}\n")
     return dest_path
 
 
