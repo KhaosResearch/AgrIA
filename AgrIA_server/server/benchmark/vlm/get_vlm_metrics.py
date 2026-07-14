@@ -8,9 +8,6 @@ import structlog
 import time
 
 from datetime import datetime, timedelta
-from PIL import Image
-from google import genai
-from google.genai import types
 from langchain_core.messages import HumanMessage, SystemMessage
 from pathlib import Path
 
@@ -31,7 +28,6 @@ from .constants import (
     FULL_DESC_SYS_INSTR_ES,
     USE_PAPER_DATA,
     LANG,
-    OG_CLASSIFICATION_FILEPATH,
 )
 from ...services.ecoscheme_payments.main import calculate_ecoscheme_payment
 from .llm_setup import generate_system_instructions
@@ -80,7 +76,7 @@ def init():
     input_df = pd.DataFrame(columns=input_col_names)
     out_df = pd.DataFrame(columns=out_col_names)
 
-    logger.debug(f"DataFrames initialized")
+    logger.debug("DataFrames initialized")
 
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     return input_df, out_df, timestamp
@@ -178,7 +174,7 @@ def get_llm_full_desc(
     image_bytes = image_path.read_bytes()
     encoded_image = base64.b64encode(image_bytes).decode("utf-8")
 
-    logger.debug(f"Image loaded for inference")
+    logger.debug("Image loaded for inference")
 
     # Determine mime type dynamically
     ext = image_path.suffix.lower().replace(".", "")

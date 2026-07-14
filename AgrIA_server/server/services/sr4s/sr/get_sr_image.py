@@ -109,7 +109,7 @@ def process_directory(input_dir, output_dir=SR5M_DIR, save_as_tif=True):
         filename, __ = os.path.splitext(base)
         prefix_parts = filename.split(f"-{band}", 1)[0].split("_")
         sr_prefix = f"SR_{prefix_parts[0]}_{prefix_parts[1]}"
-        og_prefix = f"GT_SR4S"
+        og_prefix = "GT_SR4S"
         if sr_prefix not in groups:
             groups[sr_prefix] = {}
         groups[sr_prefix][band] = f

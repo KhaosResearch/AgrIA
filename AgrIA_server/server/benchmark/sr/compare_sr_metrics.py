@@ -10,7 +10,15 @@ import os
 import glob
 
 from .constants import BM_DATA_DIR, BM_SR_DIR, BM_RES_DIR
-from .utils import *
+from .utils import (
+    detect_and_normalize,
+    EPS,
+    ergas,
+    extract_timestamp,
+    find_closest_sr,
+    resize_image,
+    spectral_angle_mapper,
+)
 
 
 def compare_sr_metrics(gt_dir: str = BM_DATA_DIR, sr_dir: str = BM_SR_DIR):
@@ -62,7 +70,7 @@ def compare_sr_metrics(gt_dir: str = BM_DATA_DIR, sr_dir: str = BM_SR_DIR):
 
     df = pd.DataFrame(all_rows)
     df.to_csv(csv_path, index=False)
-    print(f"\n✅ Combined benchmark complete for all pairs.")
+    print("\n✅ Combined benchmark complete for all pairs.")
     print(f"📁 Saved combined results to: {csv_path}")
     print(
         df[
@@ -147,7 +155,7 @@ def compute_metrics_for_pair(
             row["SSIM"] = float(
                 ssim(gt, sr_mapped, channel_axis=2, data_range=data_range)
             )
-        except Exception as e:
+        except Exception:
             try:
                 row["SSIM"] = float(
                     ssim(gt, sr_mapped, multichannel=True, data_range=data_range)

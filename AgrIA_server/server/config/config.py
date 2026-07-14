@@ -29,7 +29,7 @@ if not GEMINI_API_KEY:
         "Warning: 'GEMINI_API_KEY' was not set correctly in '.env' file. Detected value: {GEMINI_API_KEY}"
     )
     logger.warning(f"{ve}")
-    logger.warning(f"Set a valid value to access AgrIA's Chat Assistant services!")
+    logger.warning("Set a valid value to access AgrIA's Chat Assistant services!")
 
 
 class Config:

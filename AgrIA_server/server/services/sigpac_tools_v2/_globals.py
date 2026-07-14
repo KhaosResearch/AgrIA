@@ -1,5 +1,3 @@
-from pathlib import Path
-
 # URL from SIGPAC service
 BASE_URL = "https://sigpac-hubcloud.es"
 QUERY_URL = "servicioconsultassigpac/query"

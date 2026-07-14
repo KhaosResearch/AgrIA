@@ -49,7 +49,7 @@ def get_cadastral_data_from_coords(
             parcel = str(response["parcela"]).zfill(5)
 
         except Exception as e:
-            logger.exception(f"Failed to parse SIGPAC JSON response:")
+            logger.exception("Failed to parse SIGPAC JSON response:")
             raise ValueError("Invalid JSON returned by SIGPAC", e)
 
         # Build cadastral reference

@@ -85,7 +85,7 @@ def find_parcel(
 def is_coord_in_zone(lat: float = Form(...), lng: float = Form(...)):
     try:
         return {"response": is_coord_in_zones(lng, lat)}
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=400, detail="Invalid or missing coordinates")
 
 

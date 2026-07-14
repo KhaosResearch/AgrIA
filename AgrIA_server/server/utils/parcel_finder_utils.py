@@ -805,7 +805,6 @@ def merge_and_convert_to_geometry(feature_collection: dict) -> dict:
     merged = unary_union(polygons)
 
     # Step 3: Return as plain geometry dict (not Feature or FeatureCollection)
-    del transformer
     return mapping(merged)
 
 

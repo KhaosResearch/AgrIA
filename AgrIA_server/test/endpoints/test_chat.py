@@ -1,5 +1,4 @@
 import io
-from fastapi import UploadFile
 import pytest
 
 from unittest.mock import MagicMock
@@ -301,7 +300,7 @@ def test_load_active_chat_history_scenarios(
     monkeypatch.setattr(chat, "get_role_and_content", mock_get_role_and_content)
 
     # Prepare inputs
-    data = {}  # No need for input. This is a GET method. history is fetched directly from chat
+    # No need for input. This is a GET method. History is fetched directly from chat
 
     # --- ACT --- #
     response = client.get("/load-active-chat-history")
