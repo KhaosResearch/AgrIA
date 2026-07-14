@@ -1,4 +1,5 @@
 import os
+import structlog
 
 from datetime import datetime
 from fastapi import APIRouter, Form, HTTPException
@@ -12,6 +13,8 @@ from ..utils.parcel_finder_utils import (
     reset_dir,
 )
 from ..services.parcel_finder_service import get_parcel_image
+
+logger = structlog.get_logger(__file__)
 
 router = APIRouter()
 
@@ -68,7 +71,7 @@ def find_parcel(
             actual_coords,
         )
 
-        print(f"\nTOTAL TIME TAKEN: {datetime.now() - init}\n")
+        logger.info(f"\nTOTAL TIME TAKEN: {datetime.now() - init}\n")
         return {
             "response": {
                 "cadastralReference": actual_cad_ref,

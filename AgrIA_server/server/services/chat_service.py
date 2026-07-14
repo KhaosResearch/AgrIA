@@ -49,7 +49,7 @@ def get_image_description(file, filename, lang, is_detailed_description):
         image_path = TEMP_DIR / str(filename).split("?")[0]
         image = Image.open(image_path)
 
-        print(
+        logger.info(
             "Analyzing image layout using auxiliary Multi-modal Language Model engine..."
         )
 
@@ -120,7 +120,7 @@ def get_parcel_description(
         image_path = TEMP_DIR / str(image_filename).split("?")[0]
         image = Image.open(image_path)
         if vlm_client is not None:
-            print(
+            logger.info(
                 "Analyzing image layout using auxiliary Multi-modal Language Model engine..."
             )
             # Trigger your auxiliary vision model
@@ -144,8 +144,8 @@ def get_parcel_description(
 
         return response
     except Exception as e:
-        print(f"Error while getting parcel description:\t{e}")
-        raise
+        logger.error(f"Error while getting parcel description:\t{e}")
+        raise e
 
 
 def get_suggestion_for_chat(chat_history: list[Content], lang: str):
@@ -183,7 +183,8 @@ def get_suggestion_for_chat(chat_history: list[Content], lang: str):
 
         return suggestion.text
     except Exception as e:
-        print(f"Error getting suggestion:\t{e}")
+        logger.error(f"Error getting suggestion:\t{e}")
+        raise e
 
 
 def get_summarised_chat(chat_history):
@@ -206,7 +207,8 @@ def get_summarised_chat(chat_history):
 
         return summarised_chat.text
     except Exception as e:
-        print(f"Error while summarising chat:\t{e}")
+        logger.error(f"Error while summarising chat:\t{e}")
+        raise e
 
 
 def get_role_and_content(chat_history):

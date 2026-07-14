@@ -38,4 +38,4 @@ class Config:
     @classmethod
     def set_reflectance_scale(cls, value: float):
         cls.REFLECTANCE_SCALE = value
-        print("REFLECTANCE_SCALE", value)
+        logger.debug(f"REFLECTANCE_SCALE {value}")

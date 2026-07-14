@@ -1,4 +1,6 @@
 import time
+import structlog
+
 import numpy as np
 
 from datetime import datetime, timedelta
@@ -17,12 +19,14 @@ from ..constants import DELTA_DAYS, RESOLUTION, SIZE
 
 from contextvars import ContextVar
 
+logger = structlog.get_logger(__file__)
+
 request_date: ContextVar[str] = ContextVar("request_date", default="")
 
 config = SHConfig(CONFIG_NAME)
 
 if not config.sh_client_id or not config.sh_client_secret:
-    print(
+    logger.warning(
         "Warning! To use Process API, please provide the credentials (OAuth client ID and client secret)."
     )
 
@@ -42,7 +46,7 @@ def download_from_sentinel_hub(lat, lon, filename):
     bands = ["B02", "B03", "B04", "B08"]
     size = (SIZE, SIZE)
     band_files_list = download_image_bands(lat, lon, size, filename, bands)
-    print(f"\nTotal time:\t{(time.time() - start_time) / 60:.1f} minutes")
+    logger.info(f"\nTotal time:\t{(time.time() - start_time) / 60:.1f} minutes")
     return band_files_list
 
 
@@ -84,7 +88,7 @@ def download_sentinel_image(lat, lon, size, filename, evalscript):
     filepath = BANDS_DIR / filename
     save_tiff(image, filepath, bbox, crs="EPSG:4326")
 
-    print(f"Sentinel band image saved to {filepath}")
+    logger.debug(f"Sentinel band image saved to {filepath}")
 
 
 def get_cloudless_image(
@@ -109,7 +113,7 @@ def get_cloudless_image(
     current_maxcc = maxcc
 
     while attempt < max_tries:
-        print(
+        logger.debug(
             f"🛰️ Attempt {attempt + 1}: Searching between {current_initial.date()} → {current_final.date()} (maxcc={current_maxcc:.2f})"
         )
 
@@ -144,11 +148,11 @@ def get_cloudless_image(
             if np.all((img == 0) | np.isnan(img)):
                 raise ValueError("Received empty image (all zeros or NaNs).")
 
-            print(f"✅ Found valid imagery on attempt {attempt + 1}")
+            logger.debug(f"✅ Found valid imagery on attempt {attempt + 1}")
             return img
 
         except ValueError as e:
-            print(f"⚠️  Attempt {attempt + 1} failed: {e}")
+            logger.warning(f"⚠️  Attempt {attempt + 1} failed: {e}")
 
         # Push search window backward
         current_final = current_initial - timedelta(days=1)
@@ -183,7 +187,7 @@ def download_image_bands(lat, lon, size, filename=None, bands=["B02", "B03", "B0
             if filename is not None
             else f"{str(lat)[:8]}_{str(lon)[:8]}-{band}_{RESOLUTION}m.tif"
         )
-        print(f"Fetching images for coordinates: {lat}, {lon}")
+        logger.debug(f"Fetching images for coordinates: {lat}, {lon}")
 
         # Get script that will retrieve  image bands
         evalscript_band = generate_evalscript(

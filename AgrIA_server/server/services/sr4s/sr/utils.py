@@ -1,13 +1,17 @@
+import cv2
 import math
 import numpy as np
 import torch
+import structlog
+
 from dataclasses import dataclass
 from rasterio.transform import Affine
-import cv2
 
 from ....config.config import Config
 
 config = Config()
+
+logger = structlog.get_logger(__file__)
 
 
 @dataclass
@@ -62,7 +66,7 @@ def to_torch_4ch(img_bgrn_u16: np.ndarray, device: torch.device) -> torch.Tensor
 def from_torch_to_u16(sr: torch.Tensor) -> np.ndarray:
     """1x4xHxW -> HxWx4 uint16, reverse of normalization with clipping to prevent artifacts."""
     # Convert to numpy and de-normalize
-    print("REFLECTANCE_SCALE", config.REFLECTANCE_SCALE)
+    logger.debug(f"REFLECTANCE_SCALE: {config.REFLECTANCE_SCALE}")
 
     sr_denormalized = sr.detach().cpu().numpy() * config.REFLECTANCE_SCALE
 

@@ -141,7 +141,6 @@ def get_parcel_image(
             f"{os.path.basename(sigpac_image_name)}"
             f"?v={int(time.time())}"
         )
-        print("sigpac_image_url", sigpac_image_url)
         msg2 = f"\nTIME TAKEN (SEN2SR): {datetime.now() - init2}"
 
     except Exception as e:

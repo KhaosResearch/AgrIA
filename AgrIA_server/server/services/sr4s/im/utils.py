@@ -3,10 +3,15 @@ import math
 import numpy as np
 import random
 import rasterio
+import structlog
+
 from PIL import Image
 from rasterio.transform import from_bounds
 from sentinelhub import BBox, CRS
+
 from ..constants import LAT_MIN, LAT_MAX, LON_MIN, LON_MAX
+
+logger = structlog.get_logger(__file__)
 
 
 def get_bbox_from_zoom(lat, lon, size, zoom):
@@ -267,7 +272,7 @@ def perform_image_sanity_check(lat, lon, image_bytes):
 
     # # Quick sanity check: if file is too small, probably "no imagery"
     # if len(image_bytes) < 15_000:  # tweak threshold as needed
-    #     print(f"No imagery (small file) at {lat},{lon}")
+    #     logger.error(f"No imagery (small file) at {lat},{lon}")
     #     return False
 
     # Check if the image is mainly white (no imagery available)
@@ -277,7 +282,7 @@ def perform_image_sanity_check(lat, lon, image_bytes):
 
     # If almost all pixels are very bright (white background) and there's little variation, it's probably "no imagery"
     if np.mean(arr) > 230 and std_val < 15:
-        print(f"No imagery available for {lat},{lon}")
+        logger.error(f"No imagery available for {lat},{lon}")
         has_imagery = False
 
     return has_imagery

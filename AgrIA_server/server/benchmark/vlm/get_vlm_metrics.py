@@ -248,7 +248,7 @@ def extract_json_from_reply(raw_text: str, cadastral_ref: str):
             data = json.load(f)
     except json.JSONDecodeError as e:
         logger.error(f"[ERROR] Failed to decode JSON: {e}")
-        logger.debug("[DEBUG] Cleaned text preview:\n", cleaned_text[:300])
+        logger.debug(f"[DEBUG] Cleaned text preview:\n{cleaned_text[:300]}")
     logger.debug(f"Data from JSON file:\n{data}")
 
     # --- Normalize JSON into dataframe ---

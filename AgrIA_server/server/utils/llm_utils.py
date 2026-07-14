@@ -286,7 +286,7 @@ def get_aux_image_description(image_obj, lang=None):
         ]
 
         response = vlm_client.invoke([HumanMessage(content=message_content)])
-        logger.debug("Local Response Received!", response)
+        logger.debug(f"Local Response Received! {response}")
         return response.content
 
     except Exception as e:
