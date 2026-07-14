@@ -86,7 +86,7 @@ def is_coord_in_zone(lat: float = Form(...), lng: float = Form(...)):
     try:
         return {"response": is_coord_in_zones(lng, lat)}
     except Exception as e:
-        raise HTTPException(status_code=400, detail="Invalid coordinates calculation")
+        raise HTTPException(status_code=400, detail="Invalid or missing coordinates")
 
 
 # FastAPI handles serving directory static media assets safely using FileResponse
