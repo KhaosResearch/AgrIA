@@ -23,8 +23,11 @@ def create_app(ui_url: str = UI_URL) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    async def validation_exception_handler(
+        request: Request, exc: RequestValidationError
+    ):
         errors = exc.errors()
         first_error = errors[0] if errors else {}
         loc = first_error.get("loc", [])
@@ -33,39 +36,33 @@ def create_app(ui_url: str = UI_URL) -> FastAPI:
         # Match when 'userInput' form parameter is missing or invalid
         if field_name == "userInput":
             return JSONResponse(
-                status_code=400,
-                content={"error": "No user input provided"}
+                status_code=400, content={"error": "No user input provided"}
             )
 
         if field_name == "imageDate" or field_name == "selectedDate":
             return JSONResponse(
-                status_code=400,
-                content={"error": "No image date provided"}
+                status_code=400, content={"error": "No image date provided"}
             )
 
         if field_name == "lat" or field_name == "lng":
             return JSONResponse(
-                status_code=400,
-                content={"error": "Invalid or missing coordinates"}
+                status_code=400, content={"error": "Invalid or missing coordinates"}
             )
 
         if field_name == "image":
             return JSONResponse(
-                status_code=400,
-                content={"error": "No image file provided"}
+                status_code=400, content={"error": "No image file provided"}
             )
 
         return JSONResponse(
             status_code=400,
-            content={"error": first_error.get("msg", "Validation error")}
+            content={"error": first_error.get("msg", "Validation error")},
         )
 
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handler(request: Request, exc: StarletteHTTPException):
-        return JSONResponse(
-            status_code=exc.status_code,
-            content={"error": exc.detail}
-        )
+        return JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
+
     # Reset temp and benchmark dirs
     reset_dir(TEMP_DIR)
     reset_dir(BM_DATA_DIR)

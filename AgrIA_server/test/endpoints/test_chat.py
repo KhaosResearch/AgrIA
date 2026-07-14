@@ -51,7 +51,7 @@ def test_send_user_input_scenarios(
 
     # Prepare inputs
     data = {"userInput": user_input}
-    
+
     # --- ACT --- #
     response = client.post("/send-user-input", data=data)
 
@@ -61,6 +61,7 @@ def test_send_user_input_scenarios(
         assert response.json()["error"] == expected_response
     else:
         assert response.json()["response"] == expected_response
+
 
 @pytest.mark.parametrize(
     "test_name, file_data, image_filename, is_detailed_desc, expected_status, expected_response",
@@ -99,7 +100,11 @@ def test_send_image_scenarios(
 
     # --- ARRANGE --- #
     # Prepare mockups
-    monkeypatch.setattr(chat, "get_image_description", lambda file, filename, lang, is_detailed: expected_response)
+    monkeypatch.setattr(
+        chat,
+        "get_image_description",
+        lambda file, filename, lang, is_detailed: expected_response,
+    )
 
     # Prepare input
     data = {
@@ -108,9 +113,7 @@ def test_send_image_scenarios(
 
     files = {}
     if file_data is not None:
-        files = {
-            "image": (image_filename, file_data)
-        }
+        files = {"image": (image_filename, file_data)}
 
     # --- ACT --- #
     response = client.post("/send-image", data=data, files=files)
