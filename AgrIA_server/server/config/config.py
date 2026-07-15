@@ -13,18 +13,18 @@ logger = structlog.getLogger()
 load_dotenv()
 
 # LLM CREDENTIALS & MODEL
-LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "")
-LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
-LLM_MODEL_NAME = os.environ.get("LLM_MODEL_NAME", "")
+LLM_BASE_URL = os.environ.get("LLM_BASE_URL", None)
+LLM_API_KEY = os.environ.get("LLM_API_KEY", None)
+LLM_MODEL_NAME = os.environ.get("LLM_MODEL_NAME", None)
 
 # AUX VLM CREDENTIALS & MODEL
-VLM_BASE_URL = os.environ.get("VLM_BASE_URL", "")
-VLM_API_KEY = os.environ.get("VLM_API_KEY", "")
+VLM_BASE_URL = os.environ.get("VLM_BASE_URL", None)
+VLM_API_KEY = os.environ.get("VLM_API_KEY", None)
 VLM_MODEL_NAME = os.environ.get("VLM_MODEL_NAME", None)
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", None)
 
-if not GEMINI_API_KEY:
+if GEMINI_API_KEY in ["", None]:
     ve = ValueError(
         "Warning: 'GEMINI_API_KEY' was not set correctly in '.env' file. Detected value: {GEMINI_API_KEY}"
     )

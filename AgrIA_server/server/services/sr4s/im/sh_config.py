@@ -15,7 +15,7 @@ CLIENT_SECRET = os.getenv("COPERNICUS_CLIENT_SECRET")
 CONFIG_NAME = str(os.getenv("COPERNICUS_CONFIG_NAME"))
 
 # Setup config params for Copernicus dataspace Ecosystem users
-config = SHConfig()
+config = SHConfig(use_defaults=True)
 
 config.sh_client_id = CLIENT_ID
 config.sh_client_secret = CLIENT_SECRET

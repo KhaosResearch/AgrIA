@@ -823,11 +823,14 @@ def reset_dir(dir: str | Path, keep_extensions: list[str] = None):
         return
     for item in dir.iterdir():
         if item.is_dir():
-            shutil.rmtree(item)
+            try:
+                shutil.rmtree(item)
+            except FileNotFoundError:
+                pass
             continue
         if item.is_file():
             if item.suffix.lower().lstrip(".") not in keep_extensions:
-                item.unlink()
+                item.unlink(missing_ok=True)
 
 
 def check_cadastral_data(

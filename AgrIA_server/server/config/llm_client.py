@@ -1,3 +1,4 @@
+import structlog
 from google import genai
 from langchain_openai import ChatOpenAI
 from .config import (
@@ -10,16 +11,23 @@ from .config import (
     VLM_MODEL_NAME,
 )
 
-# client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
+logger = structlog.get_logger(__file__)
 
 
 def init_client(
     base_url: str = LLM_BASE_URL,
     api_key: str = LLM_API_KEY,
-    model=LLM_MODEL_NAME,
+    model: str = LLM_MODEL_NAME,
     temperature: float = 0.4,
     max_retries: int = 2,
 ):
+    # Guard clause: If key or config is missing/empty, do not initialize
+    if not api_key or not base_url:
+        logger.warning(
+            "Skipping ChatOpenAI initialization: base_url or api_key is missing."
+        )
+        return None
+
     return ChatOpenAI(
         base_url=base_url,
         api_key=api_key,
