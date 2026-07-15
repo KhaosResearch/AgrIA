@@ -7,7 +7,9 @@ from .utils import build_cadastral_reference, get_parcel_metadata_and_geometry
 logger = structlog.get_logger()
 
 
-def get_cadastral_data_from_coords(lat: float, lon: float, crs: str = "4258", use_cadastral_ref: bool = True):
+def get_cadastral_data_from_coords(
+    lat: float, lon: float, crs: str = "4258", use_cadastral_ref: bool = True
+):
     """Gets the cadastral reference of the given coordinates and reference in the given parcel.
     WARNING: The result is synthetic and does not necessarily match a real SIGPAC cadastral reference.
     However, it works for the system's scope.
@@ -47,19 +49,18 @@ def get_cadastral_data_from_coords(lat: float, lon: float, crs: str = "4258", us
             parcel = str(response["parcela"]).zfill(5)
 
         except Exception as e:
-            logger.exception(f"Failed to parse SIGPAC JSON response:")
+            logger.exception("Failed to parse SIGPAC JSON response:")
             raise ValueError("Invalid JSON returned by SIGPAC", e)
 
         # Build cadastral reference
         cadastral_ref = build_cadastral_reference(provi, munic, polig, parcel)
-        logger.info(
-            f'Associated synthetic cadastral reference: {cadastral_ref}')
+        logger.info(f"Associated synthetic cadastral reference: {cadastral_ref}")
 
         # geometry, _ = search(read_cadastral_registry(cadastral_ref))
 
         return cadastral_ref
     else:
-        geojson_endpoint = base_endpoint.replace('.json', '.geojson')
+        geojson_endpoint = base_endpoint.replace(".json", ".geojson")
         with open("ñ.log", "w") as f:
             f.write(geojson_endpoint)
         geometry, metadata = get_parcel_metadata_and_geometry(geojson_endpoint)

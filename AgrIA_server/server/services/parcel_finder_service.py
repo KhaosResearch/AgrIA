@@ -2,14 +2,30 @@ from datetime import datetime, timedelta
 import json
 import time
 import os
+import numpy as np
 import structlog
 
 from flask import abort
 
 from ..benchmark.sr.compare_sr_metrics import compare_sr_metrics
 from ..benchmark.sr.constants import BM_DATA_DIR, BM_RES_DIR
-from ..config.constants import GET_SR_BENCHMARK, SEN2SR_SR_DIR, SR_BANDS, RESOLUTION
-from ..utils.parcel_finder_utils import *
+from ..config.constants import (
+    GET_SR_BENCHMARK,
+    SEN2SR_SR_DIR,
+    SR_BANDS,
+    RESOLUTION,
+    TEMP_DIR,
+)
+from ..utils.parcel_finder_utils import (
+    cut_from_geometry,
+    download_tile_bands,
+    get_geojson_data,
+    get_rgb_composite,
+    get_tiles_polygons,
+    polygon_pixel_size,
+    reset_dir,
+    shape,
+)
 
 from .sr4s.im.get_image_bands import request_date
 
@@ -21,7 +37,15 @@ from sigpac_tools.locate import get_geometry_and_metadata_coords
 logger = structlog.get_logger()
 
 
-def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_reference: bool = True, parcel_geometry: str = None, parcel_metadata: str = None, coordinates: list[float] = None, get_sr_image: bool = True) -> tuple:
+def get_parcel_image(
+    cadastral_reference: str,
+    date: str,
+    is_from_cadastral_reference: bool = True,
+    parcel_geometry: str = None,
+    parcel_metadata: str = None,
+    coordinates: list[float] = None,
+    get_sr_image: bool = True,
+) -> tuple:
     """
     Retrieves a SIGPAC image and data for a specific parcel.
     Arguments:
@@ -46,7 +70,8 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
     elif not is_from_cadastral_reference:
         if not parcel_geometry and not coordinates:
             raise ValueError(
-                "GeoJSON data or parcel coordinates must be provided when not using cadastral reference.")
+                "GeoJSON data or parcel coordinates must be provided when not using cadastral reference."
+            )
         elif parcel_geometry:
             # Retrieve geometry from map drawing geometry
             geometry = json.loads(parcel_geometry)
@@ -56,28 +81,33 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
             try:
                 # Retrieve geometry from coordinates
                 lat, lng = coordinates
-                geometry, metadata = get_geometry_and_metadata_coords('parcela', lat, lng)
+                geometry, metadata = get_geometry_and_metadata_coords(
+                    "parcela", lat, lng
+                )
             except (ValueError, Exception) as e:
-                logger.error(
-                    f"Error finding parcel (probably URBAN) with error: {e}")
-                logger.debug(f"Attempting to use coordinates only...")
-                geometry, metadata = get_geometry_and_metadata_coords('parcela', lat, lng)
+                logger.error(f"Error finding parcel (probably URBAN) with error: {e}")
+                logger.debug("Attempting to use coordinates only...")
+                geometry, metadata = get_geometry_and_metadata_coords(
+                    "parcela", lat, lng
+                )
 
     else:
         raise ValueError(
-            "Cadastral reference missing. Reference must be provided when not using location or GeoJSON/coordinates")
+            "Cadastral reference missing. Reference must be provided when not using location or GeoJSON/coordinates"
+        )
     # Get GeoJSON data and dataframe and list of UTM zones
     os.makedirs(SEN2SR_SR_DIR, exist_ok=True)
     with open(GEOJSON_FILEPATH, "w") as file:
-        file.write(str(geometry).replace("'", '"').replace(
-            "(", "[").replace(")", "]"))  # format GeoJSON correctly
+        file.write(
+            str(geometry).replace("'", '"').replace("(", "[").replace(")", "]")
+        )  # format GeoJSON correctly
     # Get bands for RGB/SR processing
     bands = [b + f"_{RESOLUTION}m" for b in SR_BANDS]
     if not get_sr_image:
         # Remove B08 band
         bands.pop()
 
-    sigpac_image_url = ''
+    sigpac_image_url = ""
     if GET_SR_BENCHMARK:
         geojson_data, gdf = get_geojson_data(geometry, metadata)
         zones_utm = get_tiles_polygons(gdf)
@@ -85,9 +115,14 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
         reset_dir(BM_DATA_DIR)
         reset_dir(BM_RES_DIR)
         sigpac_image_url = download_parcel_image(
-            cadastral_reference, geojson_data, list_zones_utm, year, month, bands)
-    time1 = datetime.now()-init
-    msg1 = f"\nTIME TAKEN (SENTINEL HUB / MINIO + SR4S): {time1}" if sigpac_image_url else ""
+            cadastral_reference, geojson_data, list_zones_utm, year, month, bands
+        )
+    time1 = datetime.now() - init
+    msg1 = (
+        f"\nTIME TAKEN (SENTINEL HUB / MINIO + SR4S): {time1}"
+        if sigpac_image_url
+        else ""
+    )
     init2 = datetime.now()
     try:
         init2 = datetime.now()
@@ -106,29 +141,29 @@ def get_parcel_image(cadastral_reference: str, date: str, is_from_cadastral_refe
             f"{os.path.basename(sigpac_image_name)}"
             f"?v={int(time.time())}"
         )
-        print('sigpac_image_url', sigpac_image_url)
-        msg2 = f"\nTIME TAKEN (SEN2SR): {datetime.now()-init2}"
+        msg2 = f"\nTIME TAKEN (SEN2SR): {datetime.now() - init2}"
 
     except Exception as e:
         # --- FAILOVER/BACKUP DOWNLOAD (Sentinel Hub / MinIO) ---
         logger.error(
-            f"SEN2SR download failed: {e}. Falling back to backup method (SR4S)...")
+            f"SEN2SR download failed: {e}. Falling back to backup method (SR4S)..."
+        )
         sigpac_image_url = download_parcel_image(
-            cadastral_reference, geojson_data, list_zones_utm, year, month, bands)
-    msg3 = ''
+            cadastral_reference, geojson_data, list_zones_utm, year, month, bands
+        )
+    msg3 = ""
     if GET_SR_BENCHMARK:
         init3 = datetime.now()
         compare_sr_metrics()
-        msg3 = f"\nTIME TAKEN (BENCHMARK): {datetime.now()-init3}"
+        msg3 = f"\nTIME TAKEN (BENCHMARK): {datetime.now() - init3}"
 
     logger.debug(f"{msg1 + msg2 + msg3}")
 
     return geometry, metadata, sigpac_image_url
 
 
-def download_sen2sr_parcel_image(geometry, date, delta_days = 15):
-    """
-    Download and super-resolve parcel image cropped from Sentinel imagery cubo data.
+def download_sen2sr_parcel_image(geometry, date, delta_days=15):
+    """Download and super-resolve parcel image cropped from Sentinel CUBO imagery data.
 
     Arguments:
         geometry (dict): Geometry containing the parcel/image's limits.
@@ -145,48 +180,76 @@ def download_sen2sr_parcel_image(geometry, date, delta_days = 15):
             lon, lat = float(poly.centroid.x), float(poly.centroid.y)
             logger.debug(f"Centroid: {lat}, {lon}")
         else:
-            raise ValueError(
-                "Error: No GeoJSON or coordinates provided for parcel.")
+            raise ValueError("Error: No GeoJSON or coordinates provided for parcel.")
         bands = BANDS
 
         sr_size = max(min_size, polygon_pixel_size(geometry))
 
         year, month, day = date.split("-")
-        formatted_date = datetime(
-            year=int(year), month=int(month), day=int(day))
+        formatted_date = datetime(year=int(year), month=int(month), day=int(day))
         end_date = formatted_date.strftime("%Y-%m-%d")
-        start_date = (formatted_date - timedelta(days=delta_days)
-                      ).strftime("%Y-%m-%d")
+        start_date = (formatted_date - timedelta(days=delta_days)).strftime("%Y-%m-%d")
 
-        sigpac_image_name = get_sr_image(lat, lon, start_date, end_date, bands, sr_size, geometry=geometry)
+        # =========================================================================
+        # 🛠️ RUNTIME PATCH: Intercept sen2sr_tools returning a NumPy array for date
+        # =========================================================================
+        orig_download = getattr(get_sr_image, "download_sentinel_cubo", None)
+        if not orig_download:
+            # Depending on how sen2sr_tools structured its internals, find the module function
+            import sen2sr_tools.get_sr_image as sr_mod
+
+            orig_func = sr_mod.download_sentinel_cubo
+
+            def patched_download(*args, **kwargs):
+                cube_data, sample_date = orig_func(*args, **kwargs)
+                # If sample_date is wrapped in a NumPy array or object, flatten it to a clean string
+                if isinstance(sample_date, (np.ndarray, np.datetime64)) or not hasattr(
+                    sample_date, "split"
+                ):
+                    if hasattr(sample_date, "item"):
+                        sample_date = sample_date.item()
+                    # Clean any trailing time/dtype info to match 'YYYY-MM-DD'
+                    sample_date = str(sample_date)[:10]
+                return cube_data, sample_date
+
+            sr_mod.download_sentinel_cubo = patched_download
+        # =========================================================================
+
+        sigpac_image_name = get_sr_image(
+            lat, lon, start_date, end_date, bands, sr_size, geometry=geometry
+        )
 
         return sigpac_image_name
     except Exception:
-        logger.exception(f"Error while getting the SEN2SR image: ")
+        logger.exception("Error while getting the SEN2SR image: ")
         raise
 
 
-def download_parcel_image(cadastral_reference, geojson_data, list_zones_utm, year, month, bands):
+def download_parcel_image(
+    cadastral_reference, geojson_data, list_zones_utm, year, month, bands
+):
     try:
         # Download image bands
-        geometry = geojson_data['features'][0]['geometry']
+        geometry = geojson_data["features"][0]["geometry"]
         rgb_images_path = download_tile_bands(
-            list_zones_utm, year, month, bands, geometry)
+            list_zones_utm, year, month, bands, geometry
+        )
         if not rgb_images_path or len(rgb_images_path) < len(bands):
             error_message = "No images are available for the selected date range. Please choose a different date range for seleceted parcel."
             logger.error(error_message)
             abort(404, description=error_message)
 
         __, png_paths, __ = get_rgb_parcel_image(
-            cadastral_reference, geojson_data, rgb_images_path)
+            cadastral_reference, geojson_data, rgb_images_path
+        )
 
         sigpac_image_name = png_paths.pop()  # there should only be one file
 
         # Upload and fetch latest image
         sigpac_image_url = f"{os.getenv('API_URL')}/uploads/{os.path.basename(sigpac_image_name)}?v={int(time.time())}"
         return sigpac_image_url.split("?")[0]
-    except Exception as e:
-        logger.exception(f"An error occurred (download_parcel_image):\n")
+    except Exception:
+        logger.exception("An error occurred (download_parcel_image):\n")
         raise
 
 
@@ -216,7 +279,7 @@ def get_rgb_parcel_image(cadastral_reference, geojson_data, rgb_images_path):
         )
         if len(unique_formats) > 1:
             raise ValueError(
-                f"Unsupported format. You must upload images in one unique format."
+                "Unsupported format. You must upload images in one unique format."
             )
 
         # Crop the parcel outline using the geomatry available
@@ -224,13 +287,17 @@ def get_rgb_parcel_image(cadastral_reference, geojson_data, rgb_images_path):
         for feature in geojson_data["features"]:
             geometry = feature["geometry"]
             geometry_id = cadastral_reference
-            cropped_parcel_masks_paths.extend(cut_from_geometry(
-                geometry, unique_formats[0], rgb_images_path, geometry_id))
+            cropped_parcel_masks_paths.extend(
+                cut_from_geometry(
+                    geometry, unique_formats[0], rgb_images_path, geometry_id
+                )
+            )
 
         out_dir, png_paths, rgb_tif_paths = get_rgb_composite(
-            cropped_parcel_masks_paths, geojson_data)
+            cropped_parcel_masks_paths, geojson_data
+        )
 
         return out_dir, png_paths, rgb_tif_paths
-    except Exception as e:
-        logger.exception(f"An error occurred (get_rgb_parcel_image):\n")
+    except Exception:
+        logger.exception("An error occurred (get_rgb_parcel_image):\n")
         raise

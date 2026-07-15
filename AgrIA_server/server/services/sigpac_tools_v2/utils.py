@@ -57,8 +57,7 @@ def read_cadastral_registry(cadastral_ref: str) -> dict:
     """
     cadastral_ref = cadastral_ref.upper().replace(" ", "")
     if len(cadastral_ref) != 20:
-        raise ValueError(
-            "The cadastral reference must have a length of 20 characters")
+        raise ValueError("The cadastral reference must have a length of 20 characters")
 
     reg_prov = cadastral_ref[:2]
     reg_mun = cadastral_ref[2:5]
@@ -115,7 +114,7 @@ def get_parcel_metadata_and_geometry(base_endpoint: str) -> dict:
 
 
 def extract_geometry(full_json: dict) -> dict:
-    """ Extract parcel geometry info from all of the individual enclosures geometry data.
+    """Extract parcel geometry info from all of the individual enclosures geometry data.
 
     Parameters:
     ----------
@@ -131,8 +130,7 @@ def extract_geometry(full_json: dict) -> dict:
     """
     full_parcel_geometry = {}
     # Extract all geometries from features
-    all_geometries = [shape(feature["geometry"])
-                      for feature in full_json["features"]]
+    all_geometries = [shape(feature["geometry"]) for feature in full_json["features"]]
 
     if not all_geometries:
         raise ValueError("No geometries found in the provided JSON data.")
@@ -146,8 +144,8 @@ def extract_geometry(full_json: dict) -> dict:
     full_parcel_geometry = mapping(merged_geometry)
 
     # Add CRS
-    crs = f'{str(full_json["crs"]["type"]).lower()}:{full_json["crs"]["properties"]["code"]}'
-    full_parcel_geometry['CRS'] = crs
+    crs = f"{str(full_json['crs']['type']).lower()}:{full_json['crs']['properties']['code']}"
+    full_parcel_geometry["CRS"] = crs
     logger.info("Extracted geometry successfully.")
 
     return full_parcel_geometry
@@ -185,21 +183,31 @@ def extract_metadata(full_json: dict) -> dict:
         inctexto = None
 
         # Query info
-        query_cols = ["admisibilidad", "altitud", "coef_regadio", "incidencias",
-                      "pendiente_media", "recinto", "region", "uso_sigpac"]
+        query_cols = [
+            "admisibilidad",
+            "altitud",
+            "coef_regadio",
+            "incidencias",
+            "pendiente_media",
+            "recinto",
+            "region",
+            "uso_sigpac",
+        ]
         query_entry = {col: properties.get(col) for col in query_cols}
-        query_entry.update({
-            "dn_surface": superficie_admisible,
-            "inctexto": inctexto,
-            "superficie_admisible": superficie_admisible,
-            "uso_sigpac": uso_sigpac
-        })
+        query_entry.update(
+            {
+                "dn_surface": superficie_admisible,
+                "inctexto": inctexto,
+                "superficie_admisible": superficie_admisible,
+                "uso_sigpac": uso_sigpac,
+            }
+        )
 
         # Land use info
         land_use_entry = {
             "dn_superficie": dn_surface,
             "superficie_admisible": dn_surface,
-            "uso_sigpac": properties.get("uso_sigpac")
+            "uso_sigpac": properties.get("uso_sigpac"),
         }
 
         # Append to lists
@@ -210,13 +218,9 @@ def extract_metadata(full_json: dict) -> dict:
         total_surface += dn_surface
 
     # Parcel info
-    parcel_info_cols = ["provincia", "municipio",
-                        "agregado", "poligono", "parcela"]
+    parcel_info_cols = ["provincia", "municipio", "agregado", "poligono", "parcela"]
     parcel_info_entry = {col: properties.get(col) for col in parcel_info_cols}
-    parcel_info_entry.update({
-        "referencia_cat": "",
-        "dn_surface": total_surface
-    })
+    parcel_info_entry.update({"referencia_cat": "", "dn_surface": total_surface})
 
     # --- GROUP LAND USES ---
     land_use_summary = defaultdict(float)
@@ -227,8 +231,11 @@ def extract_metadata(full_json: dict) -> dict:
 
     # Convert back to list of dicts for output
     land_use_grouped = [
-        {"uso_sigpac": uso, "dn_superficie": round(
-            area, 4), "superficie_admisible": round(area, 4)}
+        {
+            "uso_sigpac": uso,
+            "dn_superficie": round(area, 4),
+            "superficie_admisible": round(area, 4),
+        }
         for uso, area in land_use_summary.items()
     ]
 
@@ -242,14 +249,16 @@ def extract_metadata(full_json: dict) -> dict:
         "query": query,
         "usos": land_use_grouped,
         "vigencia": None,
-        "vuelo": None
+        "vuelo": None,
     }
     logger.info("Extracted metadata successfully.")
 
     return full_parcel_metadata
 
 
-def build_cadastral_reference(province: str, municipality: str, polygon: str, parcel_id: str):
+def build_cadastral_reference(
+    province: str, municipality: str, polygon: str, parcel_id: str
+):
     """
     Generates a valid RURAL cadastral reference with calculated control characters.
 
@@ -260,15 +269,15 @@ def build_cadastral_reference(province: str, municipality: str, polygon: str, pa
         parcel_id (str): Parcel ID. Max: 5 digits.
 
     Returns:
-        cadastral_reference (str) 
+        cadastral_reference (str)
     """
 
     # --- 1. Prepare base components ---
     # Province (2 chars)
-    prov = province.split('-')[0].zfill(2)
+    prov = province.split("-")[0].zfill(2)
 
     # Municipality (3 chars)
-    muni = municipality.split('-')[0].zfill(3)
+    muni = municipality.split("-")[0].zfill(3)
 
     # Section (1 char) -> Use non-digit (e.g., "A") to ensure RURAL
     section = "A"
@@ -314,8 +323,7 @@ def get_control_characters(partial_ref: str) -> str:
         if ch.isdigit():
             sum_pd1 += pos[i] * (ord(ch) - 48)
         else:
-            sum_pd1 += pos[i] * ((ord(ch) - 63) if ord(ch)
-                                 > 78 else (ord(ch) - 64))
+            sum_pd1 += pos[i] * ((ord(ch) - 63) if ord(ch) > 78 else (ord(ch) - 64))
 
     # Next 7 characters
     for i in range(7):
@@ -323,8 +331,7 @@ def get_control_characters(partial_ref: str) -> str:
         if ch.isdigit():
             sum_sd2 += pos[i] * (ord(ch) - 48)
         else:
-            sum_sd2 += pos[i] * ((ord(ch) - 63) if ord(ch)
-                                 > 78 else (ord(ch) - 64))
+            sum_sd2 += pos[i] * ((ord(ch) - 63) if ord(ch) > 78 else (ord(ch) - 64))
 
     # Mixt calculation (last 4 digits before control)
     for i in range(4):
@@ -365,8 +372,7 @@ def validate_cadastral_reference(reference: str) -> None:
     res = "MQWERTYUIOPASDFGHJKLBZX"
 
     if len(reference) != 20:
-        raise ValueError(
-            "The cadastral reference must have a length of 20 characters")
+        raise ValueError("The cadastral reference must have a length of 20 characters")
     else:
         separated_ref = list(reference)
 

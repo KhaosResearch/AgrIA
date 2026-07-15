@@ -3,10 +3,15 @@ import math
 import numpy as np
 import random
 import rasterio
+import structlog
+
 from PIL import Image
 from rasterio.transform import from_bounds
 from sentinelhub import BBox, CRS
+
 from ..constants import LAT_MIN, LAT_MAX, LON_MIN, LON_MAX
+
+logger = structlog.get_logger(__file__)
 
 
 def get_bbox_from_zoom(lat, lon, size, zoom):
@@ -18,7 +23,7 @@ def get_bbox_from_zoom(lat, lon, size, zoom):
     zoom: Maps' zoom level
     """
     # meters per pixel at this latitude and zoom
-    mpp = 156543.03392 * math.cos(math.radians(lat)) / (2 ** zoom)
+    mpp = 156543.03392 * math.cos(math.radians(lat)) / (2**zoom)
 
     # total size in meters
     width_m = size[0] * mpp
@@ -65,11 +70,10 @@ def get_zoom_from_bbox(bbox: BBox, size: tuple):
     # Sentinel resolution (meters per pixel)
     mpp_x = width_m / size[0]
     mpp_y = height_m / size[1]
-    mpp = (mpp_x + mpp_y) / 2   # average
+    mpp = (mpp_x + mpp_y) / 2  # average
 
     # Compute Google zoom
-    zoom_float = math.log2(
-        (156543.03392 * math.cos(math.radians(lat_center))) / mpp)
+    zoom_float = math.log2((156543.03392 * math.cos(math.radians(lat_center))) / mpp)
     zoom = max(0, min(21, round(zoom_float)))  # clamp to [0,21]
 
     return zoom  # , google_bbox
@@ -108,7 +112,9 @@ def get_bbox_from_center(lat, lon, width_px, height_px, resolution_m):
     return BBox(bbox=[min_lon, min_lat, max_lon, max_lat], crs=CRS.WGS84)
 
 
-def get_n_random_coordinate_pairs(amount: int, bounded_zone=[LAT_MIN, LAT_MAX, LON_MIN, LON_MAX]):
+def get_n_random_coordinate_pairs(
+    amount: int, bounded_zone=[LAT_MIN, LAT_MAX, LON_MIN, LON_MAX]
+):
     """
     Generate random coordinates from a bounded zone.
 
@@ -196,7 +202,8 @@ def generate_evalscript(
 
     # apply stretch for each band
     out_expr = ", ".join(
-        [f"{stretch.replace('val', f'sample.{b}')}{mult}" for b in bands])
+        [f"{stretch.replace('val', f'sample.{b}')}{mult}" for b in bands]
+    )
 
     return f"""
 //VERSION=3
@@ -265,7 +272,7 @@ def perform_image_sanity_check(lat, lon, image_bytes):
 
     # # Quick sanity check: if file is too small, probably "no imagery"
     # if len(image_bytes) < 15_000:  # tweak threshold as needed
-    #     print(f"No imagery (small file) at {lat},{lon}")
+    #     logger.error(f"No imagery (small file) at {lat},{lon}")
     #     return False
 
     # Check if the image is mainly white (no imagery available)
@@ -275,7 +282,7 @@ def perform_image_sanity_check(lat, lon, image_bytes):
 
     # If almost all pixels are very bright (white background) and there's little variation, it's probably "no imagery"
     if np.mean(arr) > 230 and std_val < 15:
-        print(f"No imagery available for {lat},{lon}")
+        logger.error(f"No imagery available for {lat},{lon}")
         has_imagery = False
 
     return has_imagery

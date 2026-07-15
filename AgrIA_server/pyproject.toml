@@ -1,0 +1,54 @@
+[project]
+name = "agria-server"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+
+dependencies = [
+    "numpy>=2.0",
+    "pandas>=2.3",
+    "gunicorn",
+    "flask",
+    "flask-cors",
+    "python-dotenv",
+    "google-genai",
+    "structlog",
+    "minio",
+    "requests",
+    "geopandas>=1.1",
+    "shapely>=2.0",
+    "pyproj>=3.7",
+    "rasterio>=1.4",
+    "fiona>=1.10",
+    "torch==2.4.*",
+    "torchvision==0.19.*",
+    "matplotlib",
+    "pillow",
+    "opencv-python",
+    "stackstac>=0.5.1",
+    "scikit-image",
+    "rioxarray",
+    "sentinelhub",
+    "safetensors",
+    "protobuf",
+    "langchain-core>=1.4.9",
+    "langchain-openai>=1.3.4",
+    "ruff>=0.15.20",
+    "pytest>=9.1.1",
+    "pytest-mock>=3.15.1",
+    "sen2sr-tools",
+    "sigpac-tools",
+    "fastapi>=0.139.0",
+    "uvicorn>=0.51.0",
+    "python-multipart>=0.0.32",
+]
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-mock",
+    "flake8",
+    "autopep8",
+]
+
+[tool.uv.sources]
+sen2sr-tools = { git = "https://github.com/KhaosResearch/sen2sr-tools.git", rev = "dev" }
+sigpac-tools = { git = "https://github.com/KhaosResearch/sigpac-tools.git", rev = "dev" }

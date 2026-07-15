@@ -4,6 +4,7 @@ import { ChatAssistantService } from '../../../services/chat-assistant.service/c
 import { MarkdownModule } from 'ngx-markdown';
 import { NotificationService } from '../../../services/notification.service/notification.service';
 import DOMPurify from 'dompurify';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-chat-assistant',
@@ -22,7 +23,7 @@ export class ChatAssistantComponent {
     },
   ];
   // Index of the first message after chat sanitizaion
-  private firstIndex: number = 8;
+  private firstIndex: number = 0;
   // Miliscendos delay to display Chat Assistant's replies
   private milisecondsDisplay: number = 3;
   // HTML element to automatically scroll to the bototm
@@ -31,6 +32,8 @@ export class ChatAssistantComponent {
   public chatAssistantService: ChatAssistantService = inject(ChatAssistantService);
   // Service for notifications
   private notificationService = inject(NotificationService);
+  // Translation service
+  private translateService = inject(TranslateService);
 
   ngOnInit() {
     if (this.chatHistory.length <= 1) {
@@ -75,7 +78,24 @@ export class ChatAssistantComponent {
     let sanitized_history = response.slice(index);
 
     // Remove image descriptions requests data
-    sanitized_history = sanitized_history.filter(msg => !msg.content.includes('###DESCRIBE'));
+    // Locate the message containing the DESCRIBE tag and slice out the prefix data
+    sanitized_history = sanitized_history.map(msg => {
+      if (msg.content.includes('###DESCRIBE')) {
+        // Split by line break + 3 backticks
+        const parts = msg.content.split('\n```');
+
+        if (parts.length > 1) {
+          // Join everything after the first split point back together (in case there are multiple code blocks)
+          // and prepend the 3 backticks we stripped during the split action
+          return {
+            ...msg,
+            content: '```' + parts.slice(1).join('\n```')
+          };
+        }
+      }
+      return msg;
+    });
+    
     return sanitized_history;
   }
 
@@ -113,6 +133,7 @@ export class ChatAssistantComponent {
     const formData = new FormData();
     formData.append('image', imageFile);
     formData.append('isDetailedDescription', String(isDetailedDescription));
+    formData.append('lang', String(this.translateService.currentLang));
 
     this.chatAssistantService.sendImage(formData).subscribe({
       next: (responseText: string) => {

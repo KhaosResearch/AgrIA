@@ -1,8 +1,10 @@
 # Agricultural Imaging Assistant (AgrIA)
 
 <div align="center">
-  <img src="./assets/img/logo.png" alt="AgrIA Logo" width="300"/>
+  <img src="./docs/assets/img/logo.png" alt="AgrIA Logo" width="300"/>
 </div>
+
+<p align="center">
 
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
@@ -17,13 +19,17 @@
 ![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4?logo=prettier&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-Proxy-009639?logo=nginx&logoColor=white)
 
-![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-3.0+-000000?logo=flask&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.4.1-EE4C2C?logo=pytorch&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![API](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.9.1-EE4C2C?logo=pytorch&logoColor=white)
 ![GeoPandas](https://img.shields.io/badge/GeoPandas-Enabled-139C5A?logo=pandas&logoColor=white)
 ![SentinelHub](https://img.shields.io/badge/SentinelHub-Active-blue)
-![Conda](https://img.shields.io/badge/conda-forge-342B029?logo=anaconda&logoColor=white)
-![Flake8](https://img.shields.io/badge/linter-flake8-blueviolet)
+![uv](https://img.shields.io/badge/package_manager-uv-DE5FE9?logo=uv&logoColor=white)
+![Ruff](https://img.shields.io/badge/linter-ruff-blueviolet)
+
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+
+</p>
 
 AgrIA (Agricultural Image Assistant) is an **integrated image analysis and intelligent chat tool that specializes in agricultural satellite image classification**. Designed to assist farmers and landowners, AgrIA facilitates crop valuation and provides a report that helps them **qualify for various European Union eco-scheme aids within the framework of the Common Agricultural Policy (CAP).** It is currently only applicalbe to Spain's national territory and fields, but allows modification to adapt to other EU member states.
 
@@ -55,7 +61,8 @@ In order to get AgrIA started, you will need to assign the essential environment
     ```
 2. **Set the variables:** Depending whether you choose **Option 1** (*User mode*) or **Option 2** (*Dev mode*), configure the variables as you need.
 
-> *NOTE:* The `NON-ESSENTIAL VARIABLES` may be assigned but will only be used for benchmarking purposes (available by modifying the code in *Dev mode*).
+> [!NOTE]
+> The `NON-ESSENTIAL VARIABLES` may be assigned but will only be used for benchmarking purposes (available by modifying the code in *Dev mode*).
 
 ### Option 1: Docker (User mode)
 You can easily deploy AgrIA by installing **[Docker](https://docs.docker.com/get-started/get-docker/)** and running the following command:
@@ -82,11 +89,11 @@ ng serve
 2. Open a new terminal window on root dir to setup and run the backend:
 ```bash
 cd AgrIA_server
-conda env create -f environment.yml -y
-conda activate agria_server_env
+uv sync
+source .venv/bin/activate  # .venv/scripts/activate
 python run.py
 ```
-Everything should be up and running at `http://localhost:4200`, which is the default port. If you are using another one (by running `ng serve XXXX`), make sure to update the `AgrIA_server/.env` file.
+Everything should be up and running at `http://localhost:4200`, which is the default port. If you are using another one (by running `ng serve XXXX`), make sure to update the `AgrIA_server/.env` file so backend will know where UI is.
 
 ## AgrIA's pipeline:
 In order to find the parcel, users have 3 options:
@@ -96,7 +103,7 @@ In order to find the parcel, users have 3 options:
 
 The following diagram details AgrIA`s parcel finding pipeline when both image and metadata are returned.:
 
-<img src="./assets/img/AgrIA_diagram.png" alt="AgrIA's process Diagram" style="display: block; margin-left: auto; margin-right: auto;">
+<img src="./docs/assets/img/AgrIA_diagram.png" alt="AgrIA's process Diagram" style="display: block; margin-left: auto; margin-right: auto;">
 
 ### Diagram explanation
 #### Land use automatic extraction (Spain only)
@@ -111,7 +118,7 @@ The following diagram details AgrIA`s parcel finding pipeline when both image an
 
 <center>
 
-![Upscaled Output](assets/examples/example.png)
+![Upscaled Output](docs/assets/examples/example.png)
 
 </center>
 
