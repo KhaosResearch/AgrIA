@@ -4,7 +4,7 @@
   <img src="./docs/assets/img/logo.png" alt="AgrIA Logo" width="300"/>
 </div>
 
-<center>
+<p align="center">
 
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
@@ -29,7 +29,7 @@
 
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 
-</center>
+</p>
 
 AgrIA (Agricultural Image Assistant) is an **integrated image analysis and intelligent chat tool that specializes in agricultural satellite image classification**. Designed to assist farmers and landowners, AgrIA facilitates crop valuation and provides a report that helps them **qualify for various European Union eco-scheme aids within the framework of the Common Agricultural Policy (CAP).** It is currently only applicalbe to Spain's national territory and fields, but allows modification to adapt to other EU member states.
 
@@ -89,11 +89,11 @@ ng serve
 2. Open a new terminal window on root dir to setup and run the backend:
 ```bash
 cd AgrIA_server
-conda env create -f environment.yml -y
-conda activate agria_server_env
+uv sync
+source .venv/bin/activate  # .venv/scripts/activate
 python run.py
 ```
-Everything should be up and running at `http://localhost:4200`, which is the default port. If you are using another one (by running `ng serve XXXX`), make sure to update the `AgrIA_server/.env` file.
+Everything should be up and running at `http://localhost:4200`, which is the default port. If you are using another one (by running `ng serve XXXX`), make sure to update the `AgrIA_server/.env` file so backend will know where UI is.
 
 ## AgrIA's pipeline:
 In order to find the parcel, users have 3 options:
