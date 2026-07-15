@@ -1,47 +1,35 @@
-# Use a base image that already has Python and Miniconda (recommended since you use Conda)
-# We use a slim Python image for smaller size, but add Conda/Mamba for environment management
-FROM condaforge/mambaforge:latest
+FROM python:3.12-slim
 
-# -----------------------
-# System dependencies
-# -----------------------
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        libgl1 \
-        libglib2.0-0 \
+# Set working directory
+WORKDIR /agria_app
+
+# Python & UV optimization flags
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_CACHE_DIR=/agria_app/.uv_cache
+
+# Install minimal OS requirements for git dependencies and builds
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    libgl1 \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# -----------------------
-# Set working directory
-# -----------------------
-WORKDIR /app
+# Pull UV binary globally
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# -----------------------
-# Install Python/Conda deps
-# -----------------------
+# Leverage Docker cache for dependencies
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev
 
-# Copy the Conda environment file
-COPY environment-docker.yml .
-
-# Create the Conda environment using Mamba (faster than Conda)
-RUN mamba env update --file environment-docker.yml && \
-    mamba clean -afy
-
-# Make environment detected globally
-ENV CONDA_DEFAULT_ENV=agria_server_env
-ENV PATH="/opt/conda/envs/agria_server_env/bin:$PATH"
-
-# -----------------------
-# Copy code AFTER env build for caching
-# -----------------------
+# Copy the rest of the application
 COPY . .
 
-# -----------------------
-# Expose API port
-# -----------------------
+# Expose the API port
 EXPOSE 5000
 
-# -----------------------
-# CMD for runtime
-# -----------------------
-CMD ["/bin/bash", "./start.sh"]
+# Run directly through uv (async mode)
+CMD ["uv", "run", "gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-w", "4", "-b", "0.0.0.0:5000", "run:app"]

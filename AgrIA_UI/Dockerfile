@@ -11,7 +11,7 @@ WORKDIR /app
 # Copy only dependency files first (better build caching)
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
 # Copy remaining app files
 COPY . .
@@ -20,7 +20,7 @@ COPY . .
 RUN sed -i "s|apiUrl: 'http://backend:5000'|apiUrl: '${API_URL_ENV}'|" src/environments/environment.docker.ts
 
 # Build Angular optimized for Docker target
-RUN npm run build -- --configuration docker --base-href=/ --optimization=false
+RUN npm run build -- --configuration docker --base-href=/ --optimization=true
 
 
 # -----------------------
@@ -28,7 +28,10 @@ RUN npm run build -- --configuration docker --base-href=/ --optimization=false
 # -----------------------
 FROM nginx:alpine
 
-# Optional custom NGINX config (enables SPA routing)
+# Clean default assets to prevent caching ghost files
+RUN rm -rf /usr/share/nginx/html/*
+
+# Custom NGINX config (Essential for SPA routing like Angular's RouterModule)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built app from previous stage
@@ -37,3 +40,4 @@ COPY --from=build /app/dist/agria-ui/browser /usr/share/nginx/html
 EXPOSE 80
 
 # Nginx default CMD will serve the app
+CMD ["nginx", "-g", "daemon off;"]
