@@ -23,28 +23,24 @@ def hello_world():
 
 
 @router.post("/send-user-input")
-def send_user_input(userInput: str = Form(...)):
-    try:
-        response_text = generate_user_response(userInput)
-        return {"response": response_text}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/send-image")
-def send_image(
-    image: UploadFile = File(...),
+def send_user_input(
+    userMessage: str = Form(...),
+    image: UploadFile | str = File(...),
     isDetailedDescription: str = Form("false"),
     lang: str = Form("en"),
 ):
+    logger.debug(f"GOT: {userMessage}, {image}, {isDetailedDescription}, {lang}")
     try:
         is_detailed_description = "true" in isDetailedDescription.lower()
-        response_text = get_image_description(
-            image.file, image.filename, lang, is_detailed_description
-        )
+        
+        if not isinstance(image, str):
+            file, filename = image.file, image.filename
+        else:
+            file, filename = None, None
+        response_text = generate_user_response(userMessage, is_detailed_description, lang, file, filename)
+        logger.debug(f"response_text: {response_text}")
         return {"response": response_text}
     except Exception as e:
-        logger.exception("Error sending image:\n")
         raise HTTPException(status_code=500, detail=str(e))
 
 

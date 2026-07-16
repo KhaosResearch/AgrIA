@@ -21,12 +21,16 @@ export class ChatComponent {
   public imageFile: File | null = null;
   // Image URL/path for the preview module
   public imagePreviewUrl: string | null = null;
+  // Pending Uploaded Image file (waiting to be sent)
+  public uploadImageFile: File | null = null;
+  // Pending Image URL/path (waiting to be sent)
+  public uploadImagePreviewUrl: string | null = null;
   // Parcel's image information
   public parcelImageInfo: string = '...';
   // User's chat input
   public userInput: string = '';
   // User preference for longer image description
-  protected isDetailedDescription: boolean = false;
+  public isDetailedDescription: boolean = false;
   // Loading variable for styling
   public isLoading: WritableSignal<boolean> = signal(false);
 
@@ -138,26 +142,24 @@ export class ChatComponent {
   }
 
   /**
-   * Reads file and displays image on image preview module.
+   * Reads image file and stores it pending send user input.
    *
    * @param event
    */
   public onFileSelected(event: any): void {
     const files = event.target.files;
     if (files.length > 0) {
-      this.imageFile = files[0] as File;
-      this.chatAssistant.sendImage(this.imageFile, this.isDetailedDescription);
-      this.parcelImageInfo = 'FECHA: *Sin datos*\nCULTIVO: *Sin datos*';
+      this.uploadImageFile = files[0] as File;
 
       // Create a preview URL
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.imagePreviewUrl = e.target.result;
+        this.uploadImagePreviewUrl = e.target.result;
       };
-      reader.readAsDataURL(this.imageFile as Blob);
+      reader.readAsDataURL(this.uploadImageFile as Blob);
     } else {
-      this.imageFile = null;
-      this.imagePreviewUrl = null;
+      this.uploadImageFile = null;
+      this.uploadImagePreviewUrl = null;
     }
   }
 
@@ -189,7 +191,19 @@ export class ChatComponent {
       return;
     }
     if (this.userInput.trim()) {
-      this.chatAssistant.addUserMessage(this.userInput);
+      this.chatAssistant.addUserMessage(this.userInput, this.uploadImageFile, this.isDetailedDescription);
+      if(this.uploadImageFile){
+        this.imageFile = this.uploadImageFile;
+        this.imagePreviewUrl = this.uploadImagePreviewUrl;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(this.uploadImageFile as Blob);
+
+        this.uploadImageFile = null;
+        this.uploadImagePreviewUrl = null;
+        this.parcelImageInfo = "..."
+      }
+
       this.clearUserInput();
     }
   }
