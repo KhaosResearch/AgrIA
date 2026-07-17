@@ -164,6 +164,14 @@ export class ChatComponent {
   }
 
   /**
+   * Removes uploaded file
+   */
+  public removeUploadedFile() {
+    this.uploadImageFile = null;
+    this.uploadImagePreviewUrl = null;
+
+  }
+  /**
    * Check if the Chat Assistatn is still loading its reply
    * @returns boolean
    */

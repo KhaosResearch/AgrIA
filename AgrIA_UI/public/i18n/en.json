@@ -128,6 +128,7 @@
     "selectedParcel": "Selected Parcel",
     "previewAlt": "Parcel Image",
     "uploadImageAlt": "Upload image",
+    "removeImageAlt": "Remove uploaded image",
     "detailedDescription": "Detailed description.",
     "confirmParcel": "Confirm Parcel",
     "tab": {

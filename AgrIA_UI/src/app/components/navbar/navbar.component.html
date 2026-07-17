@@ -35,7 +35,7 @@
           (click)="toggleTheme()"
           title="{{ isDarkMode() ? ('nav.theme.light' | translate) : ('nav.theme.dark' | translate) }}">
           @if (this.isDarkMode()) {
-            <span>&#9788;</span>
+            <span class="light-symbol">&#9788;</span>
           } @else {
             <span>&#9790;</span>
           }
