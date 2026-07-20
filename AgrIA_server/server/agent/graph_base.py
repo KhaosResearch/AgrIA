@@ -54,7 +54,6 @@ def execute_scoped_chat(
     lang = state.get("lang", "es") if get_lang else ""
     user_input = state["messages"][-1].content
 
-    # Dynamically pull the file asset (e.g., 'ROLE.md' or 'FALLBACK.md')
     system_instruction = load_prompt_asset(lang, prompt_filename)
 
     chat = LocalChat(
@@ -86,12 +85,10 @@ def deterministic_router(state: AgrIAState) -> str:
     last_message = state["messages"][-1]
     text_content = str(last_message.content).lower().strip()
 
-    # Check 1: Direct feature triggers
     if "###describe_short_image###" in text_content:
         logger.debug(f"REPORT GENERATION DETECTED")
         return "report_generator"
 
-    # Check 2: Simple text matches via regex rules
     greetings = (
         r"\b(hola|buenos dias|buenas tardes|hi|hello|hey|quien eres|who are you)\b"
     )
@@ -99,7 +96,6 @@ def deterministic_router(state: AgrIAState) -> str:
         logger.debug(f"BASIC CHAT 1 DETECTED")
         return "basic_chat"
 
-    # Check 3: Check agricultural scope keyword domain list
     active_keywords = domain_vocabulary.get(state.get("lang", "es"), [])
     if any(kw in text_content for kw in active_keywords):
         logger.debug(f"BASIC CHAT 2 DETECTED")

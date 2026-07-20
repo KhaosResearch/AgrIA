@@ -2,7 +2,7 @@ import json
 from langchain_core.messages import HumanMessage
 
 
-from ...config.constants import BASE_PROMPTS_PATH
+from ...config.constants import BASE_CONTEXT_PATH, BASE_PROMPTS_PATH
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
 
@@ -73,7 +73,7 @@ if __name__ == "__main__":
         "visual_description": None,
     }
 
-    json_filepath = "/home/miguel/Dev/AgrIA/AgrIA_server/assets/LLM_assets/context/files/26002A001000010000EQ_example_es.json"
+    json_filepath = BASE_CONTEXT_PATH / "files/26002A001000010000EQ_example_es.json"
     with open(json_filepath, "r", encoding="utf-8") as f:
         mock_state["crop_metadata"] = json.load(f)
 
