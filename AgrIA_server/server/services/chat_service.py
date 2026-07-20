@@ -201,7 +201,7 @@ def get_summarised_chat(chat_history):
     """
     try:
         chat_message_history = get_role_and_content(chat_history)
-        system_prompt = "You are an expert chat summarizer. Retain the most important parts and higligh all nuances needed to carry on with a conversation."
+        system_prompt = "You are an expert chat summarizer. Retain the most important parts and higlight all nuances needed to carry on with a conversation."
         instruction = "Summarise this chat history in 100-200 words aprox. Make emphasis on the last 5 chat entries:"
         msg = [
             ("system", system_prompt),
