@@ -18,6 +18,9 @@
 *out*
 *.json
 
+# Custom
+misc/
+
 # Docker/Compose metadata
 .dockerignore
 
