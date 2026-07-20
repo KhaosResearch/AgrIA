@@ -7,7 +7,6 @@ from fastapi import APIRouter, Form, UploadFile, File, HTTPException
 from server.config.chat_config import CHAT as chat
 from server.services.chat_service import (
     generate_user_response,
-    get_image_description,
     get_parcel_description,
     get_role_and_content,
     get_suggestion_for_chat,
