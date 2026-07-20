@@ -14,7 +14,13 @@ from ..utils.llm_utils import get_aux_image_description
 logger = structlog.getLogger()
 
 
-def generate_user_response(user_input: str, is_detailed_description: bool, lang: str, file = None, filename: str= None) -> str:
+def generate_user_response(
+    user_input: str,
+    is_detailed_description: bool,
+    lang: str,
+    file=None,
+    filename: str = None,
+) -> str:
     """
     Sends user input to chat and retrieves output.
     Args:
@@ -28,8 +34,14 @@ def generate_user_response(user_input: str, is_detailed_description: bool, lang:
     try:
         final_input = user_input
         if None not in [file, filename]:
-            input_for_llm, image_context_prompt = get_image_description(file, filename, lang, is_detailed_description)
-            final_input = str("\n\n".join([image_context_prompt, "\n".join(input_for_llm),  user_input]))
+            input_for_llm, image_context_prompt = get_image_description(
+                file, filename, lang, is_detailed_description
+            )
+            final_input = str(
+                "\n\n".join(
+                    [image_context_prompt, "\n".join(input_for_llm), user_input]
+                )
+            )
         response = chat.send_message(final_input)
         return response.text
     except Exception as e:
@@ -105,6 +117,7 @@ def get_parcel_description(
         json_data = calculate_ecoscheme_payment(image_context_data[lang], lang)
         with open(TEMP_DIR / "ecoscheme_data.json", "w") as f:
             import json
+
             json.dump(json_data, f, indent=4)
 
         # Insert image context prompt and read image desc file

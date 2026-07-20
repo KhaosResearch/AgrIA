@@ -10,9 +10,15 @@ from PIL import Image
 
 logger = structlog.get_logger(__file__)
 
+
 class LocalChat:
     def __init__(
-        self, client, model_name: str, system_instruction: str, history_init=None, max_context_tokens: int = 30000
+        self,
+        client,
+        model_name: str,
+        system_instruction: str,
+        history_init=None,
+        max_context_tokens: int = 30000,
     ):
         self.client = client
         self.model_name = model_name
@@ -29,16 +35,18 @@ class LocalChat:
         """Replicates the history tracking endpoint expected by chat.py."""
         # Returns the underlying list of LangChain messages
         return self.history.messages
-    
+
     def _count_tokens(self, messages: list[BaseMessage]) -> int:
         """
-        Crude local token estimation. 
+        Crude local token estimation.
         For precise production matching, use `tiktoken` or `transformers.AutoTokenizer`.
         """
         total_tokens = 0
         for msg in messages:
             if isinstance(msg.content, str):
-                total_tokens += len(msg.content) // 4  # Rough heuristic: 4 chars ~ 1 token
+                total_tokens += (
+                    len(msg.content) // 4
+                )  # Rough heuristic: 4 chars ~ 1 token
             elif isinstance(msg.content, list):
                 for item in msg.content:
                     if item.get("type") == "text":
@@ -51,19 +59,23 @@ class LocalChat:
         """Invokes the client to compress older conversation history."""
         if not messages_to_summarize:
             return ""
-        
+
         # Format history into text for the summarizer
         formatted_history = []
         for m in messages_to_summarize:
             role = "User" if isinstance(m, HumanMessage) else "Assistant"
-            content = m.content if isinstance(m.content, str) else "[Multimodal Content]"
+            content = (
+                m.content if isinstance(m.content, str) else "[Multimodal Content]"
+            )
             formatted_history.append(f"{role}: {content}")
-        
+
         history_text = "\n".join(formatted_history)
-        
+
         system_prompt = "You are an expert chat summarizer. Retain crucial operational constraints, context, decisions, and facts."
-        instruction = "Summarize this historical chat segment efficiently in 150-250 words:"
-        
+        instruction = (
+            "Summarize this historical chat segment efficiently in 150-250 words:"
+        )
+
         msg = [
             ("system", system_prompt),
             ("human", f"{instruction}\n\n{history_text}"),
@@ -82,16 +94,20 @@ class LocalChat:
         all_tokens = self._count_tokens(all_messages) + self._count_tokens([user_msg])
 
         logger.debug(f"Counted Tokens: {all_tokens}")
-        logger.debug(f"{all_tokens} > {self.max_context_tokens}? {all_tokens > self.max_context_tokens}")
+        logger.debug(
+            f"{all_tokens} > {self.max_context_tokens}? {all_tokens > self.max_context_tokens}"
+        )
 
         # If safely under budget, change nothing
         if all_tokens <= self.max_context_tokens:
             return
-        
+
         self.summarize_history()
-    
+
     def summarize_history(self):
-        logger.info(f"Context length exceeded threshold {self.max_context_tokens} max)! Managing history memory...")
+        logger.info(
+            f"Context length exceeded threshold {self.max_context_tokens} max)! Managing history memory..."
+        )
 
         all_messages = self.history.messages
 
@@ -107,7 +123,7 @@ class LocalChat:
 
         # Summarize the middle segment
         summary_text = self._summarize_old_history(middle_messages)
-        
+
         # Build memory injection block
         memory_message = SystemMessage(
             content=f"--- CONTEXT SUMMARY OF OLDER CONVERSATION ---\n{summary_text}\n--------------------------------------------"
@@ -115,13 +131,13 @@ class LocalChat:
 
         # Re-build memory with: [System Message] -> [Context Summary] -> [Recent Context turns]
         new_messages = [system_message, memory_message] + recent_messages
-        
+
         # Clear and swap internal storage
         self.history.clear()
         self.history.add_messages(new_messages)
 
         logger.debug(f"New history entries: {len(self.history.messages)}")
-    
+
     def _process_input_item(self, item):
         """Converts local inputs (strings, files, or PIL Images) into OpenAI-compatible structures."""
         # 1. Handle Text
@@ -215,4 +231,3 @@ class LocalChat:
                 return self.send_message(content_input, False)
 
             raise e
-

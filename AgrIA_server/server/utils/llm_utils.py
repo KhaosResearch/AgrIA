@@ -162,7 +162,9 @@ def load_documents_from_json(
     return documents
 
 
-def set_initial_history(documents_json_path: str = CONTEXT_DOCUMENTS_FILE)->list[BaseMessage]:
+def set_initial_history(
+    documents_json_path: str = CONTEXT_DOCUMENTS_FILE,
+) -> list[BaseMessage]:
     """
     Constructs the initial LangChain message history session,
     injecting context documents dynamically without heavy vector search overhead.

@@ -7,12 +7,16 @@ from ..utils.llm_utils import generate_system_instructions, set_initial_history
 
 
 def create_chat(
-    llm_client = client,
+    llm_client=client,
     model_name: str = LLM_MODEL_NAME,
     system_instruction: str = None,
     chat_history: list[BaseMessage] = None,
 ):
-    sys_instruction = generate_system_instructions() if system_instruction is None else system_instruction
+    sys_instruction = (
+        generate_system_instructions()
+        if system_instruction is None
+        else system_instruction
+    )
     chat_history = set_initial_history() if chat_history is None else chat_history
 
     chat = LocalChat(

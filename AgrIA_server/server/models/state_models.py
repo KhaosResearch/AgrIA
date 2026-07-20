@@ -1,6 +1,7 @@
 from typing import TypedDict, Optional
 from langchain_core.messages import BaseMessage
 
+
 # Define the clean State representation for LangGraph
 class AgrIAState(TypedDict):
     messages: list[BaseMessage]

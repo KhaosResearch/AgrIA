@@ -6,10 +6,12 @@ from ...config.constants import BASE_PROMPTS_PATH
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
 
+
 def load_prompt_template(lang: str, filename: str) -> str:
     """Loads prompt files from our prompts-as-code folder."""
     file_path = BASE_PROMPTS_PATH / lang / filename
     return file_path.read_text(encoding="utf-8")
+
 
 def generate_report_node(state: AgrIAState, client, model_name: str) -> dict:
     """
@@ -18,15 +20,21 @@ def generate_report_node(state: AgrIAState, client, model_name: str) -> dict:
     """
     lang = state.get("lang", "es")
     metadata = state.get("crop_metadata", {})
-    
+
     # Align state key naming uniform checks
-    visual_desc = state.get("visual_description") or state.get("visual_desc") or "No image data provided."
+    visual_desc = (
+        state.get("visual_description")
+        or state.get("visual_desc")
+        or "No image data provided."
+    )
 
     # 1. Fetch our optimized base prompt template
     raw_instruction = load_prompt_template(lang, "report_generator.md")
-    
+
     # Dynamic runtime string injection for localization constraints
-    system_instruction = raw_instruction.replace("{lang}", "Spanish" if lang == "es" else "English")
+    system_instruction = raw_instruction.replace(
+        "{lang}", "Spanish" if lang == "es" else "English"
+    )
 
     # 2. Package data cleanly inside isolated XML blocks
     user_content = f"""
@@ -46,16 +54,15 @@ Please compile the agricultural report matching the template constraints using t
         client=client,
         model_name=model_name,
         system_instruction=system_instruction,
-        max_context_tokens=32000  # Give it a large temporary window for complex payloads
+        max_context_tokens=20000,  # Give it a large temporary window for complex payloads
     )
-    
+
     # Send payload through your standard class invocation pipeline
     response_wrapper = chat.send_message(user_content)
-    
+
     # Return updates back cleanly to the graph lifecycle state machine
-    return {
-        "messages": state["messages"] + [response_wrapper.text]
-    }
+    return {"messages": state["messages"] + [response_wrapper.text]}
+
 
 if __name__ == "__main__":
     # Concrete test execution framework
@@ -63,9 +70,9 @@ if __name__ == "__main__":
         "messages": [],
         "lang": "es",
         "crop_metadata": None,
-        "visual_description": None
+        "visual_description": None,
     }
-    
+
     json_filepath = "/home/miguel/Dev/AgrIA/AgrIA_server/assets/LLM_assets/context/files/26002A001000010000EQ_example_es.json"
     with open(json_filepath, "r", encoding="utf-8") as f:
         mock_state["crop_metadata"] = json.load(f)
@@ -75,6 +82,9 @@ if __name__ == "__main__":
         "Esta imagen satélite muestra una parcela irregular delimitada y dividida por líneas blancas. "
         "Destacan extensas zonas doradas de cultivo seco, combinadas con cuadrículas de vegetación verde."
     )
-    
+
     node_update = generate_report_node(mock_state)
-    print("\n[Node Finished Operation Success] Output Payload:\n", node_update["messages"][-1])
+    print(
+        "\n[Node Finished Operation Success] Output Payload:\n",
+        node_update["messages"][-1],
+    )

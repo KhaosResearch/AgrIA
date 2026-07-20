@@ -31,12 +31,14 @@ def send_user_input(
     logger.debug(f"GOT: {userMessage}, {image}, {isDetailedDescription}, {lang}")
     try:
         is_detailed_description = "true" in isDetailedDescription.lower()
-        
+
         if not isinstance(image, str):
             file, filename = image.file, image.filename
         else:
             file, filename = None, None
-        response_text = generate_user_response(userMessage, is_detailed_description, lang, file, filename)
+        response_text = generate_user_response(
+            userMessage, is_detailed_description, lang, file, filename
+        )
         logger.debug(f"response_text: {response_text}")
         return {"response": response_text}
     except Exception as e:
