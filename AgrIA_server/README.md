@@ -137,8 +137,6 @@ This is a brief overview of each main directory in the project structure:
 Agria_server
 │
 ├── Dockerfile                            # Docker instructions to build the backend server image.
-├── environment-docker.yml                # Conda env used in Docker builds.
-├── environment.yml                       # Local development Conda environment file.
 ├── README.md                             # Project documentation and setup instructions.
 ├── run.py                                # Application entrypoint used by Gunicorn/Flask.
 │
