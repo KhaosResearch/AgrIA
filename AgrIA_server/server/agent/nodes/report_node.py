@@ -32,7 +32,7 @@ def generate_report_node(state: AgrIAState, client, model_name: str) -> dict:
     )
 
     # 1. Fetch our optimized base prompt template
-    raw_instruction = load_prompt_template(lang, "report_generator.md")
+    raw_instruction = load_prompt_template(lang, "REPORT.md")
 
     # Dynamic runtime string injection for localization constraints
     system_instruction = raw_instruction.replace(
@@ -52,7 +52,6 @@ ATTENTION: Your previous output failed verification checks. You MUST fix these e
 """
 
     # 2. Package data inside XML (feedback included)
-    logger.debug(f"feedback_block: {feedback_block}")
     user_content = f"""{feedback_block}
 Please compile the agricultural report matching the template constraints using these source materials.
 

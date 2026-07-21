@@ -5,10 +5,10 @@ from langchain_core.messages import AIMessage, HumanMessage
 from typing import Literal
 from langgraph.graph import StateGraph, START, END
 
-
 from ..config.constants import BASE_CONTEXT_PATH
 from ..config.llm_client import client, LLM_MODEL_NAME
 from ..models.state_models import AgrIAState
+from .nodes.cap_query import cap_query_node
 from .nodes.conversation_node import basic_chat_node
 from .nodes.fallback_node import fallback_rejection_node
 from .nodes.report_node import generate_report_node
@@ -28,6 +28,7 @@ builder.add_node(
     "fallback_rejection",
     lambda state: fallback_rejection_node(state, client, model_name),
 )
+builder.add_node("cap_query", lambda state: cap_query_node(state, client, model_name))
 builder.add_node(
     "report_generator", lambda state: generate_report_node(state, client, model_name)
 )
@@ -51,6 +52,7 @@ builder.add_conditional_edges(
         "basic_chat": "basic_chat",
         "fallback_rejection": "fallback_rejection",
         "report_generator": "report_generator",
+        "cap_query": "cap_query",
     },
 )
 
@@ -58,6 +60,7 @@ builder.add_conditional_edges(
 builder.add_edge("basic_chat", END)
 builder.add_edge("fallback_rejection", END)
 builder.add_edge("report_generator", "validate_report")
+builder.add_edge("cap_query", END)
 
 # The Dynamic Self-Correction Feedback Edge!
 builder.add_conditional_edges(
@@ -72,75 +75,79 @@ builder.add_conditional_edges(
 agria_graph = builder.compile()
 
 if __name__ == "__main__":
+    # 1. Models & Config initialization
+
     print("==================================================")
-    print("        EXECUTING COMPILED LANGGRAPH MACHINE     ")
+    print("      RUNNING INTEGRATED AGRIA STATE GRAPH TEST   ")
     print("==================================================")
 
-    # Setup Test Inputs for Report Node
+    # ----------------------------------------------------------------
+    # TEST CASE A: Greeting (basic_chat)
+    # ----------------------------------------------------------------
+    logger.info("[TEST A] Initiating Greeting Session...")
+    state_a: AgrIAState = {
+        "messages": [HumanMessage(content="Hola buenas tardes")],
+        "lang": "es",
+        "crop_metadata": None,
+        "visual_description": None,
+        "correction_feedback": None,
+    }
+    result_a = agria_graph.invoke(state_a)
+    logger.info(f"-> Node Output: {result_a['messages'][-1]}\n")
+
+    # ----------------------------------------------------------------
+    # TEST CASE B: Out of Scope (fallback_rejection)
+    # ----------------------------------------------------------------
+    logger.info("[TEST B] Initiating Out-of-Scope Prompt...")
+    state_b: AgrIAState = {
+        "messages": [HumanMessage(content="¿Cuál es el sentido de la vida?")],
+        "lang": "es",
+        "crop_metadata": None,
+        "visual_description": None,
+        "correction_feedback": None,
+    }
+    result_b = agria_graph.invoke(state_b)
+    logger.info(f"-> Node Output: {result_b['messages'][-1]}\n")
+
+    # ----------------------------------------------------------------
+    # TEST CASE C: Report Flow (report_generator + validation loop)
+    # ----------------------------------------------------------------
+    logger.info("[TEST C] Initiating Report Generation Flow...")
     json_filepath = BASE_CONTEXT_PATH / "files/26002A001000010000EQ_example_es.json"
     with open(json_filepath, "r", encoding="utf-8") as f:
         mock_crop_json = json.load(f)
 
-    # For report generation node
-    msg = "###DESCRIBE_SHORT_IMAGE### Generate analysis."
-    # # For rejection node
-    # msg = "¿Cuál es el sentido de la vida bro?"
-    # # For basic chat node
-    # msg = (
-    #     "Qué es un ecorregimen? Cuántos hay. que importes tienen y cómo accedo a ellos?"
-    # )
-    input_state: AgrIAState = {
-        "messages": [HumanMessage(content=msg)],
+    state_c: AgrIAState = {
+        "messages": [
+            HumanMessage(content="###DESCRIBE_SHORT_IMAGE### Genera el informe.")
+        ],
         "lang": "es",
         "crop_metadata": mock_crop_json,
-        "visual_description": "Parcela irregular con cultivo de secano y zonas verdes estructuradas.",
+        "visual_description": "Parcela irregular con cultivo de secano y zonas verdes.",
+        "correction_feedback": None,
+    }
+    result_c = agria_graph.invoke(state_c)
+    logger.info(f"-> Final Report Output:\n{result_c['messages'][-1]}\n")
+
+    # ----------------------------------------------------------------
+    # TEST CASE D: CAP / Regulatory Query (cap_query_node + pypdf JIT)
+    # ----------------------------------------------------------------
+    logger.info("[TEST D] Initiating Ecorregímenes Query Flow...")
+    state_d: AgrIAState = {
+        "messages": [
+            HumanMessage(
+                content="¿Cuáles son los requisitos para cobrar el ecorregimen de cubiertas vegetales en cultivos leñosos?"
+            )
+        ],
+        "lang": "es",
+        "crop_metadata": None,
+        "visual_description": None,
         "correction_feedback": None,
     }
 
-    # Execute the state graph run
-    # LangGraph completely manages state modification, routing, and termination internally
-    final_output_state = agria_graph.invoke(input_state)
+    result_d = agria_graph.invoke(state_d)
+    logger.info(f"-> Regulatory Answer Output:\n{result_d['messages'][-1]}\n")
 
-    logger.info("[LANGGRAPH RUN COMPLETE]")
-    logger.info(f"Final Message in History:\n{final_output_state['messages'][-1]}")
-    print("==================================================\n")
-
-    # print("==================================================")
-    # print("    TESTING LANGGRAPH LOOP RECOVERY MECHANICS    ")
-    # print("==================================================")
-
-    # # 1. Load context payload data
-    # json_filepath = BASE_CONTEXT_PATH / "files/26002A001000010000EQ_example_es.json"
-    # with open(json_filepath, "r", encoding="utf-8") as f:
-    #     mock_crop_json = json.load(f)  # Total_Parcel_Area_ha is 45.7332
-
-    # # 2. Forge a bad input state simulating a broken report output
-    # # We pass a broken string to see if the validator catches it and sends it back to the generator
-    # broken_report_history = [
-    #     HumanMessage(content="###DESCRIBE_SHORT_IMAGE### Make report"),
-    #     AIMessage(
-    #         content="Aquí está tu informe rápido: La parcela se ve bastante bien y tiene cultivos arables."
-    #     ),
-    # ]
-
-    # malformed_state: AgrIAState = {
-    #     "messages": broken_report_history,
-    #     "lang": "es",
-    #     "crop_metadata": mock_crop_json,
-    #     "visual_description": "Parcela arable sin detalles estructurales.",
-    #     "correction_feedback": None,
-    # }
-
-    # logger.info(
-    #     "[Action] Invoking graph directly at the 'validate_report' node entry to test recovery..."
-    # )
-
-    # # LangGraph allows you to test specific segments by passing an explicit entry point string
-    # recovery_output = agria_graph.invoke(malformed_state, config={"subgraphs": True})
-    # # recovery_output = validate_report_node(malformed_state)  # Call the method directly to check code functionality (not in Graph)
-
-    # logger.info("[LANGGRAPH RUN COMPLETE]")
-    # logger.info(
-    #     f"Final Verification Record Status: {recovery_output.get('correction_feedback')}"
-    # )
-    # print("==================================================")
+    print("==================================================")
+    print("                ALL GRAPH TESTS COMPLETE          ")
+    print("==================================================")
