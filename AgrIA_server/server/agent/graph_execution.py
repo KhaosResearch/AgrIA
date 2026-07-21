@@ -1,7 +1,7 @@
 import structlog
 import json
 
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage
 from typing import Literal
 from langgraph.graph import StateGraph, START, END
 
@@ -81,15 +81,20 @@ if __name__ == "__main__":
     with open(json_filepath, "r", encoding="utf-8") as f:
         mock_crop_json = json.load(f)
 
+    # For report generation node
     msg = "###DESCRIBE_SHORT_IMAGE### Generate analysis."
-    msg = (
-        "Qué es un ecorregimen? Cuántos hay. que importes tienen y cómo accedo a ellos?"
-    )
+    # # For rejection node
+    # msg = "¿Cuál es el sentido de la vida bro?"
+    # # For basic chat node
+    # msg = (
+    #     "Qué es un ecorregimen? Cuántos hay. que importes tienen y cómo accedo a ellos?"
+    # )
     input_state: AgrIAState = {
         "messages": [HumanMessage(content=msg)],
         "lang": "es",
         "crop_metadata": mock_crop_json,
         "visual_description": "Parcela irregular con cultivo de secano y zonas verdes estructuradas.",
+        "correction_feedback": None,
     }
 
     # Execute the state graph run
@@ -98,4 +103,44 @@ if __name__ == "__main__":
 
     logger.info("[LANGGRAPH RUN COMPLETE]")
     logger.info(f"Final Message in History:\n{final_output_state['messages'][-1]}")
-    print("==================================================")
+    print("==================================================\n")
+
+    # print("==================================================")
+    # print("    TESTING LANGGRAPH LOOP RECOVERY MECHANICS    ")
+    # print("==================================================")
+
+    # # 1. Load context payload data
+    # json_filepath = BASE_CONTEXT_PATH / "files/26002A001000010000EQ_example_es.json"
+    # with open(json_filepath, "r", encoding="utf-8") as f:
+    #     mock_crop_json = json.load(f)  # Total_Parcel_Area_ha is 45.7332
+
+    # # 2. Forge a bad input state simulating a broken report output
+    # # We pass a broken string to see if the validator catches it and sends it back to the generator
+    # broken_report_history = [
+    #     HumanMessage(content="###DESCRIBE_SHORT_IMAGE### Make report"),
+    #     AIMessage(
+    #         content="Aquí está tu informe rápido: La parcela se ve bastante bien y tiene cultivos arables."
+    #     ),
+    # ]
+
+    # malformed_state: AgrIAState = {
+    #     "messages": broken_report_history,
+    #     "lang": "es",
+    #     "crop_metadata": mock_crop_json,
+    #     "visual_description": "Parcela arable sin detalles estructurales.",
+    #     "correction_feedback": None,
+    # }
+
+    # logger.info(
+    #     "[Action] Invoking graph directly at the 'validate_report' node entry to test recovery..."
+    # )
+
+    # # LangGraph allows you to test specific segments by passing an explicit entry point string
+    # recovery_output = agria_graph.invoke(malformed_state, config={"subgraphs": True})
+    # # recovery_output = validate_report_node(malformed_state)  # Call the method directly to check code functionality (not in Graph)
+
+    # logger.info("[LANGGRAPH RUN COMPLETE]")
+    # logger.info(
+    #     f"Final Verification Record Status: {recovery_output.get('correction_feedback')}"
+    # )
+    # print("==================================================")

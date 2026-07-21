@@ -1,5 +1,7 @@
 import structlog
 
+from langchain_core.messages import HumanMessage
+
 from ..config.constants import BASE_PROMPTS_PATH
 from ..models.chat_models import LocalChat
 from ..models.state_models import AgrIAState
@@ -26,16 +28,26 @@ def execute_scoped_chat(
 ) -> dict:
     """Core underlying utility handler to process stateless conversational nodes."""
     lang = state.get("lang", "es") if get_lang else ""
-    user_input = state["messages"][-1].content
+    last_chat_msg = state["messages"][-1]
 
-    system_instruction = load_prompt_asset(lang, prompt_filename)
+    if type(last_chat_msg) is HumanMessage:
+        user_input = last_chat_msg.content
 
-    chat = LocalChat(
-        client=client,
-        model_name=model_name,
-        system_instruction=system_instruction,
-        max_context_tokens=8000,
-    )
+        system_instruction = load_prompt_asset(lang, prompt_filename)
 
-    response_wrapper = chat.send_message(user_input)
-    return {"messages": state["messages"] + [response_wrapper.text]}
+        chat = LocalChat(
+            client=client,
+            model_name=model_name,
+            system_instruction=system_instruction,
+            max_context_tokens=8000,
+        )
+
+        response_wrapper = chat.send_message(user_input)
+        out = {"messages": state["messages"] + [response_wrapper.text]}
+    else:
+        logger.warning(
+            "Detected chat message was not from the user. Skipping node interaction..."
+        )
+        out = {"messages": state["messages"]}
+
+    return out

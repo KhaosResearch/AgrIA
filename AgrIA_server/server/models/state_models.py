@@ -8,3 +8,4 @@ class AgrIAState(TypedDict):
     lang: str  # "es" or "en"
     crop_metadata: dict  # The JSON calculated from your ES tools
     visual_description: Optional[str]
+    correction_feedback: Optional[str]

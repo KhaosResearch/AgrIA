@@ -1,10 +1,13 @@
 import json
-from langchain_core.messages import HumanMessage
+import structlog
 
+from langchain_core.messages import AIMessage
 
 from ...config.constants import BASE_CONTEXT_PATH, BASE_PROMPTS_PATH
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
+
+logger = structlog.get_logger(__file__)
 
 
 def load_prompt_template(lang: str, filename: str) -> str:
@@ -36,8 +39,25 @@ def generate_report_node(state: AgrIAState, client, model_name: str) -> dict:
         "{lang}", "Spanish" if lang == "es" else "English"
     )
 
-    # 2. Package data cleanly inside isolated XML blocks
-    user_content = f"""
+    # Check state feedback
+    feedback = state.get("correction_feedback")
+    feedback_block = ""
+    logger.debug(f"REPORT DETECTED CORRECTION FEEDBACK: {feedback}")
+    logger.debug(
+        f"feedback and feedback != 'PASSED'? {feedback and feedback != 'PASSED'}"
+    )
+
+    if feedback and feedback != "PASSED":
+        feedback_block = f"""
+<critical_retry_warning>
+ATTENTION: Your previous output failed verification checks. You MUST fix these errors in this attempt:
+{feedback}
+</critical_retry_warning>
+"""
+
+    # 2. Package data inside XML (feedback included)
+    logger.debug(f"feedback_block: {feedback_block}")
+    user_content = f"""{feedback_block}
 Please compile the agricultural report matching the template constraints using these source materials.
 
 <visual_description>
@@ -61,7 +81,10 @@ Please compile the agricultural report matching the template constraints using t
     response_wrapper = chat.send_message(user_content)
 
     # Return updates back cleanly to the graph lifecycle state machine
-    return {"messages": state["messages"] + [response_wrapper.text]}
+    return {
+        "messages": state["messages"] + [AIMessage(response_wrapper.text)],
+        "correction_feedback": feedback,
+    }
 
 
 if __name__ == "__main__":
