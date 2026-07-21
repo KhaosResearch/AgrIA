@@ -42,10 +42,6 @@ def generate_report_node(state: AgrIAState, client, model_name: str) -> dict:
     # Check state feedback
     feedback = state.get("correction_feedback")
     feedback_block = ""
-    logger.debug(f"REPORT DETECTED CORRECTION FEEDBACK: {feedback}")
-    logger.debug(
-        f"feedback and feedback != 'PASSED'? {feedback and feedback != 'PASSED'}"
-    )
 
     if feedback and feedback != "PASSED":
         feedback_block = f"""
@@ -74,7 +70,7 @@ Please compile the agricultural report matching the template constraints using t
         client=client,
         model_name=model_name,
         system_instruction=system_instruction,
-        max_context_tokens=20000,  # Give it a large temporary window for complex payloads
+        max_context_tokens=10000,  # Give it a large temporary window for complex payloads
     )
 
     # Send payload through your standard class invocation pipeline

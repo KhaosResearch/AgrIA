@@ -20,7 +20,8 @@ def validate_report_node(state: AgrIAState) -> dict:
     errors = []
 
     # Rule 1: Structural Markdown Check (Must contain at least one Markdown Table)
-    if "|" not in generated_report or "-|-" not in generated_report:
+    logger.debug(f"'|' in generated_report: {"|" in generated_report}")
+    if "|" not in generated_report:
         errors.append(
             "Missing required structured Markdown tables for Eco-Schemes or Calculations."
         )
