@@ -17,6 +17,7 @@
 *res*
 *out*
 *.json
+*.log
 
 # Custom
 misc/
