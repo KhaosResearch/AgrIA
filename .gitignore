@@ -12,11 +12,9 @@
 *.png
 *.tif*
 *.tsv
-*assets/.scripts
-*model/
 *data*
 *res*
-*out*
+llm_formatted_out/
 *.json
 *.log
 
