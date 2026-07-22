@@ -91,7 +91,7 @@ if __name__ == "__main__":
         "visual_description": None,
     }
 
-    json_filepath = BASE_CONTEXT_PATH / "files/26002A001000010000EQ_example_es.json"
+    json_filepath = BASE_PROMPTS_PATH / "examples/26002A001000010000EQ_example_es.json"
     with open(json_filepath, "r", encoding="utf-8") as f:
         mock_state["crop_metadata"] = json.load(f)
 

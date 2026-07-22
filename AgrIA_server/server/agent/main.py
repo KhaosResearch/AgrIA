@@ -4,7 +4,7 @@ import structlog
 from langchain_core.messages import HumanMessage
 
 from ..config.config import LLM_MODEL_NAME
-from ..config.constants import BASE_CONTEXT_PATH
+from ..config.constants import BASE_PROMPTS_PATH
 from ..config.llm_client import client
 from .graph_base import deterministic_router
 from .graph_base import basic_chat_node, fallback_rejection_node
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     logger.info("[TEST C] Initiating Report Generation Flow...")
 
     # Load your actual local example JSON data
-    json_filepath = BASE_CONTEXT_PATH / "files/26002A001000010000EQ_example_es.json"
+    json_filepath = BASE_PROMPTS_PATH / "examples/26002A001000010000EQ_example_es.json"
 
     try:
         with open(json_filepath, "r", encoding="utf-8") as f:

@@ -1,11 +1,10 @@
 import structlog
 import json
 
-from langchain_core.messages import AIMessage, HumanMessage
-from typing import Literal
+from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, START, END
 
-from ..config.constants import BASE_CONTEXT_PATH
+from ..config.constants import BASE_PROMPTS_PATH
 from ..config.llm_client import client, LLM_MODEL_NAME
 from ..models.state_models import AgrIAState
 from .nodes.cap_query import cap_query_node
@@ -36,18 +35,16 @@ builder.add_node("validate_report", validate_report_node)  # Fast code checking 
 
 
 # 3. Define the routing edge logic
-def router_edge_adapter(
-    state: AgrIAState,
-) -> Literal["basic_chat", "fallback_rejection", "report_generator"]:
-    """Adapts our existing router return string to LangGraph's strict Type typing."""
-    return deterministic_router(state)
+def route_adapter(state: AgrIAState) -> str:
+    """Adapter function to pass model execution runtime args to the router."""
+    return deterministic_router(state, client=client, model_name=model_name)
 
 
 # 4. Wire up the graph flow topology
 # Instead of hardcoding paths, we tell START to use our conditional router function
 builder.add_conditional_edges(
     START,
-    router_edge_adapter,
+    route_adapter,
     {
         "basic_chat": "basic_chat",
         "fallback_rejection": "fallback_rejection",
@@ -115,7 +112,7 @@ if __name__ == "__main__":
     # TEST CASE C: Report Flow (report_generator + validation loop)
     # ----------------------------------------------------------------
     logger.info("[TEST C] Initiating Report Generation Flow...")
-    json_filepath = BASE_CONTEXT_PATH / "files/26002A001000010000EQ_example_es.json"
+    json_filepath = BASE_PROMPTS_PATH / "examples/26002A001000010000EQ_example_es.json"
     with open(json_filepath, "r", encoding="utf-8") as f:
         mock_crop_json = json.load(f)
 
@@ -139,7 +136,7 @@ if __name__ == "__main__":
     state_d: AgrIAState = {
         "messages": [
             HumanMessage(
-                content="¿Cuáles son los requisitos para cobrar el ecorregimen de cubiertas vegetales en cultivos leñosos P7 y cómo afectan las cuestas en el terreno? Cita tus fuentes: los nombres de los documentos o fuentes que uses."
+                content="¿Cuáles son los Importes Unitarios Definitivos para el Pago de Anticipos (Campaña 2025)?"
             )
         ],
         "lang": "es",

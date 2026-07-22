@@ -3,7 +3,7 @@ import hashlib
 import structlog
 
 from chromadb.utils import embedding_functions
-from langchain_community.document_loaders import PyPDFLoader, UnstructuredMarkdownLoader
+from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pathlib import Path
 from typing import List
@@ -25,11 +25,10 @@ def chunk_document(
     Reads a PDF or Markdown document and yields smaller, overlapping text segments.
     """
     logger.info(f"📖 Loading document for chunking: {file_path.name}")
-
     if file_path.suffix.lower() == ".pdf":
         loader = PyPDFLoader(str(file_path))
     elif file_path.suffix.lower() in [".md", ".txt"]:
-        loader = UnstructuredMarkdownLoader(str(file_path))
+        loader = TextLoader(str(file_path), encoding="utf-8")
     else:
         logger.warning(f"Unsupported file format skipped: {file_path.name}")
         return []
@@ -59,7 +58,6 @@ def add_documents_to_kb(collection, document_paths: List[Path]):
     for file_path in document_paths:
         if not file_path.exists() or file_path.name.startswith("_"):
             continue
-
         chunks = chunk_document(file_path)
         for idx, chunk in enumerate(chunks):
             content = chunk.page_content.strip()
@@ -123,12 +121,16 @@ def get_or_create_knowledge_base(
 
     # Auto-populate if empty
     logger.info(f"🚀 Collection is empty. Ingesting PDF files from {base_files_dir}...")
-    files_to_ingest = list(base_files_dir.glob("*.pdf"))
-    if not files_to_ingest or len(files_to_ingest) < 1:
-        logger.info("No PDF files found. Searching for MD and TXT files...")
-        files_to_ingest = list(base_files_dir.glob("*.md")) + list(
-            base_files_dir.glob("*.txt")
-        )
+    files_to_ingest = (
+        list(base_files_dir.glob("*.pdf"))
+        + list(base_files_dir.glob("*.md"))
+        + list(base_files_dir.glob("*.txt"))
+    )
+    # if not files_to_ingest or len(files_to_ingest) < 1:
+    # logger.info("No PDF files found. Searching for MD and TXT files...")
+    # files_to_ingest = list(base_files_dir.glob("*.md")) + list(
+    #     base_files_dir.glob("*.txt")
+    # )
     add_documents_to_kb(collection, files_to_ingest)
 
     return collection
