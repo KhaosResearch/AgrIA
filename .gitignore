@@ -2,6 +2,7 @@
 .git-credentials
 
 # Backend
+*db/ 
 .env
 *temp*
 .venv
