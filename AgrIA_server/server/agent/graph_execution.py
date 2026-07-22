@@ -93,6 +93,7 @@ if __name__ == "__main__":
         "correction_feedback": None,
     }
     result_a = agria_graph.invoke(state_a)
+    logger.info(f"-> Node Input: {state_a['messages'][-1]}")
     logger.info(f"-> Node Output: {result_a['messages'][-1]}\n")
 
     # ----------------------------------------------------------------
@@ -107,6 +108,7 @@ if __name__ == "__main__":
         "correction_feedback": None,
     }
     result_b = agria_graph.invoke(state_b)
+    logger.info(f"-> Node Input: {state_b['messages'][-1]}")
     logger.info(f"-> Node Output: {result_b['messages'][-1]}\n")
 
     # ----------------------------------------------------------------
@@ -127,6 +129,7 @@ if __name__ == "__main__":
         "correction_feedback": None,
     }
     result_c = agria_graph.invoke(state_c)
+    logger.info(f"-> Final Report Input: {state_c['messages'][-1]}")
     logger.info(f"-> Final Report Output:\n{result_c['messages'][-1]}\n")
 
     # ----------------------------------------------------------------
@@ -136,7 +139,7 @@ if __name__ == "__main__":
     state_d: AgrIAState = {
         "messages": [
             HumanMessage(
-                content="¿Cuáles son los requisitos para cobrar el ecorregimen de cubiertas vegetales en cultivos leñosos?"
+                content="¿Cuáles son los requisitos para cobrar el ecorregimen de cubiertas vegetales en cultivos leñosos P7 y cómo afectan las cuestas en el terreno? Cita tus fuentes: los nombres de los documentos o fuentes que uses."
             )
         ],
         "lang": "es",
@@ -146,6 +149,7 @@ if __name__ == "__main__":
     }
 
     result_d = agria_graph.invoke(state_d)
+    logger.info(f"-> Regulatory Answer Input: {state_d['messages'][-1]}")
     logger.info(f"-> Regulatory Answer Output:\n{result_d['messages'][-1]}\n")
 
     print("==================================================")

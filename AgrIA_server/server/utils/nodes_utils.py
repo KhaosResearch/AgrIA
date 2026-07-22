@@ -1,6 +1,6 @@
 import structlog
 
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, AIMessage
 
 from ..config.constants import BASE_PROMPTS_PATH
 from ..models.chat_models import LocalChat
@@ -43,7 +43,7 @@ def execute_scoped_chat(
         )
 
         response_wrapper = chat.send_message(user_input)
-        out = {"messages": state["messages"] + [response_wrapper.text]}
+        out = {"messages": state["messages"] + [AIMessage(response_wrapper.text)]}
     else:
         logger.warning(
             "Detected chat message was not from the user. Skipping node interaction..."
