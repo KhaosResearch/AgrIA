@@ -35,7 +35,7 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_IN
 
     # Fallback to LLM intent classifier
     try:
-        system_instruction = load_prompt_asset("", "INTENT.md")
+        system_instruction = load_prompt_asset("INTENT.md")
 
         # Fast, short-lived session with strict context boundaries
         classifier_chat = LocalChat(
@@ -65,10 +65,11 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_IN
         )
 
         if detected_intent in [
-            "report_generator",
-            "cap_query",
             "basic_chat",
+            "cap_query",
+            "ecoschemes_rates",
             "fallback_rejection",
+            "report_generator",
         ]:
             return detected_intent
 

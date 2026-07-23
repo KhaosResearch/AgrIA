@@ -4,12 +4,14 @@ import json
 from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, START, END
 
+
 from ..config.constants import BASE_PROMPTS_PATH
 from ..config.llm_client import client, LLM_MODEL_NAME
 from ..models.state_models import AgrIAState
 from .nodes.cap_query import cap_query_node
 from .nodes.conversation_node import basic_chat_node
 from .nodes.fallback_node import fallback_rejection_node
+from .nodes.ecoscheme_rates_node import ecoschemes_rates_node
 from .nodes.report_node import generate_report_node
 from .nodes.router_node import deterministic_router
 from .nodes.validation_node import validate_report_node, evaluation_router_edge
@@ -23,11 +25,14 @@ model_name = LLM_MODEL_NAME
 # 2. Register our worker nodes
 # We use simple lambda wrappers to pass your custom client runtime arguments
 builder.add_node("basic_chat", lambda state: basic_chat_node(state, client, model_name))
+builder.add_node("cap_query", lambda state: cap_query_node(state, client, model_name))
 builder.add_node(
     "fallback_rejection",
     lambda state: fallback_rejection_node(state, client, model_name),
 )
-builder.add_node("cap_query", lambda state: cap_query_node(state, client, model_name))
+builder.add_node(
+    "ecoschemes_rates", lambda state: ecoschemes_rates_node(state, client, model_name)
+)
 builder.add_node(
     "report_generator", lambda state: generate_report_node(state, client, model_name)
 )
@@ -47,17 +52,19 @@ builder.add_conditional_edges(
     route_adapter,
     {
         "basic_chat": "basic_chat",
+        "cap_query": "cap_query",
+        "ecoschemes_rates": "ecoschemes_rates",
         "fallback_rejection": "fallback_rejection",
         "report_generator": "report_generator",
-        "cap_query": "cap_query",
     },
 )
 
 # Every worker node in this layout is a terminal leaf node for this turn, so they route to END
 builder.add_edge("basic_chat", END)
+builder.add_edge("cap_query", END)
+builder.add_edge("ecoschemes_rates", END)
 builder.add_edge("fallback_rejection", END)
 builder.add_edge("report_generator", "validate_report")
-builder.add_edge("cap_query", END)
 
 # The Dynamic Self-Correction Feedback Edge!
 builder.add_conditional_edges(
@@ -136,7 +143,7 @@ if __name__ == "__main__":
     state_d: AgrIAState = {
         "messages": [
             HumanMessage(
-                content="¿Cuáles son los Importes Unitarios Definitivos para el Pago de Anticipos (Campaña 2025)?"
+                content="¿Cuáles son los ecorregímenes más adecuados para cultivos leñosos?"
             )
         ],
         "lang": "es",
@@ -148,6 +155,26 @@ if __name__ == "__main__":
     result_d = agria_graph.invoke(state_d)
     logger.info(f"-> Regulatory Answer Input: {state_d['messages'][-1]}")
     logger.info(f"-> Regulatory Answer Output:\n{result_d['messages'][-1]}\n")
+
+    # ----------------------------------------------------------------
+    # TEST CASE E: Ecoschemes rates and prices (ecoscheme_rate_node)
+    # ----------------------------------------------------------------
+    logger.info("[TEST E] Initiating Ecoscheme Rates Flow...")
+    state_e: AgrIAState = {
+        "messages": [
+            HumanMessage(
+                content="¿Cuáles son los importes de los ecorregímenes en 2026?"
+            )
+        ],
+        "lang": "es",
+        "crop_metadata": None,
+        "visual_description": None,
+        "correction_feedback": None,
+    }
+
+    result_e = agria_graph.invoke(state_e)
+    logger.info(f"-> Regulatory Answer Input: {state_e['messages'][-1]}")
+    logger.info(f"-> Regulatory Answer Output:\n{result_e['messages'][-1]}\n")
 
     print("==================================================")
     print("                ALL GRAPH TESTS COMPLETE          ")

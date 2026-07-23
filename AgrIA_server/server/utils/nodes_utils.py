@@ -9,7 +9,7 @@ from ..models.state_models import AgrIAState
 logger = structlog.get_logger(__file__)
 
 
-def load_prompt_asset(lang: str, filename: str) -> str:
+def load_prompt_asset(filename: str, lang: str = "") -> str:
     """Reads modular markdown text prompts directly from filesystem."""
     file_path = BASE_PROMPTS_PATH / lang / filename
     try:
@@ -33,7 +33,7 @@ def execute_scoped_chat(
     if type(last_chat_msg) is HumanMessage:
         user_input = last_chat_msg.content
 
-        system_instruction = load_prompt_asset(lang, prompt_filename)
+        system_instruction = load_prompt_asset(prompt_filename, lang)
 
         chat = LocalChat(
             client=client,
