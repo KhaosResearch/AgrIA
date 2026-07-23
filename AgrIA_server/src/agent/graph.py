@@ -15,10 +15,12 @@ from .nodes.validation_node import validate_report_node, evaluation_router_edge
 
 logger = structlog.get_logger(__file__)
 
+
 # Define graph routing logic
 def route_adapter(state: AgrIAState, model_name: str = LLM_MODEL_NAME) -> str:
     """Adapter function to pass model execution runtime args to the router."""
     return deterministic_router(state, client=client, model_name=model_name)
+
 
 def build_graph() -> StateGraph[AgrIAState]:
     # Initialize the Graph Builder using our State structural definition
@@ -27,17 +29,23 @@ def build_graph() -> StateGraph[AgrIAState]:
 
     # Register our worker nodes
     # We use simple lambda wrappers to pass your custom client runtime arguments
-    builder.add_node("basic_chat", lambda state: basic_chat_node(state, client, model_name))
-    builder.add_node("cap_query", lambda state: cap_query_node(state, client, model_name))
+    builder.add_node(
+        "basic_chat", lambda state: basic_chat_node(state, client, model_name)
+    )
+    builder.add_node(
+        "cap_query", lambda state: cap_query_node(state, client, model_name)
+    )
     builder.add_node(
         "fallback_rejection",
         lambda state: fallback_rejection_node(state, client, model_name),
     )
     builder.add_node(
-        "ecoschemes_rates", lambda state: ecoschemes_rates_node(state, client, model_name)
+        "ecoschemes_rates",
+        lambda state: ecoschemes_rates_node(state, client, model_name),
     )
     builder.add_node(
-        "report_generator", lambda state: generate_report_node(state, client, model_name)
+        "report_generator",
+        lambda state: generate_report_node(state, client, model_name),
     )
     builder.add_node("validate_report", validate_report_node)  # Fast code checking node
 
@@ -70,6 +78,9 @@ def build_graph() -> StateGraph[AgrIAState]:
             "__end__": END,  # Exits to user if perfect
         },
     )
+
+    return builder
+
 
 # Compile the State Machine
 builder = build_graph()

@@ -2,7 +2,7 @@ import pytest
 
 from unittest.mock import MagicMock
 
-from server.endpoints import chat
+from src.endpoints import chat
 
 
 def test_hello_world(client):

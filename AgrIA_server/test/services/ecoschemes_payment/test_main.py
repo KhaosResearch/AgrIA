@@ -1,4 +1,4 @@
-from server.services.ecoscheme_payments.main import calculate_ecoscheme_payment
+from src.services.ecoscheme_payments.main import calculate_ecoscheme_payment
 
 
 def test_main_calculation_output(sample_input_data_str, mocker):
@@ -6,7 +6,7 @@ def test_main_calculation_output(sample_input_data_str, mocker):
     End-to-end test of the main function, mocking the rule loading.
     """
     mocker.patch(
-        "server.benchmark.vlm.constants.OG_CLASSIFICATION_FILEPATH", "dummy_path.json"
+        "src.benchmark.vlm.constants.OG_CLASSIFICATION_FILEPATH", "dummy_path.json"
     )
 
     output = calculate_ecoscheme_payment(sample_input_data_str)

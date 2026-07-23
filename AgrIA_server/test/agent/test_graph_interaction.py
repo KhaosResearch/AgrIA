@@ -1,4 +1,4 @@
-from server.agent.graph import AGRIA_GRAPH
+from src.agent.graph import AGRIA_GRAPH
 
 
 def test_greeting_flow(base_state):

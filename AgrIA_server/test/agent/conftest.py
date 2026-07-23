@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 from langchain_core.messages import HumanMessage
-from server.models.state_models import AgrIAState
+from src.models.state_models import AgrIAState
 
 
 @pytest.fixture

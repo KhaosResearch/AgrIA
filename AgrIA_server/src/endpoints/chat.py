@@ -4,8 +4,8 @@ import structlog
 from typing import Optional
 from fastapi import APIRouter, Form, UploadFile, File, HTTPException
 
-from server.config.chat_config import CHAT as chat
-from server.services.chat_service import (
+from src.config.chat_config import CHAT as chat
+from src.services.chat_service import (
     generate_user_response,
     get_parcel_description,
     get_role_and_content,
