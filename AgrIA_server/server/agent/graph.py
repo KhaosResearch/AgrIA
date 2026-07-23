@@ -1,11 +1,8 @@
 import structlog
-import json
 
-from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, START, END
 
 
-from ..config.constants import BASE_PROMPTS_PATH
 from ..config.llm_client import client, LLM_MODEL_NAME
 from ..models.state_models import AgrIAState
 from .nodes.cap_query import cap_query_node
@@ -77,4 +74,3 @@ builder.add_conditional_edges(
 )
 # 5. Compile the State Machine
 agria_graph = builder.compile()
-

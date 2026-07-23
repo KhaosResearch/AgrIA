@@ -24,23 +24,27 @@ def hello_world():
 @router.post("/send-user-input")
 def send_user_input(
     userMessage: str = Form(...),
-    image: UploadFile | str = File(...),
+    image: UploadFile | str | None = File(None),
     isDetailedDescription: str = Form("false"),
     lang: str = Form("en"),
 ):
-    logger.debug(f"GOT: {userMessage}, {image}, {isDetailedDescription}, {lang}")
     try:
         is_detailed_description = "true" in isDetailedDescription.lower()
 
-        if not isinstance(image, str):
+        if image is not None and not isinstance(image, str):
             file, filename = image.file, image.filename
         else:
             file, filename = None, None
-        response_text = generate_user_response(
-            userMessage, is_detailed_description, lang, file, filename
-        )
-        logger.debug(f"response_text: {response_text}")
-        return {"response": response_text}
+        if userMessage is not None and len(userMessage) > 0:
+            response_text = generate_user_response(
+                userMessage, is_detailed_description, lang, file, filename
+            )
+            return {"response": response_text}
+        else:
+            msg = "No user input provided"
+            ve = ValueError(msg)
+            logger.error(str(ve))
+            raise HTTPException(status_code=400, detail=msg)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
