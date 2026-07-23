@@ -1,10 +1,10 @@
-from server.agent.graph import agria_graph
+from server.agent.graph import AGRIA_GRAPH
 
 
 def test_greeting_flow(base_state):
     """[TEST A] Verify greeting routes to conversation_node."""
     state = base_state("Hola buenas tardes")
-    result = agria_graph.invoke(state)
+    result = AGRIA_GRAPH.invoke(state)
 
     assert len(result["messages"]) > 1
     assert isinstance(result["messages"][-1].content, str)
@@ -14,7 +14,7 @@ def test_greeting_flow(base_state):
 def test_out_of_scope_flow(base_state):
     """[TEST B] Verify non-agricultural prompt routes to fallback_node."""
     state = base_state("¿Cuál es el sentido de la vida?")
-    result = agria_graph.invoke(state)
+    result = AGRIA_GRAPH.invoke(state)
 
     assert len(result["messages"]) > 1
     # Verify rejection response is returned
@@ -27,7 +27,7 @@ def test_report_flow(base_state, mock_crop_json):
     state["crop_metadata"] = mock_crop_json
     state["visual_description"] = "Parcela irregular con cultivo de secano."
 
-    result = agria_graph.invoke(state)
+    result = AGRIA_GRAPH.invoke(state)
 
     assert len(result["messages"]) > 1
     assert (
@@ -41,7 +41,7 @@ def test_cap_query_flow(base_state):
     state = base_state(
         "¿Cuáles son los ecorregímenes más adecuados para cultivos leñosos?"
     )
-    result = agria_graph.invoke(state)
+    result = AGRIA_GRAPH.invoke(state)
 
     assert len(result["messages"]) > 1
     assert len(result["messages"][-1].content) > 0
@@ -50,7 +50,7 @@ def test_cap_query_flow(base_state):
 def test_ecoscheme_rates_flow(base_state):
     """[TEST E] Verify rates query triggers ecoscheme_rates_node."""
     state = base_state("¿Cuáles son los importes de los ecorregímenes en 2026?")
-    result = agria_graph.invoke(state)
+    result = AGRIA_GRAPH.invoke(state)
 
     assert len(result["messages"]) > 1
     assert len(result["messages"][-1].content) > 0
