@@ -3,7 +3,7 @@ import structlog
 
 from langchain_core.messages import AIMessage
 
-from ...config.constants import BASE_CONTEXT_PATH, BASE_PROMPTS_PATH
+from ...config.constants import BASE_PROMPTS_PATH
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
 

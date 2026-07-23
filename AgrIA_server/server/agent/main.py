@@ -6,10 +6,11 @@ from langchain_core.messages import HumanMessage
 from ..config.config import LLM_MODEL_NAME
 from ..config.constants import BASE_PROMPTS_PATH
 from ..config.llm_client import client
-from .graph_base import deterministic_router
-from .graph_base import basic_chat_node, fallback_rejection_node
 from ..models.state_models import AgrIAState
+from .nodes.conversation_node import basic_chat_node
+from .nodes.fallback_node import fallback_rejection_node
 from .nodes.report_node import generate_report_node
+from .nodes.router_node import deterministic_router
 
 logger = structlog.get_logger(__file__)
 
@@ -17,7 +18,7 @@ logger = structlog.get_logger(__file__)
 def simulate_graph_run(
     initial_state: AgrIAState, client, model_name: str
 ) -> AgrIAState:
-    logger.info(f"--- Starting AgrIA Graph Routing ---")
+    logger.info("--- Starting AgrIA Graph Routing ---")
     logger.info(f"Active Language Context: {initial_state['lang']}")
 
     # 1. Evaluate the routing logic deterministically
@@ -33,7 +34,7 @@ def simulate_graph_run(
         logger.info("Routing to report generator (Step 3)...")
         updated_state = generate_report_node(initial_state, client, model_name)
 
-    logger.info(f"Transaction Complete. Tokens saved by bypassing monolithic loading.")
+    logger.info("Transaction Complete. Tokens saved by bypassing monolithic loading.")
     return updated_state
 
 
