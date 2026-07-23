@@ -6,9 +6,9 @@
       "Conditions": "Maintain minimum and maximum livestock density within established limits (e.g., 0.2 LU/ha to 1.2 LU/ha), and respect a non-grazing or mowing period on at least 50% of the area to promote biodiversity.",
       "Rates": {
         "Pluriannuality": "N/A",
-        "Threshold_ha": "N/A",
-        "Peninsular": 43.64,
-        "Insular":43.64
+        "Threshold_ha": 65,
+        "Peninsular": 54.54,
+        "Insular": 43.64
       }
     },
     {
@@ -19,11 +19,11 @@
         "Pluriannuality": "N/A",
         "Threshold_ha": 95,
         "Peninsular": {
-          "Tier_1": 27.27,
+          "Tier_1": 35.92,
           "Tier_2": 27.27
         },
         "Insular": {
-          "Tier_1": 49.27,
+          "Tier_1": 57.92,
           "Tier_2": 49.27
         }
 
@@ -52,7 +52,7 @@
       "Conditions": "Rotate 50% of the crop area annually or 10% of the land with enhancing species (5% for legumes) OR 40% of the requested area must be left untilled.",
       "Rates": {
         "Pluriannuality": "Applicable",
-        "Threshold_ha": "N/A",
+        "Threshold_ha": 30,
         "Peninsular": {
           "Tier_1": 62.986183,
           "Tier_2": 46.18
@@ -87,7 +87,7 @@
       "Rates": {
         "Pluriannuality": "N/A",
         "Threshold_ha": "N/A",
-        "Peninsular": 42.996797,
+        "Peninsular": 48.1112,
         "Insular": "N/A"
       }
     },
@@ -98,7 +98,7 @@
       "Rates": {
         "Pluriannuality": "N/A",
         "Threshold_ha": "N/A",
-        "Peninsular": 145.098595,
+        "Peninsular": 148.818297,
         "Insular": "N/A"
       }
     },
@@ -144,12 +144,12 @@
         "Pluriannuality": "Applicable",
         "Threshold_ha": 15,
         "Peninsular": {
-          "Tier_1": 131.381037,
-          "Tier_2": 102.91
+          "Tier_1": 160.39,
+          "Tier_2": 112.273
         },
         "Insular": {
-          "Tier_1": 219.381037,
-          "Tier_2": 190.91
+          "Tier_1": 248.39,
+          "Tier_2": 200.273
         }        
       }
     },
@@ -172,8 +172,8 @@
       "Conditions": "Mantener una carga ganadera mínima y máxima dentro de los límites establecidos (ej. 0.2 UGM/ha a 1.2 UGM/ha), y respetar un periodo de no pastoreo o siega en al menos el 50% de la superficie para favorecer la biodiversidad.",
       "Rates": {
         "Pluriannuality": "N/A",
-        "Threshold_ha": "N/A",
-        "Peninsular": 43.64,
+        "Threshold_ha": 65,
+        "Peninsular": 54.54,
         "Insular": 43.64
       }
     },
@@ -186,11 +186,11 @@
         "Threshold_ha": 95,
 
         "Peninsular": {
-          "Tier_1": 27.27,
+          "Tier_1": 35.92,
           "Tier_2": 27.27
         },
         "Insular": {
-          "Tier_1": 49.27,
+          "Tier_1": 57.92,
           "Tier_2": 49.27
         }
       }
@@ -254,7 +254,7 @@
       "Rates": {
         "Pluriannuality": "N/A",
         "Threshold_ha": "N/A",
-        "Peninsular": 42.996797,
+        "Peninsular": 48.1112,
         "Insular": "N/A"
       }
     },
@@ -265,7 +265,7 @@
       "Rates": {
         "Pluriannuality": "N/A",
         "Threshold_ha": "N/A",
-        "Peninsular": 145.098595,
+        "Peninsular": 148.818297,
         "Insular": "N/A"
       }
     },
@@ -311,12 +311,12 @@
         "Pluriannuality": "Si",
         "Threshold_ha": 15,
         "Peninsular": {
-          "Tier_1": 131.381037,
-          "Tier_2": 102.91
+          "Tier_1": 160.39,
+          "Tier_2": 112.273
         },
         "Insular": {
-          "Tier_1": 219.381037,
-          "Tier_2": 190.91
+          "Tier_1": 248.39,
+          "Tier_2": 200.273
         }
       }
     },

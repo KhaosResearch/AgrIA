@@ -37,7 +37,7 @@ def init_client(
     )
 
 
-client = init_client()
+client = init_client(temperature=0.5)
 vlm_client = None
 if all(v not in (None, "") for v in (VLM_BASE_URL, VLM_API_KEY, VLM_MODEL_NAME)):
     vlm_client = init_client(VLM_BASE_URL, VLM_API_KEY, VLM_MODEL_NAME)

@@ -14,18 +14,40 @@ from ..utils.llm_utils import get_aux_image_description
 logger = structlog.getLogger()
 
 
-def generate_user_response(user_input: str) -> str:
+def generate_user_response(
+    user_input: str,
+    is_detailed_description: bool,
+    lang: str,
+    file=None,
+    filename: str = None,
+) -> str:
     """
     Sends user input to chat and retrieves output.
     Args:
         user_input (str): User input fron frontend.
+        is_detailed_description (bool): If `True`, give a detailed explanation.
+        file: File content in bytes.
+        filename (str): Name of the image file.
     Returns:
         response.text (str): Response from model.
     """
-    response = chat.send_message(
-        user_input,
-    )
-    return response.text
+    try:
+        final_input = user_input
+        if None not in [file, filename]:
+            input_for_llm, image_context_prompt = get_image_description(
+                file, filename, lang, is_detailed_description
+            )
+            final_input = str(
+                "\n\n".join(
+                    [image_context_prompt, "\n".join(input_for_llm), user_input]
+                )
+            )
+        response = chat.send_message(final_input)
+        return response.text
+    except Exception as e:
+        logger.error(f"Error while generating response: {e}")
+        logger.exception(e)
+        raise e
 
 
 def get_image_description(file, filename, lang, is_detailed_description):
@@ -59,25 +81,19 @@ def get_image_description(file, filename, lang, is_detailed_description):
         )
 
         # Reconstruct the text chain to Hermes using the extracted description string
-        hermes_payload = [
+        llm_payload = [
             f"Visual Analysis Report of Parcel: {extracted_visual_description}",
             image_desc_prompt,
         ]
-        response = {
-            "text": chat.send_message(hermes_payload).text,
-            "imageDesc": image_context_prompt[lang],
-        }
+        input_for_llm = llm_payload
     else:
         text = {
             "es": "Lo siento, no puedo procesa imágenes directamente sin mis funcionalidades auxiliares de lectura de archivos.\nSi necesitas que te ayude a evaluar una parcela, por favor, usa el módulo de **Buscador de Parcelas**.",
             "en": "Sorry, I can't process images directly without my file reading auxiliary features.\nIf you need help assessing a parcel, please use the **Parcel Finder** module.",
         }
-        response = {
-            "text": text[lang],
-            "imageDesc": image_context_prompt[lang],
-        }
+        input_for_llm = text[lang]
 
-    return response.get("text", "")
+    return input_for_llm, image_context_prompt[lang]
 
 
 def get_parcel_description(
@@ -103,6 +119,7 @@ def get_parcel_description(
             import json
 
             json.dump(json_data, f, indent=4)
+
         # Insert image context prompt and read image desc file
         desc_trigger = (
             FULL_DESC_TRIGGER if is_detailed_description else SHORT_DESC_TRIGGER
@@ -197,7 +214,7 @@ def get_summarised_chat(chat_history):
     """
     try:
         chat_message_history = get_role_and_content(chat_history)
-        system_prompt = "You are an expert chat summarizer. Retain the most important parts and higligh all nuances needed to carry on with a conversation."
+        system_prompt = "You are an expert chat summarizer. Retain the most important parts and higlight all nuances needed to carry on with a conversation."
         instruction = "Summarise this chat history in 100-200 words aprox. Make emphasis on the last 5 chat entries:"
         msg = [
             ("system", system_prompt),

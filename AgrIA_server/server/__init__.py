@@ -34,7 +34,7 @@ def create_app(ui_url: str = UI_URL) -> FastAPI:
         field_name = loc[-1] if loc else ""
 
         # Match when 'userInput' form parameter is missing or invalid
-        if field_name == "userInput":
+        if field_name in ["userInput", "userMessage"]:
             return JSONResponse(
                 status_code=400, content={"error": "No user input provided"}
             )

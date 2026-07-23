@@ -5,7 +5,7 @@ import structlog
 
 from google.genai import Client as GeminiGenAIClient
 from io import BytesIO
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from ..config.llm_client import vlm_client
 from ..config.constants import (
@@ -162,10 +162,12 @@ def load_documents_from_json(
     return documents
 
 
-def set_initial_history(documents_json_path: str = CONTEXT_DOCUMENTS_FILE):
-    """Constructs the initial LangChain message history session, injecting context
-
-    documents dynamically without heavy vector search overhead.
+def set_initial_history(
+    documents_json_path: str = CONTEXT_DOCUMENTS_FILE,
+) -> list[BaseMessage]:
+    """
+    Constructs the initial LangChain message history session,
+    injecting context documents dynamically without heavy vector search overhead.
     """
     initial_history = []
     doc_paths_list = []

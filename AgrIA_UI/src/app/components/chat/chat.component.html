@@ -30,14 +30,26 @@
     </div>
 
     <div id="input">
-      <label class="custom-file-upload">
-        <img
-          src="img/upload-icon1.png"
-          alt="{{ 'parcelFinder.uploadImageAlt' | translate }}"
-          title="{{ 'parcelFinder.uploadImageAlt' | translate }}" />
-        <input type="file" accept="image/*" (change)="onFileSelected($event)" />
-      </label>
-
+      <div  style="align-items: center; justify-content: center; vertical-align: middle;">
+        @if (uploadImageFile) {
+          <button
+            type="button"
+            class="remove-upload-button"
+            title="{{ 'parcelFinder.removeImageAlt' | translate }}"
+            (click)="removeUploadedFile()">
+            X
+          </button>
+        }
+        <label
+          class="custom-file-upload"
+          [class.file-selected]="uploadImageFile">
+          <img
+            src="img/upload-icon1.png"
+            alt="{{ 'parcelFinder.uploadImageAlt' | translate }}"
+            title="{{ 'parcelFinder.uploadImageAlt' | translate }}" />
+          <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+        </label>
+      </div>
       <textarea
         id="user-input"
         (keydown.enter)="sendUserInput()"

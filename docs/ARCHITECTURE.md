@@ -20,21 +20,22 @@ The following diagram displays the core processes involved:
 <img src="./assets/img/AgrIA_diagram.png" alt="AgrIA's process Diagram" style="display: block; margin-left: auto; margin-right: auto;">
 
 
+
 ## Components Diagram
 ```mermaid
 graph TD
-    subgraph Frontend [AgrIA_UI]
+    subgraph Frontend[AgrIA_UI]
         App[App Component] --> Nav[Navbar Component]
-        
+
+        subgraph Homepage[Homepage View]
+            Home[Home Page Component]
+        end
+
         Nav --> Home
         Nav --> Chat[Chat Component]
         Nav --> Parcel[Parcel Finder Component]
         
-        subgraph homepage [Homepage View]
-            Home[Home Page Component]
-        end
-
-        subgraph Parcel_System [Parcel Finder View]
+        subgraph Parcel_System[Parcel Finder View]
             Parcel --> ParcelCad[Parcel Cadastral]
             Parcel --> ParcelLoc[Parcel Locator]
             Parcel --> ParcelDraw[Parcel Drawer]
@@ -42,7 +43,7 @@ graph TD
             ParcelLoc & ParcelCad & ParcelDraw --> ParcelService[Parcel Finder Service]
         end
         
-        subgraph Chat_System [Chat View]
+        subgraph Chat_System[Chat View]
             Chat --> ChatAsst[Chat Assistant Component]
             ChatAsst --> ChatService[Chat Assistant Services]
         end
@@ -53,16 +54,16 @@ graph TD
 
     API_Client -- "REST API" --> Server
 
-    subgraph Backend [AgrIA_server]
+    subgraph Backend[AgrIA_server]
         Server[Server Entry Point] --> Router[API Router/Controllers/Endpoints]
         
-        subgraph Assets [Assets & Docs]
+        subgraph Assets[Assets & Docs]
             LLM_Assets[LLM Assets / Context Docs]
             Geo_Assets[GeoJSON Assets]
             CAP_Docs[CAP Reference Docs]
         end
 
-        subgraph Core_Logic [Core Logic]
+        subgraph Core_Logic[Core Logic]
             ChatLogic[Chat Logic / LLM Processing]
             GeoLogic[GeoJSON / Spatial Logic]
             ClassifLogic[Ecoschemes Classif. Algorithm]

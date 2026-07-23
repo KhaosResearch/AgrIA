@@ -7,7 +7,6 @@ from fastapi import APIRouter, Form, UploadFile, File, HTTPException
 from server.config.chat_config import CHAT as chat
 from server.services.chat_service import (
     generate_user_response,
-    get_image_description,
     get_parcel_description,
     get_role_and_content,
     get_suggestion_for_chat,
@@ -23,28 +22,30 @@ def hello_world():
 
 
 @router.post("/send-user-input")
-def send_user_input(userInput: str = Form(...)):
-    try:
-        response_text = generate_user_response(userInput)
-        return {"response": response_text}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/send-image")
-def send_image(
-    image: UploadFile = File(...),
+def send_user_input(
+    userMessage: str = Form(...),
+    image: UploadFile | str | None = File(None),
     isDetailedDescription: str = Form("false"),
     lang: str = Form("en"),
 ):
     try:
         is_detailed_description = "true" in isDetailedDescription.lower()
-        response_text = get_image_description(
-            image.file, image.filename, lang, is_detailed_description
-        )
-        return {"response": response_text}
+
+        if image is not None and not isinstance(image, str):
+            file, filename = image.file, image.filename
+        else:
+            file, filename = None, None
+        if userMessage is not None and len(userMessage) > 0:
+            response_text = generate_user_response(
+                userMessage, is_detailed_description, lang, file, filename
+            )
+            return {"response": response_text}
+        else:
+            msg = "No user input provided"
+            ve = ValueError(msg)
+            logger.error(str(ve))
+            raise HTTPException(status_code=400, detail=msg)
     except Exception as e:
-        logger.exception("Error sending image:\n")
         raise HTTPException(status_code=500, detail=str(e))
 
 
