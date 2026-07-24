@@ -6,6 +6,7 @@ from langchain_core.messages import BaseMessage
 
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
+from ...utils.chat_utils import get_recent_history
 from ...utils.nodes_utils import load_prompt_asset
 
 logger = structlog.get_logger(__name__)
@@ -65,7 +66,7 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_IN
         confidence = data.get("confidence", 0.0)
 
         logger.info(
-            f"🧠 LLM Router classified intent: '{detected_intent}' (Confidence: {confidence})"
+            f"🧠 LLM Router classified intent: '{detected_intent.upper()}' (Confidence: {confidence})"
         )
 
         if detected_intent in [

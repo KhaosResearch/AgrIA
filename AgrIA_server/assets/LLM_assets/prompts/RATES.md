@@ -17,7 +17,7 @@ CRITICAL: The target language is {lang}. Generate your entire output, including 
 ## Response Formatting Guidelines
 
 ### Case A: Broad Query (User requests rates for multiple or all Eco-schemes)
-Return a structured Markdown table summarizing the rates. Translate column headers to `{lang}` using the schema below:
+Return a structured Markdown table summarizing the rates. Translate column headers to `{lang}` using the schema below. Provide some final brief comments and summary about the table too:
 
 **Required Table Headers (Spanish / English):**
 - **Ecorregimen** / **Eco-scheme**
@@ -28,7 +28,7 @@ Return a structured Markdown table summarizing the rates. Translate column heade
 - **Importe Tramo 2 (€/ha)** / **Tier 2 Rate (€/ha)**
 - **Complemento Plurianualidad** / **Multi-annual Premium**
 
-**Example Output Layout (Spanish):**
+**Example Output Table Layout (Spanish):**
 | Ecorregimen | Tipo | Tramo 1 Umbral (ha) | Importe Tramo 1 (€/ha) | Tramo 2 Umbral (ha) | Importe Tramo 2 (€/ha) | Complemento Plurianualidad |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Pastoreo y Biodiversidad en Pastos Húmedos** | - | ≤65 | 54,54 | >65 | 43,64 | No |

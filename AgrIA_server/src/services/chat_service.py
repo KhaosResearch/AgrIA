@@ -2,12 +2,14 @@ import structlog
 
 from PIL import Image
 from google.genai.types import Content
+from langchain_core.messages import HumanMessage, AIMessage
 
 from .ecoscheme_payments.main import calculate_ecoscheme_payment
-from ..config.chat_config import CHAT as chat
+from ..agent.graph import AGRIA_GRAPH as agent_graph
 from ..config.llm_client import vlm_client
 from ..config.constants import FULL_DESC_TRIGGER, SHORT_DESC_TRIGGER, TEMP_DIR
 from ..config.llm_client import client
+from ..config.state_config import AGRIA_STATE
 from ..utils.chat_utils import generate_image_context_data, save_image_and_get_path
 from ..utils.llm_utils import get_aux_image_description
 
@@ -31,6 +33,7 @@ def generate_user_response(
     Returns:
         response.text (str): Response from model.
     """
+    global AGRIA_STATE
     try:
         final_input = user_input
         if None not in [file, filename]:
@@ -42,8 +45,11 @@ def generate_user_response(
                     [image_context_prompt, "\n".join(input_for_llm), user_input]
                 )
             )
-        response = chat.send_message(final_input)
-        return response.text
+        AGRIA_STATE["lang"] = lang
+        AGRIA_STATE["messages"].append(HumanMessage(final_input))
+        AGRIA_STATE = agent_graph.invoke(AGRIA_STATE)
+        response = str(AGRIA_STATE["messages"][-1].content)
+        return response
     except Exception as e:
         logger.error(f"Error while generating response: {e}")
         logger.exception(e)
@@ -111,6 +117,7 @@ def get_parcel_description(
     Returns:
         response (dict:{text:str, imagedesc:str}): Contains the text response and image description.
     """
+    global AGRIA_STATE
     try:
         logger.info("Retrieveing parcel data...")
         image_context_data = generate_image_context_data(image_date, land_uses, query)
@@ -145,17 +152,22 @@ def get_parcel_description(
                 image_obj=image, lang=lang
             )
 
-            # Reconstruct the text chain to Hermes using the extracted description string
-            hermes_payload = [
+            # Reconstruct the text chain to model using the extracted description string
+            model_payload = "\n".join([
                 f"Visual Analysis Report of Parcel: {extracted_visual_description}",
                 image_indication_prompt,
                 image_desc_prompt,
-            ]
+            ])
         else:
-            hermes_payload = [image_indication_prompt, image_desc_prompt]
+            model_payload = "\n".join([image_indication_prompt, image_desc_prompt])
+        
+        AGRIA_STATE["lang"] = lang
+        AGRIA_STATE["messages"].append(HumanMessage(model_payload))
+        AGRIA_STATE = agent_graph.invoke(AGRIA_STATE)
+        response = str(AGRIA_STATE["messages"][-1].content)
 
         response = {
-            "text": chat.send_message(hermes_payload).text,
+            "text": response,
             "imageDesc": image_context_data,
         }
 
