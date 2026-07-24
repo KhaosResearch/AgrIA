@@ -2,7 +2,7 @@ from src.agent.graph import AGRIA_GRAPH
 
 
 def test_greeting_flow(base_state):
-    """[TEST A] Verify greeting routes to conversation_node."""
+    """[TEST A] Verify greeting routes to basic_chat_node."""
     state = base_state("Hola buenas tardes")
     result = AGRIA_GRAPH.invoke(state)
 
@@ -37,7 +37,7 @@ def test_report_flow(base_state, mock_crop_json):
 
 
 def test_cap_query_flow(base_state):
-    """[TEST D] Verify CAP questions trigger cap_query node."""
+    """[TEST D] Verify CAP questions trigger cap_query_node."""
     state = base_state(
         "¿Cuáles son los ecorregímenes más adecuados para cultivos leñosos?"
     )

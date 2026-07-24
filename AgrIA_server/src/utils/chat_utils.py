@@ -144,3 +144,8 @@ def get_coefficients(query, land_use) -> float:
     )
 
     return mean_irrigation_coef, mean_slope_coef
+
+
+def get_recent_history(messages: list, max_turns: int = 6) -> list:
+    """Extracts the last N messages to preserve conversational context."""
+    return messages[-max_turns:] if len(messages) > max_turns else messages

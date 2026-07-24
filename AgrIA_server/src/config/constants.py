@@ -22,6 +22,16 @@ PROMPT_LIST_FILE = "prompt_list.json"
 
 TEMP_DIR = Path(ROOT_DIR / "temp/")
 
+WELCOME_MESSAGE = (
+    "¡Hola!\n\nSoy tu Asistente de Imágenes Agrícolas, ¡pero puedes llamarme **AgrIA**!\n\n"
+    "Mi propósito aquí es **analizar imágenes satelitales de campos de cultivo** para "
+    "asistir a los agricultores en el análisis de su **uso del espacio y los recursos, "
+    "así como las prácticas agrícolas**, con el fin de **asesorarles a reunir los requisitos "
+    "para las subvenciones del Comité Europeo de Política Agrícola Común (CAP)**.\n\n"
+    "¡Sólo tienes que subir una imagen satelital de tus campos de cultivo y nos pondremos manos a la obra!\n\n"
+    "Si tiene alguna pregunta, también puede escribir en el cuadro de texto."
+)
+
 EXCLUSIVITY_RULE = """\n\n
 **CRITICAL EXCLUSIVITY DIRECTIVE FOR CALCULATION:**
 **UNBREAKABLE CAP RULE:** Ecoscheme aid is **MUTUALLY EXCLUSIVE**. Each hectare of land (Land Use) can only be assigned to **ONE SINGLE** Ecoscheme (ES).
@@ -96,5 +106,5 @@ GET_SR_BENCHMARK = False
 
 if GET_SR_BENCHMARK:
     logger.warning(
-        "⚠️  WARNING: SUPER-RES BENCHMARK IS ACTIVE. This will execute both SR4S and SEN2SR pipelines (in that order), which will slow down all parcel fetching processes. To deactivate it, set the `GET_SR_BENCHMARK` to `False` in the `Agria_server/server/config/constants.py` file"
+        "⚠️  WARNING: SUPER-RES BENCHMARK IS ACTIVE. This will execute both SR4S and SEN2SR pipelines (in that order), which will slow down all parcel fetching processes. To deactivate it, set the `GET_SR_BENCHMARK` to `False` in the `AgrIA/AgrIA_server/server/config/constants.py` file"
     )

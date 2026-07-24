@@ -5,6 +5,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 from ..config.constants import BASE_PROMPTS_PATH
 from ..models.chat_models import LocalChat
 from ..models.state_models import AgrIAState
+from ..utils.chat_utils import get_recent_history
 
 logger = structlog.get_logger(__file__)
 
@@ -39,7 +40,8 @@ def execute_scoped_chat(
             client=client,
             model_name=model_name,
             system_instruction=system_instruction,
-            max_context_tokens=8000,
+            history_init=get_recent_history(state["messages"][:-1]),
+            max_context_tokens=20000,
         )
 
         response_wrapper = chat.send_message(user_input)

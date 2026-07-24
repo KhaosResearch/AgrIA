@@ -6,6 +6,7 @@ from langchain_core.messages import AIMessage
 from ...config.constants import BASE_PROMPTS_PATH
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
+from ...utils.chat_utils import get_recent_history
 
 logger = structlog.get_logger(__file__)
 
@@ -23,6 +24,7 @@ def generate_report_node(state: AgrIAState, client, model_name: str) -> dict:
     """
     lang = state.get("lang", "es")
     metadata = state.get("crop_metadata", {})
+    history_messages = state["messages"]
 
     # Align state key naming uniform checks
     visual_desc = (
@@ -50,6 +52,7 @@ ATTENTION: Your previous output failed verification checks. You MUST fix these e
 {feedback}
 </critical_retry_warning>
 """
+        history_messages = history_messages[:-1]  # Removed failed report
 
     # 2. Package data inside XML (feedback included)
     user_content = f"""{feedback_block}
@@ -64,12 +67,12 @@ Please compile the agricultural report matching the template constraints using t
 </parcel_metadata_json>
 """
 
-    # 3. Initialize a dedicated, short-lived session specifically for this compilation
     chat = LocalChat(
         client=client,
         model_name=model_name,
         system_instruction=system_instruction,
-        max_context_tokens=10000,  # Give it a large temporary window for complex payloads
+        history_init=get_recent_history(history_messages),
+        max_context_tokens=10000,
     )
 
     # Send payload through your standard class invocation pipeline
@@ -77,10 +80,9 @@ Please compile the agricultural report matching the template constraints using t
 
     # Return updates back cleanly to the graph lifecycle state machine
     return {
-        "messages": state["messages"] + [AIMessage(response_wrapper.text)],
-        "correction_feedback": feedback,
+        "messages": [AIMessage(content=response_wrapper.text)],
+        "correction_feedback": None,  # Reset feedback after every attempt
     }
-
 
 if __name__ == "__main__":
     # Concrete test execution framework

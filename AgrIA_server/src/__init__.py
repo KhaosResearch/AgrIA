@@ -2,14 +2,26 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from langchain_core.messages import AIMessage
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .benchmark.sr.constants import BM_DATA_DIR, BM_RES_DIR
-from .config.constants import TEMP_DIR
+from .config.constants import TEMP_DIR, WELCOME_MESSAGE
 from .config.env_config import UI_URL
 from .endpoints.chat import router as chat_router
 from .endpoints.parcel_finder import router as parcel_finder_router
+from .models.state_models import AgrIAState
 from .utils.parcel_finder_utils import reset_dir
+
+AGRIA_STATE = AgrIAState(
+    {
+        "messages": [AIMessage(content=WELCOME_MESSAGE)],
+        "lang": "es",
+        "crop_metadata": None,
+        "visual_description": None,
+        "correction_feedback": None,
+    }
+)
 
 
 def create_app(ui_url: str = UI_URL) -> FastAPI:

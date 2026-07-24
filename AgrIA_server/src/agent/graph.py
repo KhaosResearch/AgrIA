@@ -5,8 +5,8 @@ from langgraph.graph import StateGraph, START, END
 
 from ..config.llm_client import client, LLM_MODEL_NAME
 from ..models.state_models import AgrIAState
-from .nodes.cap_query import cap_query_node
-from .nodes.conversation_node import basic_chat_node
+from .nodes.cap_query_node import cap_query_node
+from .nodes.basic_chat_node import basic_chat_node
 from .nodes.fallback_node import fallback_rejection_node
 from .nodes.ecoscheme_rates_node import ecoschemes_rates_node
 from .nodes.report_node import generate_report_node

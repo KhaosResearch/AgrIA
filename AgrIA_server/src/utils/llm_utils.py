@@ -13,6 +13,7 @@ from ..config.constants import (
     BASE_PROMPTS_PATH,
     CONTEXT_DOCUMENTS_FILE,
     PROMPT_LIST_FILE,
+    WELCOME_MESSAGE,
 )
 from ..services.llm_services import upload_context_document
 
@@ -203,18 +204,8 @@ def set_initial_history(
 
     # 3. Chat Intro Sequence
     user_input_intro = "Recuerda que debes hablar en el mismo idioma que el usuario, ya sea español, inglés u otro. Ahora preséntate."
-    model_output_intro = (
-        "¡Hola!\n\nSoy tu Asistente de Imágenes Agrícolas, ¡pero puedes llamarme **AgrIA**!\n\n"
-        "Mi propósito aquí es **analizar imágenes satelitales de campos de cultivo** para "
-        "asistir a los agricultores en el análisis de su **uso del espacio y los recursos, "
-        "así como las prácticas agrícolas**, con el fin de **asesorarles a reunir los requisitos "
-        "para las subvenciones del Comité Europeo de Política Agrícola Común (CAP)**.\n\n"
-        "¡Sólo tienes que subir una imagen satelital de tus campos de cultivo y nos pondremos manos a la obra!\n\n"
-        "Si tiene alguna pregunta, también puede escribir en el cuadro de texto."
-    )
-
     initial_history.append(HumanMessage(content=user_input_intro))
-    initial_history.append(AIMessage(content=model_output_intro))
+    initial_history.append(AIMessage(content=WELCOME_MESSAGE))
 
     return initial_history
 

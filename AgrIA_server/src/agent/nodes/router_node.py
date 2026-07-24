@@ -37,17 +37,21 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_IN
     try:
         system_instruction = load_prompt_asset("INTENT.md")
 
-        # Fast, short-lived session with strict context boundaries
         classifier_chat = LocalChat(
             client=client,
             model_name=model_name,
             system_instruction=system_instruction,
-            max_context_tokens=3000,
+            history_init=get_recent_history(state["messages"][:-1]),
+            max_context_tokens=8000,
         )
 
-        response_wrapper = classifier_chat.send_message(
-            f'Classify this user message: "{text_content}"'
+        # Use last few messages for context
+        recent_messages = state["messages"][-4:]
+        formatted_dialogue = "\n".join(
+            [f"{m.type}: {m.content}" for m in recent_messages]
         )
+        user_prompt = f"Classify the intent of the last message in this dialogue. Use the chat history as context:\n<last_user_message>\n{formatted_dialogue}\n</last_user_message>"
+        response_wrapper = classifier_chat.send_message(user_prompt)
 
         # Parse output payload
         response_text = response_wrapper.text.strip()

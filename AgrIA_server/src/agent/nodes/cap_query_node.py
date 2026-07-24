@@ -3,6 +3,7 @@ from langchain_core.messages import AIMessage
 from ...utils.rag_utils import get_or_create_knowledge_base, query_knowledge_base
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
+from ...utils.chat_utils import get_recent_history
 from ...utils.nodes_utils import load_prompt_asset
 
 
@@ -43,9 +44,10 @@ def cap_query_node(state: AgrIAState, client, model_name: str) -> dict:
         client=client,
         model_name=model_name,
         system_instruction=system_instruction,
-        max_context_tokens=8000,  # Highly conservative window—no more 32k bloat!
+        history_init=get_recent_history(state["messages"][:-1]),
+        max_context_tokens=20000,
     )
 
     response_wrapper = chat.send_message(user_payload)
 
-    return {"messages": state["messages"] + [AIMessage(content=response_wrapper.text)]}
+    return {"messages": [AIMessage(content=response_wrapper.text)]}
