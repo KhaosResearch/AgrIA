@@ -3,6 +3,7 @@ from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
 from typing import Annotated
 
+
 # Define the clean State representation for LangGraph
 class AgrIAState(TypedDict):
     messages: Annotated[BaseMessage, add_messages]

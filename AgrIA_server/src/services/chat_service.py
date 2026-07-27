@@ -2,7 +2,7 @@ import structlog
 
 from PIL import Image
 from google.genai.types import Content
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage
 
 from .ecoscheme_payments.main import calculate_ecoscheme_payment
 from ..agent.graph import AGRIA_GRAPH as agent_graph
@@ -103,8 +103,13 @@ def get_image_description(file, filename, lang, is_detailed_description):
 
 
 def get_parcel_description(
-    image_date, land_uses, query, image_filename, is_detailed_description, lang
-):
+    image_date: str,
+    land_uses: list[dict],
+    query: list[dict],
+    image_filename: str,
+    is_detailed_description: bool = False,
+    lang: str = "es",
+) -> dict:
     """
     Handles the parcel information reading and description.
     Args:
@@ -153,14 +158,16 @@ def get_parcel_description(
             )
 
             # Reconstruct the text chain to model using the extracted description string
-            model_payload = "\n".join([
-                f"Visual Analysis Report of Parcel: {extracted_visual_description}",
-                image_indication_prompt,
-                image_desc_prompt,
-            ])
+            model_payload = "\n".join(
+                [
+                    f"Visual Analysis Report of Parcel: {extracted_visual_description}",
+                    image_indication_prompt,
+                    image_desc_prompt,
+                ]
+            )
         else:
             model_payload = "\n".join([image_indication_prompt, image_desc_prompt])
-        
+
         AGRIA_STATE["lang"] = lang
         AGRIA_STATE["messages"].append(HumanMessage(model_payload))
         AGRIA_STATE = agent_graph.invoke(AGRIA_STATE)
@@ -186,7 +193,7 @@ def get_suggestion_for_chat(chat_history: list[Content], lang: str):
         suggestion (str): Suggestion for the user to input.
     """
     try:
-        last_message = chat_history[-1] if chat_history[-1] else ""
+        last_message = chat_history[-1].content if chat_history[-1] else ""
         summarised_chat = (
             "### CHAT_SUMMARY_START ###\n"
             + get_summarised_chat(chat_history)

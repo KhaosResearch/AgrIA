@@ -4,7 +4,7 @@ import structlog
 from typing import Optional
 from fastapi import APIRouter, Form, UploadFile, File, HTTPException
 
-from src.config.chat_config import CHAT as chat
+from src.config.state_config import AGRIA_STATE
 from src.services.chat_service import (
     generate_user_response,
     get_parcel_description,
@@ -82,8 +82,9 @@ def send_parcel_info_to_chat(
 
 @router.post("/get-input-suggestion")
 def get_input_suggestion(lang: str = Form("es")):
+    global AGRIA_STATE
     try:
-        chat_history = chat.get_history()
+        chat_history = AGRIA_STATE["messages"]
         if not chat_history:
             raise ValueError("No valid history provided.")
         response = get_suggestion_for_chat(chat_history, lang)
@@ -97,8 +98,9 @@ def get_input_suggestion(lang: str = Form("es")):
 
 @router.get("/load-active-chat-history")
 def load_active_chat_history():
+    global AGRIA_STATE
     try:
-        chat_history = chat.get_history()
+        chat_history = AGRIA_STATE["messages"]
         if not chat_history:
             raise ValueError("No valid history provided.")
         response = get_role_and_content(chat_history)
