@@ -206,14 +206,18 @@ def get_suggestion_for_chat(chat_history: list[Content], lang: str):
             + "### LAST_OUTPUT_END ###"
         )
         language = "Spanish" if lang == "es" else "English"
-        system_prompt = "You are acting as a user. Do not use any data not mentioned. Questions are heavily encouraged. Limit the use of expressions such as 'Genial/Great','Excelente/Excellent', etc..:\n\n"
-        suggestion_prompt = f"Using the summary as context, provide an appropiate 300-character max response in {language} to this chat output."
+        # Load System Instructions
+        raw_instruction = load_prompt_asset("SUGGESTION.md")
+        system_instruction = raw_instruction.replace(
+            "{lang}", "Spanish" if lang == "es" else "English"
+        )
+
 
         msg = [
-            ("system", system_prompt),
+            ("system", system_instruction),
             (
                 "human",
-                "\n".join([suggestion_prompt, summarised_chat, last_chat_output]),
+                "\n".join(["Summarised chat:", summarised_chat, "\nLast chat entry:", last_chat_output]),
             ),
         ]
         suggestion = client.invoke(msg)
