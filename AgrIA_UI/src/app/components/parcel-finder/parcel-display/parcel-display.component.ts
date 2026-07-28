@@ -40,7 +40,7 @@ export class ParcelDisplayComponent {
     this.subscription = this.parcelFinderService.parcelInfo$.subscribe(parcelInfo => {
       if (parcelInfo) {
         this.selectedParcelInfo = parcelInfo;
-        this.parcelImageUrl = parcelInfo.imagePath + '?t=' + new Date().getTime();
+        this.parcelImageUrl = parcelInfo.imagePath.includes('?t=') ? parcelInfo.imagePath : parcelInfo.imagePath + '?t=' + new Date().getTime();
         this.cdRef.markForCheck();
       }
     });

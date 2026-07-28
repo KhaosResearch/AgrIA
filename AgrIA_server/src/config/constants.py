@@ -22,6 +22,11 @@ PROMPT_LIST_FILE = "prompt_list.json"
 
 TEMP_DIR = Path(ROOT_DIR / "temp/")
 
+KML_FILENAME = (
+    "S2A_OPER_GIP_TILPAR_MPC__20151209T095117_V20150622T000000_21000101T000000_B00"
+)
+KML_FILE_URL = "https://sentiwiki.copernicus.eu/__attachments/1692737/{KML_FILENAME}.zip?inst-v=4ece9b51-c9c2-42f6-96f6-479e12c9d659"
+
 WELCOME_MESSAGE = (
     "¡Hola!\n\nSoy tu Asistente de Imágenes Agrícolas, ¡pero puedes llamarme **AgrIA**!\n\n"
     "Mi propósito aquí es **analizar imágenes satelitales de campos de cultivo** para "

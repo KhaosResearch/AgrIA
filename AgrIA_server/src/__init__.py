@@ -1,3 +1,10 @@
+import io
+import os
+import structlog
+import requests
+import zipfile
+
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -5,15 +12,38 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .benchmark.sr.constants import BM_DATA_DIR, BM_RES_DIR
-from .config.constants import TEMP_DIR
+from .config.constants import BASE_GEOJSON_PATH, KML_FILE_URL, KML_FILENAME, TEMP_DIR
 from .config.env_config import UI_URL
 from .endpoints.chat import router as chat_router
 from .endpoints.parcel_finder import router as parcel_finder_router
 from .utils.parcel_finder_utils import reset_dir
 
+logger = structlog.get_logger()
 
-def create_app(ui_url: str = UI_URL) -> FastAPI:
-    app = FastAPI(title="AgrIA Server")
+
+# --- Lifespan handler ---
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Fetch Sentinel2 Grid KML file
+    try:
+        if not os.path.exists(str(BASE_GEOJSON_PATH / str(KML_FILENAME + ".kml"))):
+            response = requests.get(KML_FILE_URL, stream=True)
+            response.raise_for_status()
+            z = zipfile.ZipFile(io.BytesIO(response.content))
+            z.extractall(BASE_GEOJSON_PATH)
+            logger.info("Successfully downloaded and extracted KML files on startup.")
+        else:
+            logger.info("KML file detected and already available on startup.")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Download failed: {e}")
+    except zipfile.BadZipFile:
+        logger.error("The URL didn't actually return a valid ZIP file.")
+
+    yield
+
+
+def create_app(ui_url: str = UI_URL, lifespan=lifespan) -> FastAPI:
+    app = FastAPI(title="AgrIA Server", lifespan=lifespan)
 
     # FastAPI standard CORS middleware configuration
     app.add_middleware(

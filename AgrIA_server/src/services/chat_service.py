@@ -168,6 +168,7 @@ def get_parcel_description(
         else:
             model_payload = "\n".join([image_indication_prompt, image_desc_prompt])
 
+        AGRIA_STATE["crop_metadata"] = json_data
         AGRIA_STATE["lang"] = lang
         AGRIA_STATE["messages"].append(HumanMessage(model_payload))
         AGRIA_STATE = agent_graph.invoke(AGRIA_STATE)
