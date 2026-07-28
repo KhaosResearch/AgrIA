@@ -72,7 +72,7 @@ Please compile the agricultural report matching the template constraints using t
         model_name=model_name,
         system_instruction=system_instruction,
         history_init=get_recent_history(history_messages),
-        max_context_tokens=10000,
+        max_context_tokens=20000,
     )
 
     # Send payload through your standard class invocation pipeline
