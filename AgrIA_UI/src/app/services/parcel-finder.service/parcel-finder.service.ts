@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { ICropClassification } from '../../models/parcel-drawer.model';
 import { environment } from '../../../environments/environment';
-import { IFindParcelresponse } from '../../models/parcel-finder.model';
+import { IFindParcelResponse } from '../../models/parcel-finder.model';
 import { ISigpacLocationData } from '../../models/parcel-locator.model';
 import { CROP_CLASSIFICATION_FILENAME } from '../../config/constants';
 
@@ -12,7 +12,7 @@ import { CROP_CLASSIFICATION_FILENAME } from '../../config/constants';
 })
 export class ParcelFinderService {
   private apiUrl = environment.apiUrl;
-  private parcelInfoSubject = new BehaviorSubject<IFindParcelresponse | null>(null);
+  private parcelInfoSubject = new BehaviorSubject<IFindParcelResponse | null>(null);
   parcelInfo$ = this.parcelInfoSubject.asObservable();
 
   constructor(private http: HttpClient) {}
@@ -23,9 +23,9 @@ export class ParcelFinderService {
       .pipe(map(res => res.response));
   }
 
-  findParcel(request: FormData): Observable<IFindParcelresponse> {
+  findParcel(request: FormData): Observable<IFindParcelResponse> {
     return this.http
-      .post<{ response: IFindParcelresponse }>(`${this.apiUrl}/find-parcel`, request)
+      .post<{ response: IFindParcelResponse }>(`${this.apiUrl}/find-parcel`, request)
       .pipe(map(res => res.response));
   }
 
@@ -41,7 +41,7 @@ export class ParcelFinderService {
     return this.http.post<{ response: boolean }>(`${this.apiUrl}/is-coord-in-zone`, request).pipe(map(res => res.response));
   }
 
-  setParcelInfo(data: IFindParcelresponse) {
+  setParcelInfo(data: IFindParcelResponse) {
     this.parcelInfoSubject.next(data);
   }
 }

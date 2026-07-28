@@ -7,7 +7,7 @@ import { ParcelFinderService } from '../../services/parcel-finder.service/parcel
 import { ChatService } from '../../services/chat.service/chat.service';
 import { IChatParcelResponse } from '../../models/chat.model';
 import { Subscription, take } from 'rxjs';
-import { IFindParcelresponse } from '../../models/parcel-finder.model';
+import { IFindParcelResponse } from '../../models/parcel-finder.model';
 import { NotificationService } from '../../services/notification.service/notification.service';
 
 @Component({
@@ -103,7 +103,7 @@ export class ChatComponent {
    *
    * @param parcel
    */
-  private sendParcelInfoToChat(parcel: IFindParcelresponse) {
+  private sendParcelInfoToChat(parcel: IFindParcelResponse) {
     this.chatAssistant.showMessageIcon();
     const [__, year, month] = this.imagePreviewUrl?.split('/')?.pop()?.split('.')[0].split('_') || [];
 
