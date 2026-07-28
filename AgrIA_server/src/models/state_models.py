@@ -6,8 +6,8 @@ from typing import Annotated
 
 # Define the clean State representation for LangGraph
 class AgrIAState(TypedDict):
-    messages: Annotated[BaseMessage, add_messages]
+    messages: Annotated[list[BaseMessage], add_messages]
     lang: str  # "es" or "en"
-    crop_metadata: dict  # The JSON calculated from your ES tools
+    crop_metadata: Optional[dict]  # The JSON calculated from your tools
     visual_description: Optional[str]
     correction_feedback: Optional[str]

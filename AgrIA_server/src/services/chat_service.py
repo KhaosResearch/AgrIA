@@ -4,12 +4,13 @@ from PIL import Image
 from google.genai.types import Content
 from langchain_core.messages import HumanMessage
 
+from ..utils.nodes_utils import load_prompt_asset
+
 from .ecoscheme_payments.main import calculate_ecoscheme_payment
 from ..agent.graph import AGRIA_GRAPH as agent_graph
 from ..config.llm_client import vlm_client
 from ..config.constants import FULL_DESC_TRIGGER, SHORT_DESC_TRIGGER, TEMP_DIR
 from ..config.llm_client import client
-from ..config.state_config import AGRIA_STATE
 from ..utils.chat_utils import generate_image_context_data, save_image_and_get_path
 from ..utils.llm_utils import get_aux_image_description
 
@@ -22,6 +23,7 @@ def generate_user_response(
     lang: str,
     file=None,
     filename: str = None,
+    thread_id: str = "default_session",
 ) -> str:
     """
     Sends user input to chat and retrieves output.
@@ -33,7 +35,6 @@ def generate_user_response(
     Returns:
         response.text (str): Response from model.
     """
-    global AGRIA_STATE
     try:
         final_input = user_input
         if None not in [file, filename]:
@@ -45,10 +46,13 @@ def generate_user_response(
                     [image_context_prompt, "\n".join(input_for_llm), user_input]
                 )
             )
-        AGRIA_STATE["lang"] = lang
-        AGRIA_STATE["messages"].append(HumanMessage(final_input))
-        AGRIA_STATE = agent_graph.invoke(AGRIA_STATE)
-        response = str(AGRIA_STATE["messages"][-1].content)
+        inputs = {
+            "lang": lang,
+            "messages": [HumanMessage(content=final_input)],
+        }
+        config = {"configurable": {"thread_id": thread_id}}  # Avoids multiple users colission
+        output_state = agent_graph.invoke(inputs, config=config)
+        response = str(output_state["messages"][-1].content)
         return response
     except Exception as e:
         logger.error(f"Error while generating response: {e}")
@@ -109,6 +113,7 @@ def get_parcel_description(
     image_filename: str,
     is_detailed_description: bool = False,
     lang: str = "es",
+    thread_id: str = "default_session",
 ) -> dict:
     """
     Handles the parcel information reading and description.
@@ -122,7 +127,6 @@ def get_parcel_description(
     Returns:
         response (dict:{text:str, imagedesc:str}): Contains the text response and image description.
     """
-    global AGRIA_STATE
     try:
         logger.info("Retrieveing parcel data...")
         image_context_data = generate_image_context_data(image_date, land_uses, query)
@@ -168,11 +172,14 @@ def get_parcel_description(
         else:
             model_payload = "\n".join([image_indication_prompt, image_desc_prompt])
 
-        AGRIA_STATE["crop_metadata"] = json_data
-        AGRIA_STATE["lang"] = lang
-        AGRIA_STATE["messages"].append(HumanMessage(model_payload))
-        AGRIA_STATE = agent_graph.invoke(AGRIA_STATE)
-        response = str(AGRIA_STATE["messages"][-1].content)
+        inputs = {
+            "crop_metadata": json_data,
+            "lang": lang,
+            "messages": [HumanMessage(content=model_payload)],
+        }
+        config = {"configurable": {"thread_id": thread_id}}
+        output_state = agent_graph.invoke(inputs, config=config)
+        response = str(output_state["messages"][-1].content)
 
         response = {
             "text": response,

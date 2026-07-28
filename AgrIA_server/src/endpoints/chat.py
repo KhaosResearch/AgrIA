@@ -1,10 +1,12 @@
 import json
 import structlog
 
+from langchain_core.messages import AIMessage
 from typing import Optional
 from fastapi import APIRouter, Form, UploadFile, File, HTTPException
 
-from src.config.state_config import AGRIA_STATE
+from src.config.constants import WELCOME_MESSAGE
+from src.agent.graph import AGRIA_GRAPH as agent_graph
 from src.services.chat_service import (
     generate_user_response,
     get_parcel_description,
@@ -81,11 +83,19 @@ def send_parcel_info_to_chat(
 
 
 @router.post("/get-input-suggestion")
-def get_input_suggestion(lang: str = Form("es")):
-    global AGRIA_STATE
+def get_input_suggestion(
+    lang: str = Form("es"),
+    thread_id: str = "default_session",
+):
     try:
-        chat_history = AGRIA_STATE["messages"]
-        if not chat_history:
+        # Retrieve current thread state from LangGraph checkpointer
+        config = {"configurable": {"thread_id": thread_id}}
+        current_state = agent_graph.get_state(config)
+
+        # Access stored messages (returns empty list if thread doesn't exist yet)
+        chat_history = current_state.values.get("messages", [])
+
+        if not len(chat_history) > 0:
             raise ValueError("No valid history provided.")
         response = get_suggestion_for_chat(chat_history, lang)
         return {"response": response}
@@ -97,13 +107,22 @@ def get_input_suggestion(lang: str = Form("es")):
 
 
 @router.get("/load-active-chat-history")
-def load_active_chat_history():
-    global AGRIA_STATE
+def load_active_chat_history(thread_id: str = "default_session"):
     try:
-        chat_history = AGRIA_STATE["messages"]
+        config = {"configurable": {"thread_id": thread_id}}
+        current_state = agent_graph.get_state(config)
+
+        chat_history = current_state.values.get("messages", [])
+        
         if not chat_history:
-            raise ValueError("No valid history provided.")
+            welcome_msg = AIMessage(content=WELCOME_MESSAGE)
+            agent_graph.update_state(config, {"messages": [welcome_msg]})
+            chat_history = [welcome_msg]
         response = get_role_and_content(chat_history)
+        with open("history.json", "w") as f:
+            import json
+
+            json.dump(response, f, indent=4)
         return {"response": response}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

@@ -1,7 +1,7 @@
 import structlog
 
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph, START, END
-
 
 from ..config.llm_client import client, LLM_MODEL_NAME
 from ..models.state_models import AgrIAState
@@ -84,4 +84,5 @@ def build_graph() -> StateGraph[AgrIAState]:
 
 # Compile the State Machine
 builder = build_graph()
-AGRIA_GRAPH = builder.compile()
+checkpointer = MemorySaver()
+AGRIA_GRAPH = builder.compile(checkpointer=checkpointer)

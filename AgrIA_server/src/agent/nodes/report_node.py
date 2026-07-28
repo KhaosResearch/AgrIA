@@ -1,7 +1,7 @@
 import json
 import structlog
 
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, RemoveMessage
 
 from ...config.constants import BASE_PROMPTS_PATH
 from ...models.chat_models import LocalChat
@@ -44,6 +44,7 @@ def generate_report_node(state: AgrIAState, client, model_name: str) -> dict:
     # Check state feedback
     feedback = state.get("correction_feedback")
     feedback_block = ""
+    message_to_remove = None
 
     if feedback and feedback != "PASSED":
         feedback_block = f"""
@@ -52,7 +53,15 @@ ATTENTION: Your previous output failed verification checks. You MUST fix these e
 {feedback}
 </critical_retry_warning>
 """
-        history_messages = history_messages[:-1]  # Removed failed report
+        # Identify the last message (the invalid report) to delete it from state
+        if history_messages and isinstance(history_messages[-1], AIMessage):
+            last_msg = history_messages[-1]
+            # If the message has an ID, create a RemoveMessage instruction for LangGraph
+            if hasattr(last_msg, "id") and last_msg.id:
+                message_to_remove = RemoveMessage(id=last_msg.id)
+            
+            # Exclude the failed report from the history passed to LLM
+            history_messages = history_messages[:-1]
 
     # 2. Package data inside XML (feedback included)
     user_content = f"""{feedback_block}
@@ -78,9 +87,17 @@ Please compile the agricultural report matching the template constraints using t
     # Send payload through your standard class invocation pipeline
     response_wrapper = chat.send_message(user_content)
 
+    messages_update = []
+    
+    # If we have a failed message to purge from state, add RemoveMessage command first
+    if message_to_remove:
+        messages_update.append(message_to_remove)
+        
+    messages_update.append(AIMessage(content=response_wrapper.text))
+
     # Return updates back cleanly to the graph lifecycle state machine
     return {
-        "messages": [AIMessage(content=response_wrapper.text)],
+        "messages": messages_update,
         "correction_feedback": None,  # Reset feedback after every attempt
     }
 
