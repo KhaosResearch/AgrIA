@@ -19,8 +19,8 @@ def cap_query_node(state: AgrIAState, client, model_name: str) -> dict:
     # 1. Access knowledge base
     collection = get_or_create_knowledge_base(reset_database=False)
 
-    # 2. Retrieve top 3 relevant passages matching query (~1,000 - 1,500 tokens)
-    retrieved_context = query_knowledge_base(collection, user_query, n_results=7)
+    # 2. Retrieve top 3 relevant passages matching query
+    retrieved_context = query_knowledge_base(collection, user_query, n_results=20)
 
     # 3. Load System Instructions
     raw_instruction = load_prompt_asset("CAP_QUERY.md", lang)

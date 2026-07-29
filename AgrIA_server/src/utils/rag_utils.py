@@ -27,7 +27,7 @@ def chunk_document(
     logger.info(f"📖 Loading document for chunking: {file_path.name}")
     if file_path.suffix.lower() == ".pdf":
         loader = PyPDFLoader(str(file_path))
-    elif file_path.suffix.lower() in [".md", ".txt"]:
+    elif file_path.suffix.lower() in [".md", ".txt", ".json"]:
         loader = TextLoader(str(file_path), encoding="utf-8")
     else:
         logger.warning(f"Unsupported file format skipped: {file_path.name}")
@@ -125,6 +125,7 @@ def get_or_create_knowledge_base(
         list(base_files_dir.glob("*.pdf"))
         + list(base_files_dir.glob("*.md"))
         + list(base_files_dir.glob("*.txt"))
+        + list(base_files_dir.glob("*.json"))
     )
     # if not files_to_ingest or len(files_to_ingest) < 1:
     # logger.info("No PDF files found. Searching for MD and TXT files...")
@@ -150,5 +151,6 @@ def query_knowledge_base(collection, query_text: str, n_results: int = 3) -> str
         src = meta.get("source_file", "Unknown")
         page = f" (Page {meta['page_number']})" if "page_number" in meta else ""
         formatted_context.append(f"--- FROM: {src}{page} ---\n{doc}")
-
+    with open("rag.log", "w") as f:
+        f.write("\n\n".join(formatted_context))
     return "\n\n".join(formatted_context)
