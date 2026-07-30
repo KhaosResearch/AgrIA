@@ -11,10 +11,10 @@ graph TD
     START([🚀 User Input / State Initialization])
     ROUTER{{"🧠 Router Node<br/>(Fast-Path & LLM Intent Classifier)"}}
     
-    CONV["💬 Conversation Node<br/>(basic_chat)"]
+    CONV["💬 Basic Chat Node<br/>(basic_chat)"]
     FALLBACK["🚫 Fallback Node<br/>(fallback_rejection)"]
-    CAP["📜 CAP Regulatory Node<br/>(cap_query)"]
-    RATES["💶 Ecoscheme Rates Node<br/>(ecoscheme_rates_node)"]
+    CAP["📜 CAP Query Node<br/>(cap_query)"]
+    RATES["💶 Ecoscheme Rates Node<br/>(ecoscheme_rates)"]
     REPORT["📊 Report Node<br/>(report_generator)"]
     VALIDATION["✅ Validation Node<br/>(report_validation)"]
     
@@ -37,7 +37,7 @@ graph TD
     RATES --> END
 
     %% Validation Loop Sub-Graph
-    REPORT --> VALIDATION
+    REPORT -- "Is valid report?" --> VALIDATION
     VALIDATION -- "Approved" --> END
     VALIDATION -- "Correction Required" --> REPORT
 
@@ -57,7 +57,7 @@ graph TD
 
 ### 1. State Management (`AgrIAState`)
 The agent maintains an immutable execution state passed between nodes:
-* `messages`: Full conversation thread (`List[BaseMessage]`).
+* `messages`: Full conversation thread (`Annotated[BaseMessage]`).
 * `lang`: Target response language (`"es"` | `"en"`).
 * `crop_metadata`: SIGPAC / GIS parcel JSON payload (if provided).
 * `visual_description`: Multi-modal VLM scene analysis.
@@ -70,10 +70,10 @@ The agent maintains an immutable execution state passed between nodes:
 | Node Name | Module Path | Description / Scope |
 | :--- | :--- | :--- |
 | **Router** | `nodes/router_node.py` | Dual-mode intent classifier. Uses **Fast-Path** regex detection for rapid report triggers (`###DESCRIBE_SHORT_IMAGE###`) or a **Structured JSON LLM call** for natural language routing. |
-| **Conversation** | `nodes/conversation_node.py` | Handles general domain chit-chat, greetings, and high-level non-regulatory agricultural questions. |
+| **Basich Chat** | `nodes/basic_chat_node.py` | Handles general domain chit-chat, greetings, and high-level non-regulatory agricultural questions. |
 | **Fallback** | `nodes/fallback_node.py` | Out-of-scope filter. Politeness rejection for queries unrelated to agriculture, crops, or farming. |
-| **CAP Query** | `nodes/cap_query.py` | Local RAG pipeline powered by **ChromaDB**. Retrieves semantically relevant legal contexts from regional/national PAC regulatory PDFs and `.md` files. |
-| **Ecoscheme Rates** | `nodes/ecoscheme_rates_node.py` | Direct context injection node for Campaign Eco-scheme rates, financial thresholds, multi-annual premiums, and payment tables. |
+| **CAP Query** | `nodes/cap_query_node.py` | Local RAG pipeline powered by **ChromaDB**. Retrieves semantically relevant legal contexts from regional/national PAC regulatory PDFs and `.md` files. |
+| **Ecoscheme Rates** | `nodes/ecoscheme_rates.py` | Direct context injection node for Campaign Eco-scheme rates, financial thresholds, multi-annual premiums, and payment tables. |
 | **Report** | `nodes/report_node.py` | Generates comprehensive parcel diagnostic reports combining SIGPAC metadata and VLM visual descriptions. |
 | **Validation** | `nodes/validation_node.py` | Automated self-reflection node that evaluates generated reports against required schema metrics before returning output to the user. |
 

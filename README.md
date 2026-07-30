@@ -150,7 +150,7 @@ graph TD
     
     CONV["💬 Conversation Node<br/>(basic_chat)"]
     FALLBACK["🚫 Fallback Node<br/>(fallback_rejection)"]
-    CAP["📜 CAP Regulatory Node<br/>(cap_query)"]
+    CAP["📜 CAP Regulatory Node<br/>(cap_query_node)"]
     RATES["💶 Ecoscheme Rates Node<br/>(ecoscheme_rates_node)"]
     REPORT["📊 Report Node<br/>(report_generator)"]
     VALIDATION["✅ Validation Node<br/>(report_validation)"]
@@ -163,7 +163,7 @@ graph TD
     %% Router Branching
     ROUTER -- "basic_chat" --> CONV
     ROUTER -- "fallback_rejection" --> FALLBACK
-    ROUTER -- "cap_query" --> CAP
+    ROUTER -- "cap_query_node" --> CAP
     ROUTER -- "ecoscheme_rates" --> RATES
     ROUTER -- "report_generator" --> REPORT
 
