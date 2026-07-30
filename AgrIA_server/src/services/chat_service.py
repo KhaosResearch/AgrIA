@@ -1,3 +1,5 @@
+import asyncio
+import inspect
 import structlog
 
 from PIL import Image
@@ -17,7 +19,7 @@ from ..utils.llm_utils import get_aux_image_description
 logger = structlog.getLogger()
 
 
-def generate_user_response(
+def _generate_user_response_sync(
     user_input: str,
     is_detailed_description: bool,
     lang: str,
@@ -51,13 +53,36 @@ def generate_user_response(
             "messages": [HumanMessage(content=final_input)],
         }
         config = {"configurable": {"thread_id": thread_id}}  # Avoids multiple users colission
-        output_state = agent_graph.invoke(inputs, config=config)
+        invoke_method = getattr(agent_graph, "ainvoke", None)
+        if invoke_method is not None:
+            output_state = asyncio.run(invoke_method(inputs, config=config))
+        else:
+            output_state = agent_graph.invoke(inputs, config=config)
         response = str(output_state["messages"][-1].content)
         return response
     except Exception as e:
         logger.error(f"Error while generating response: {e}")
         logger.exception(e)
         raise e
+
+
+async def generate_user_response(
+    user_input: str,
+    is_detailed_description: bool,
+    lang: str,
+    file=None,
+    filename: str = None,
+    thread_id: str = "default_session",
+) -> str:
+    return await asyncio.to_thread(
+        _generate_user_response_sync,
+        user_input,
+        is_detailed_description,
+        lang,
+        file,
+        filename,
+        thread_id,
+    )
 
 
 def get_image_description(file, filename, lang, is_detailed_description):
@@ -106,7 +131,7 @@ def get_image_description(file, filename, lang, is_detailed_description):
     return input_for_llm, image_context_prompt[lang]
 
 
-def get_parcel_description(
+def _get_parcel_description_sync(
     image_date: str,
     land_uses: list[dict],
     query: list[dict],
@@ -192,7 +217,28 @@ def get_parcel_description(
         raise e
 
 
-def get_suggestion_for_chat(chat_history: list[Content], lang: str):
+async def get_parcel_description(
+    image_date: str,
+    land_uses: list[dict],
+    query: list[dict],
+    image_filename: str,
+    is_detailed_description: bool = False,
+    lang: str = "es",
+    thread_id: str = "default_session",
+) -> dict:
+    return await asyncio.to_thread(
+        _get_parcel_description_sync,
+        image_date,
+        land_uses,
+        query,
+        image_filename,
+        is_detailed_description,
+        lang,
+        thread_id,
+    )
+
+
+def _get_suggestion_for_chat_sync(chat_history: list[Content], lang: str):
     """
     Provides a suggested input for the model's last chat output.
     Args:
@@ -233,6 +279,10 @@ def get_suggestion_for_chat(chat_history: list[Content], lang: str):
     except Exception as e:
         logger.error(f"Error getting suggestion:\t{e}")
         raise e
+
+
+async def get_suggestion_for_chat(chat_history: list[Content], lang: str):
+    return await asyncio.to_thread(_get_suggestion_for_chat_sync, chat_history, lang)
 
 
 def get_summarised_chat(chat_history):

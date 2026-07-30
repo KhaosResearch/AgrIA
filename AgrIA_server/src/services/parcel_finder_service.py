@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timedelta
 import json
 import time
@@ -37,7 +38,7 @@ from sigpac_tools.locate import get_geometry_and_metadata_coords
 logger = structlog.get_logger()
 
 
-def get_parcel_image(
+def _get_parcel_image_sync(
     cadastral_reference: str,
     date: str,
     is_from_cadastral_reference: bool = True,
@@ -160,6 +161,27 @@ def get_parcel_image(
     logger.debug(f"{msg1 + msg2 + msg3}")
 
     return geometry, metadata, sigpac_image_url
+
+
+async def get_parcel_image(
+    cadastral_reference: str,
+    date: str,
+    is_from_cadastral_reference: bool = True,
+    parcel_geometry: str = None,
+    parcel_metadata: str = None,
+    coordinates: list[float] = None,
+    get_sr_image: bool = True,
+) -> tuple:
+    return await asyncio.to_thread(
+        _get_parcel_image_sync,
+        cadastral_reference,
+        date,
+        is_from_cadastral_reference,
+        parcel_geometry,
+        parcel_metadata,
+        coordinates,
+        get_sr_image,
+    )
 
 
 def download_sen2sr_parcel_image(geometry, date, delta_days=15):

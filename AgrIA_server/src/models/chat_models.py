@@ -1,4 +1,6 @@
+import asyncio
 import base64
+import inspect
 import io
 import openai
 import structlog
@@ -82,7 +84,11 @@ class LocalChat:
         ]
         try:
             # Re-using the client to summarize
-            summary_response = self.client.invoke(msg)
+            summary_method = getattr(self.client, "ainvoke", None)
+            if summary_method is not None:
+                summary_response = asyncio.run(summary_method(msg))
+            else:
+                summary_response = self.client.invoke(msg)
             return summary_response.content
         except Exception as e:
             logger.error(f"Failed to auto-summarize history: {e}")
@@ -198,7 +204,11 @@ class LocalChat:
             all_messages = self.history.messages
 
             # Execute API call to local LLM backend
-            response = self.client.invoke(all_messages)
+            invoke_method = getattr(self.client, "ainvoke", None)
+            if invoke_method is not None:
+                response = asyncio.run(invoke_method(all_messages))
+            else:
+                response = self.client.invoke(all_messages)
 
             # Append model response back into memory tracking
             self.history.add_message(AIMessage(content=response.content))

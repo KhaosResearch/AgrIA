@@ -1,6 +1,7 @@
 import os
 import structlog
 
+from inspect import isawaitable
 from datetime import datetime
 from fastapi import APIRouter, Form, HTTPException
 from fastapi.responses import FileResponse
@@ -19,8 +20,14 @@ logger = structlog.get_logger(__file__)
 router = APIRouter()
 
 
+async def _await_if_needed(result):
+    if isawaitable(result):
+        return await result
+    return result
+
+
 @router.post("/load-parcel-description")
-def load_parcel_description(lang: str = Form("es")):
+async def load_parcel_description(lang: str = Form("es")):
     try:
         parcel_desc_file = os.path.join(TEMP_DIR, f"parcel_desc-{lang}.txt")
         content = "..."
@@ -34,7 +41,7 @@ def load_parcel_description(lang: str = Form("es")):
 
 
 @router.post("/find-parcel")
-def find_parcel(
+async def find_parcel(
     selectedDate: str = Form(...),
     isFromCadastralReference: str = Form("False"),
     cadastralReference: Optional[str] = Form(None),
@@ -62,13 +69,15 @@ def find_parcel(
                 cadastralReference, province, municipality, polygon, parcelId
             )
 
-        geometry, metadata, url_image_address = get_parcel_image(
-            actual_cad_ref,
-            selectedDate,
-            is_from_cadastral_reference,
-            actual_geometry,
-            parcelMetadata,
-            actual_coords,
+        geometry, metadata, url_image_address = await _await_if_needed(
+            get_parcel_image(
+                actual_cad_ref,
+                selectedDate,
+                is_from_cadastral_reference,
+                actual_geometry,
+                parcelMetadata,
+                actual_coords,
+            )
         )
 
         logger.info(f"\nTOTAL TIME TAKEN: {datetime.now() - init}\n")
@@ -85,7 +94,7 @@ def find_parcel(
 
 
 @router.post("/is-coord-in-zone")
-def is_coord_in_zone(lat: float = Form(...), lng: float = Form(...)):
+async def is_coord_in_zone(lat: float = Form(...), lng: float = Form(...)):
     try:
         return {"response": is_coord_in_zones(lng, lat)}
     except Exception:
@@ -94,7 +103,7 @@ def is_coord_in_zone(lat: float = Form(...), lng: float = Form(...)):
 
 # FastAPI handles serving directory static media assets safely using FileResponse
 @router.get("/uploads/{filename}")
-def uploaded_file(filename: str):
+async def uploaded_file(filename: str):
     file_path = os.path.join(os.getcwd(), TEMP_DIR, filename)
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")

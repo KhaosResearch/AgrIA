@@ -1,6 +1,7 @@
 import json
 import structlog
 
+from inspect import isawaitable
 from langchain_core.messages import AIMessage
 from typing import Optional
 from fastapi import APIRouter, Form, UploadFile, File, HTTPException
@@ -16,15 +17,22 @@ from src.services.chat_service import (
 
 logger = structlog.get_logger()
 router = APIRouter()
+chat = agent_graph
+
+
+async def _await_if_needed(result):
+    if isawaitable(result):
+        return await result
+    return result
 
 
 @router.get("/hello-world")
-def hello_world():
+async def hello_world():
     return {"response": "Hello, World!"}
 
 
 @router.post("/send-user-input")
-def send_user_input(
+async def send_user_input(
     userMessage: str = Form(...),
     image: UploadFile | str | None = File(None),
     isDetailedDescription: str = Form("false"),
@@ -38,8 +46,10 @@ def send_user_input(
         else:
             file, filename = None, None
         if userMessage is not None and len(userMessage) > 0:
-            response_text = generate_user_response(
-                userMessage, is_detailed_description, lang, file, filename
+            response_text = await _await_if_needed(
+                generate_user_response(
+                    userMessage, is_detailed_description, lang, file, filename
+                )
             )
             return {"response": response_text}
         else:
@@ -52,7 +62,7 @@ def send_user_input(
 
 
 @router.post("/load-parcel-data-to-chat")
-def send_parcel_info_to_chat(
+async def send_parcel_info_to_chat(
     imageDate: str = Form(...),
     landUses: str = Form(...),
     query: str = Form(...),
@@ -66,13 +76,15 @@ def send_parcel_info_to_chat(
         parsed_query = json.loads(query)
         is_detailed_description = "true" in isDetailedDescription.lower()
 
-        response = get_parcel_description(
-            image_date,
-            parsed_land_uses,
-            parsed_query,
-            imageFilename,
-            is_detailed_description,
-            lang,
+        response = await _await_if_needed(
+            get_parcel_description(
+                image_date,
+                parsed_land_uses,
+                parsed_query,
+                imageFilename,
+                is_detailed_description,
+                lang,
+            )
         )
         return {"response": response}
     except ValueError as e:
@@ -83,21 +95,21 @@ def send_parcel_info_to_chat(
 
 
 @router.post("/get-input-suggestion")
-def get_input_suggestion(
+async def get_input_suggestion(
     lang: str = Form("es"),
     thread_id: str = "default_session",
 ):
     try:
-        # Retrieve current thread state from LangGraph checkpointer
-        config = {"configurable": {"thread_id": thread_id}}
-        current_state = agent_graph.get_state(config)
+        if hasattr(chat, "get_history"):
+            chat_history = chat.get_history()
+        else:
+            config = {"configurable": {"thread_id": thread_id}}
+            current_state = chat.get_state(config)
+            chat_history = current_state.values.get("messages", [])
 
-        # Access stored messages (returns empty list if thread doesn't exist yet)
-        chat_history = current_state.values.get("messages", [])
-
-        if not len(chat_history) > 0:
+        if not chat_history:
             raise ValueError("No valid history provided.")
-        response = get_suggestion_for_chat(chat_history, lang)
+        response = await _await_if_needed(get_suggestion_for_chat(chat_history, lang))
         return {"response": response}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -107,16 +119,19 @@ def get_input_suggestion(
 
 
 @router.get("/load-active-chat-history")
-def load_active_chat_history(thread_id: str = "default_session"):
+async def load_active_chat_history(thread_id: str = "default_session"):
     try:
         config = {"configurable": {"thread_id": thread_id}}
-        current_state = agent_graph.get_state(config)
+        if hasattr(chat, "get_history"):
+            chat_history = chat.get_history()
+        else:
+            current_state = chat.get_state(config)
+            chat_history = current_state.values.get("messages", [])
 
-        chat_history = current_state.values.get("messages", [])
-        
         if not chat_history:
             welcome_msg = AIMessage(content=WELCOME_MESSAGE)
-            agent_graph.update_state(config, {"messages": [welcome_msg]})
+            if not hasattr(chat, "get_history"):
+                agent_graph.update_state(config, {"messages": [welcome_msg]})
             chat_history = [welcome_msg]
         response = get_role_and_content(chat_history)
         with open("history.json", "w") as f:
