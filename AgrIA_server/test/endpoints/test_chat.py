@@ -2,7 +2,10 @@ import pytest
 
 from unittest.mock import MagicMock
 
-from server.endpoints import chat
+from langchain_core.messages import AIMessage
+
+from src.endpoints import chat
+from src.services import chat_service
 
 
 def test_hello_world(client):
@@ -19,6 +22,34 @@ def test_hello_world(client):
     # --- ASSERT --- #
     assert response.status_code == 200
     assert response.json()["response"] == MOCK_RESPONSE
+
+
+def test_send_user_input_waits_for_async_service(client, monkeypatch):
+    async def async_generate_user_response(*args, **kwargs):
+        return "Async service reply"
+
+    monkeypatch.setattr(chat, "generate_user_response", async_generate_user_response)
+
+    response = client.post(
+        "/send-user-input",
+        data={"userMessage": "Hello", "isDetailedDescription": "false", "lang": "en"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["response"] == "Async service reply"
+
+
+@pytest.mark.anyio
+async def test_generate_user_response_uses_async_graph(monkeypatch):
+    async def fake_ainvoke(inputs, config=None):
+        return {"messages": [AIMessage(content="Async graph reply")]}
+
+    monkeypatch.setattr(chat_service.agent_graph, "ainvoke", fake_ainvoke)
+    monkeypatch.setattr(chat_service, "get_image_description", lambda *args, **kwargs: (["ok"], "ctx"))
+
+    response = await chat_service.generate_user_response("Hello", False, "en")
+
+    assert response == "Async graph reply"
 
 
 @pytest.mark.parametrize(
@@ -251,11 +282,11 @@ def test_get_input_suggestion_scenarios(
             id="Success_HistoryLoaded",
         ),
         pytest.param(
-            "Failure: No history available",
+            "Success: Auto-seeds welcome message on empty history",
             None,
-            400,
-            "No valid history provided.",
-            id="Failure_NoHistory",
+            200,
+            "History loaded correctly!.",
+            id="Success_EmptyHistoryAutoSeeded",
         ),
     ],
 )

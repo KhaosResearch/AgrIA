@@ -4,7 +4,7 @@ import { ParcelCadastralComponent } from './parcel-cadastral/parcel-cadastral.co
 import { ParcelDisplayComponent } from './parcel-display/parcel-display.component';
 import { ParcelDrawerComponent } from './parcel-drawer/parcel-drawer.component';
 import { ParcelLocatorComponent } from './parcel-locator/parcel-locator.component';
-import { IFindParcelresponse } from '../../models/parcel-finder.model';
+import { IFindParcelResponse as IFindParcelResponse } from '../../models/parcel-finder.model';
 import { ParcelFinderService } from '../../services/parcel-finder.service/parcel-finder.service';
 import { NotificationService } from '../../services/notification.service/notification.service';
 
@@ -17,7 +17,7 @@ import { NotificationService } from '../../services/notification.service/notific
 export class ParcelFinderComponent {
   // Active tab attribute
   protected activeTab: 'finder' | 'drawer' | 'locator' = 'finder';
-  private selectedParcelInfo: IFindParcelresponse | null = null;
+  private selectedParcelInfo: IFindParcelResponse | null = null;
   protected isLoading: WritableSignal<boolean> = signal(false);
   protected maxLoadingDuration = 40;
 
@@ -27,7 +27,7 @@ export class ParcelFinderComponent {
 
   constructor() {}
 
-  protected handleParcelFound(parcel: IFindParcelresponse) {
+  protected handleParcelFound(parcel: IFindParcelResponse) {
     this.selectedParcelInfo = parcel;
     this.selectedParcelInfo.hasBeenDescribed = true;
     this.isLoading.set(false);
@@ -50,7 +50,7 @@ export class ParcelFinderComponent {
   protected handleFindParcelRequest(request: FormData) {
     this.scrollToDisplay();
     this.parcelFinderService.findParcel(request).subscribe({
-      next: (response: IFindParcelresponse) => {
+      next: (response: IFindParcelResponse) => {
         // Finish loading
         this.notificationService.showNotification('parcel-finder.success', '', 'success');
         document.body.style.cursor = 'default';

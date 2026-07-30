@@ -33,6 +33,7 @@ After that, manually install `sen2sr` if needed:
 ```
 pip install sen2sr mlstac git+https://github.com/ESDS-Leipzig/cubo.git -q
 ```
+
 ### System environment setup:
 You will need to rename the `.env_example` file to `.env` and complete it with your own data.
   ```bash
@@ -196,4 +197,3 @@ Agria_server
             ├── test_rules.py
             └── test_utils.py
 ```
-

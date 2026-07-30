@@ -1,7 +1,8 @@
 import pytest
+import uuid
 from unittest.mock import MagicMock
 from langchain_core.messages import HumanMessage
-from server.models.state_models import AgrIAState
+from src.models.state_models import AgrIAState
 
 
 @pytest.fixture
@@ -13,6 +14,11 @@ def mock_crop_json(tmp_path):
         "surface_ha": 4.2,
     }
 
+
+@pytest.fixture
+def test_config():
+    """Generates a unique thread_id per test run to keep tests isolated."""
+    return {"configurable": {"thread_id": f"test_{uuid.uuid4()}"}}
 
 @pytest.fixture
 def base_state():

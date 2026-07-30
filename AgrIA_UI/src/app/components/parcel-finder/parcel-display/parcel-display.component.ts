@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject, Input, signal, WritableSignal } from '@angular/core';
 import { ParcelFinderService } from '../../../services/parcel-finder.service/parcel-finder.service';
-import { IFindParcelresponse } from '../../../models/parcel-finder.model';
+import { IFindParcelResponse } from '../../../models/parcel-finder.model';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -21,7 +21,7 @@ export class ParcelDisplayComponent {
   // URL of the parcel's satellite image
   protected parcelImageUrl: string | null | undefined = null;
   // Selected parcel information
-  private selectedParcelInfo: IFindParcelresponse | null = null;
+  private selectedParcelInfo: IFindParcelResponse | null = null;
   // User preference for longer image description
   protected isDetailedDescription: boolean = false;
 
@@ -40,7 +40,7 @@ export class ParcelDisplayComponent {
     this.subscription = this.parcelFinderService.parcelInfo$.subscribe(parcelInfo => {
       if (parcelInfo) {
         this.selectedParcelInfo = parcelInfo;
-        this.parcelImageUrl = parcelInfo.imagePath + '?t=' + new Date().getTime();
+        this.parcelImageUrl = parcelInfo.imagePath.includes('?t=') ? parcelInfo.imagePath : parcelInfo.imagePath + '?t=' + new Date().getTime();
         this.cdRef.markForCheck();
       }
     });

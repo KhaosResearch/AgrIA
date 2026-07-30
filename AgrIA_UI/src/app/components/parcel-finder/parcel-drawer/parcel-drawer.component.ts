@@ -11,7 +11,7 @@ import {
   ISelectedCrop,
 } from '../../../models/parcel-drawer.model';
 import { NotificationService } from '../../../services/notification.service/notification.service';
-import { IFindParcelresponse, IParcelMetadata } from '../../../models/parcel-finder.model';
+import { IFindParcelResponse, IParcelMetadata } from '../../../models/parcel-finder.model';
 import { Subscription } from 'rxjs';
 
 const GlobalL = (window as any).L;
@@ -35,7 +35,7 @@ export class ParcelDrawerComponent {
   @Input() isLoading: WritableSignal<boolean> = signal(false);
 
   // Parcel found emmiter
-  @Output() parcelFound = new EventEmitter<IFindParcelresponse>();
+  @Output() parcelFound = new EventEmitter<IFindParcelResponse>();
   // Start loading process emmiter
   @Output() loadingStarted = new EventEmitter<number>();
   // Find parcel request emmiter
@@ -97,7 +97,7 @@ export class ParcelDrawerComponent {
     },
   };
   // Selected parcel response information
-  protected selectedParcelInfo: IFindParcelresponse | null = null;
+  protected selectedParcelInfo: IFindParcelResponse | null = null;
   // Detailed description flag
   protected isDetailedDescription: boolean = false;
   // Valid input flag
