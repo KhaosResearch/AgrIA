@@ -1,4 +1,4 @@
-export interface IFindParcelresponse {
+export interface IFindParcelResponse {
   cadastralReference: string;
   geometry: IParcelGeometry;
   imagePath: string;

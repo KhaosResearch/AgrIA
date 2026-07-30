@@ -115,63 +115,35 @@ export class ChatAssistantComponent {
    * Adds user message to chat and gets assistant output
    * @param content - User message content
    */
-  public addUserMessage(content: string) {
+  public addUserMessage(content: string, imageFile: File | null, isDetailedDescription: boolean) {
     if (content.length > 0) {
       const safeContent = this.sanitizeMarkdown(content);
       this.chatHistory.push({ role: 'user', content: safeContent });
-      this.sendUserInput(safeContent);
+      this.sendUserInput(safeContent, imageFile, isDetailedDescription);
       this.scrollToBottom();
     }
   }
 
   /**
-   * Send image to assistant
-   * @param imageFile - Image file to be sent to the assistant
-   */
-  public sendImage(imageFile: File, isDetailedDescription: boolean) {
-    this.showMessageIcon();
-    const formData = new FormData();
-    formData.append('image', imageFile);
-    formData.append('isDetailedDescription', String(isDetailedDescription));
-    formData.append('lang', String(this.translateService.currentLang));
-
-    this.chatAssistantService.sendImage(formData).subscribe({
-      next: (responseText: string) => {
-        this.hideMessageIcon();
-        this.displayResponse(responseText);
-      },
-      error: err => {
-        console.error('Error from assistant:', err);
-        this.hideMessageIcon();
-
-        this.notificationService.showNotification('chat-assistant.assistant-error', err.error.error, 'error', 10000);
-
-        this.chatHistory.push({
-          role: 'model',
-          content:
-            'Oops! Something went wrong while processing your image. Error was:\n\n' +
-            err.error.error +
-            '\n\nPlease try again later.',
-        });
-        this.scrollToBottom();
-      },
-    });
-  }
-
-  /**
    * Send input and pushes assistant's response to chat stack
    *
-   * @param userInput - User input message
+   * @param userMessage - User input message
+   * @param imageFile - image file content
+   * @param isDetailedDescription - Whether to use the shrot or detailed description
    */
-  public sendUserInput(userInput: string) {
-    const trimmedInput: string = userInput
+  public sendUserInput(userMessage: string, imageFile: File | null, isDetailedDescription: boolean = false) {
+    const trimmedInput: string = userMessage
       .trim()
       .replace(/[\r\n]+/g, ' ')
       .replace(/\s+/g, ' ');
     this.showMessageIcon();
+    const imageFileData = imageFile == null ? "Nan" : imageFile;
     const formData = new FormData();
-    formData.append('userInput', trimmedInput);
-
+    formData.append('userMessage', trimmedInput);
+    formData.append('image', imageFileData);
+    formData.append('isDetailedDescription', String(isDetailedDescription));
+    formData.append('lang', String(this.translateService.currentLang));
+    
     this.chatAssistantService.sendUserInput(formData).subscribe({
       next: (responseText: string) => {
         this.hideMessageIcon();

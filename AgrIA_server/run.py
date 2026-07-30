@@ -1,6 +1,6 @@
 import uvicorn
-from server.config.env_config import API_HOST, API_PORT
-from server import create_app
+from src.config.env_config import API_HOST, API_PORT
+from src import create_app
 
 app = create_app()
 

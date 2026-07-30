@@ -37,7 +37,7 @@ It leverages an Angular-based frontend and a FastAPI Python server logic along w
 
 This repository contains the unified source code for both the Frontend UI (`AgrIA_UI`) and the Python Backend services (`AgrIA_server`).
 
-## Main features:
+## 🎯 Main features:
 - **Parcel Location:** Automatically find your parcel by simply using its cadastral reference, address or drawing/locating it in the map interface.
 - **Image Super-Resolution:** Improved 10m/px image resolution up to 2,5m/px thanks to the [SEN2SR](https://github.com/ESAOpenSR/SEN2SR.git) implementation of a Deep Learning model.
 - **Satellite Image Analysis:** Get an accurate description of your fields from Sentinel satellite images that provide a detailed view of the terrain.
@@ -45,15 +45,15 @@ This repository contains the unified source code for both the Frontend UI (`AgrI
 - **CAP Advisory:** Get expert guidance on how to meet Common Agricultural Policy subsidy criteria.
 - **Interactive Support:** Interact with AgrIA through chat and receive updated answers about your crops.
 
-## Requirements:
+## 🛠️ Requirements:
 In order to run `AgrIA` properly, you will need the following:
 - `Python 3.10+` (available at [www.python.org](https://www.python.org/downloads/)).
 - `Conda` package manager (installment guide available at [conda.io](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)).
 - `Node.js` and `npm` (download tutorial available at [npmjs.com](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)).
     - `Angular CLI` (easy to get if you have `npm` by just using `npm install -g @angular/cli`).
-- Have the `AgrIA_server/.env` file setup and have the `GEOJSON_FILE` constant set (see [`AgrIA_server/README.md`](AgrIA_server/README.md)). This last file is essential if you want access to the MinIO database.
+- Have the `AgrIA_server/.env` file setup.
 
-## Quickstart:
+## 🚀 Quickstart:
 In order to get AgrIA started, you will need to assign the essential environment variables:
 1. **Copy the environment template file:**
     ```bash
@@ -95,7 +95,7 @@ python run.py
 ```
 Everything should be up and running at `http://localhost:4200`, which is the default port. If you are using another one (by running `ng serve XXXX`), make sure to update the `AgrIA_server/.env` file so backend will know where UI is.
 
-## AgrIA's pipeline:
+## 🔧 AgrIA's pipeline:
 In order to find the parcel, users have 3 options:
 - **Use Cadastral data:** Only the cadastrals code is required. AgrIA will retrieve the parcel's image and metadata with crop info.
 - **Use Location data:** Fill out the address input fields (provinde, municipality, etc...) and Agria will automatically fetch the necessary data.
@@ -105,7 +105,7 @@ The following diagram details AgrIA`s parcel finding pipeline when both image an
 
 <img src="./docs/assets/img/AgrIA_diagram.png" alt="AgrIA's process Diagram" style="display: block; margin-left: auto; margin-right: auto;">
 
-### Diagram explanation
+### 📝 Diagram explanation
 #### Land use automatic extraction (Spain only)
 1. User provides the cadastral reference code/parcel location data or click in your parcel and selects the date they want the image to be taken from.
 
@@ -135,3 +135,66 @@ The process is the same, only more manual input is required:
 - User needs to draw the state/parcel's limits on the map and indicate the land uses (SIGPAC format) using the SIGPAC Classification form.
 - After finding  the parcel and the super-resolved cropped image and land use information are confirmed, all data will be sent to the Chat Assistant to assess the parcel.
 - **NOTE: AgrIA will apply rates from the latest Spain's CAP Strategic Plan**. User's will need to provide new data to the Chat in order for AgrIA to update the rates accordingly.
+
+## 🤖 AgrIA Agentic Workflow (LangGraph Engine)
+
+AgrIA utilizes a stateful **LangGraph** orchestration architecture to route user intents, query regulatory databases via local RAG, and generate standardized agricultural visual reports.
+
+### 📐 Graph Topology
+
+```mermaid
+graph TD
+    %% Node Definitions
+    START([🚀 User Input / State Initialization])
+    ROUTER{{"🧠 Router Node<br/>(Fast-Path & LLM Intent Classifier)"}}
+    
+    CONV["💬 Conversation Node<br/>(basic_chat)"]
+    FALLBACK["🚫 Fallback Node<br/>(fallback_rejection)"]
+    CAP["📜 CAP Regulatory Node<br/>(cap_query_node)"]
+    RATES["💶 Ecoscheme Rates Node<br/>(ecoscheme_rates_node)"]
+    REPORT["📊 Report Node<br/>(report_generator)"]
+    VALIDATION["✅ Validation Node<br/>(report_validation)"]
+    
+    END([🏁 Final State Response / Output])
+
+    %% Flow Connections
+    START --> ROUTER
+
+    %% Router Branching
+    ROUTER -- "basic_chat" --> CONV
+    ROUTER -- "fallback_rejection" --> FALLBACK
+    ROUTER -- "cap_query_node" --> CAP
+    ROUTER -- "ecoscheme_rates" --> RATES
+    ROUTER -- "report_generator" --> REPORT
+
+    %% Node Execution Outputs
+    CONV --> END
+    FALLBACK --> END
+    CAP --> END
+    RATES --> END
+
+    %% Validation Loop Sub-Graph
+    REPORT --> VALIDATION
+    VALIDATION -- "Approved" --> END
+    VALIDATION -- "Correction Required" --> REPORT
+
+    %% Styling
+    style START fill:#2d3748,stroke:#cbd5e0,color:#fff
+    style END fill:#2d3748,stroke:#cbd5e0,color:#fff
+    style ROUTER fill:#3182ce,stroke:#63b3ed,color:#fff
+    style REPORT fill:#d69e2e,stroke:#f6e05e,color:#fff
+    style VALIDATION fill:#d69e2e,stroke:#f6e05e,color:#fff
+    style CAP fill:#38a169,stroke:#9ae6b4,color:#fff
+    style RATES fill:#38a169,stroke:#9ae6b4,color:#fff
+    style CONV fill:#805ad5,stroke:#d6bcfa,color:#fff
+    style FALLBACK fill:#e53e3e,stroke:#feb2b2,color:#fff
+```
+
+### ⚡ Highlights
+* **Hybrid Intent Router**: Features a zero-latency fast-path regex check for report triggers alongside an LLM JSON classifier for natural user queries.
+* **Context Isolation & Local RAG**: Powered by an embedded ChromaDB store to retrieve latest CAP regulatory context dynamically without bloating context windows.
+* **Deterministic Rates Injection**: Direct file-injection fallback for high-frequency financial and ecorregímenes rate tables to guarantee 100% numerical accuracy.
+* **Automated Self-Reflection**: Report outputs undergo automated validation before final response emitting.
+
+> For full technical documentation, node contracts, and schema definitions, see the agent's sepcific [`README`](AgrIA_server/src/agent/README.md) file.
+> 

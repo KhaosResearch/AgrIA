@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from server.services.ecoscheme_payments.rules import get_ecoscheme_rules_data
+from src.services.ecoscheme_payments.rules import get_ecoscheme_rules_data
 
 
 def test_get_ecoscheme_rules_data_structure(dummy_rules_data):

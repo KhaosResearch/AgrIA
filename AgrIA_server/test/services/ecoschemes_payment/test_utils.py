@@ -1,10 +1,10 @@
 from decimal import Decimal
 
-from server.services.ecoscheme_payments.utils import (
+from src.services.ecoscheme_payments.utils import (
     calculate_payments_for_rate_type,
     is_valid_rate_for_coefficients,
 )
-from server.services.ecoscheme_payments.constants import (
+from src.services.ecoscheme_payments.constants import (
     PLURIANNUALITY_BONUS_PER_HA,
     ROUNDING_PAYMENT,
 )

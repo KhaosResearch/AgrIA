@@ -4,8 +4,8 @@ import pytest
 from flask import make_response
 from unittest.mock import MagicMock, mock_open
 
-from server.config.constants import TEMP_DIR
-from server.endpoints import parcel_finder
+from src.config.constants import TEMP_DIR
+from src.endpoints import parcel_finder
 
 # Define mock return values once
 MOCK_CADASTRAL_VALUE = "MOCK_REF_20CHAR_00000"

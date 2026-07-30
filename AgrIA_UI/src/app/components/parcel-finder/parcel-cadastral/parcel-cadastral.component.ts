@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, Input, Output, signal, WritableSignal } from '@angular/core';
-import { IFindParcelresponse } from '../../../models/parcel-finder.model';
+import { IFindParcelResponse } from '../../../models/parcel-finder.model';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { NotificationService } from '../../../services/notification.service/notification.service';
@@ -15,7 +15,7 @@ export class ParcelCadastralComponent {
   @Input() isLoading: WritableSignal<boolean> = signal(false);
 
   // Parcel found emmiter
-  @Output() parcelFound = new EventEmitter<IFindParcelresponse>();
+  @Output() parcelFound = new EventEmitter<IFindParcelResponse>();
   // Start loading process emmiter
   @Output() loadingStarted = new EventEmitter<number>();
   // Find parcel request emmiter
@@ -32,7 +32,7 @@ export class ParcelCadastralComponent {
   // Maximum seconds set for the progress bar
   public maxLoadingDuration: number = 40;
   // Selected parcel information
-  protected selectedParcelInfo: IFindParcelresponse | null = null;
+  protected selectedParcelInfo: IFindParcelResponse | null = null;
   // URL of the parcel's satellite image
   public parcelImageUrl: string | null = null;
 

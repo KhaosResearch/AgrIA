@@ -2,6 +2,7 @@
 .git-credentials
 
 # Backend
+*db/ 
 .env
 *temp*
 .venv
@@ -11,12 +12,14 @@
 *.png
 *.tif*
 *.tsv
-*assets/.scripts
-*model/
 *data*
 *res*
-*out*
+llm_formatted_out/
 *.json
+*.log
+
+# Custom
+misc/
 
 # Docker/Compose metadata
 .dockerignore

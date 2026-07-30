@@ -147,8 +147,8 @@ app-chat-assistant {
   cursor: pointer;
   transition: background-color 0.3s ease;
   flex-shrink: 0; /* Prevent it from shrinking */
-  width: 45px; /* Fixed width for circular button */
-  height: 45px; /* Fixed height for circular button */
+  width: 60px; /* Fixed width for circular button */
+  height: 60px; /* Fixed height for circular button */
   box-shadow: var(--shadow-subtle);
 }
 
@@ -157,13 +157,48 @@ app-chat-assistant {
 }
 
 .custom-file-upload img {
-  width: 24px; /* Adjust icon size */
-  height: 24px;
+  width: 32px; /* Adjust icon size */
+  height: 32px;
   filter: invert(1); /* Makes a dark icon white */
 }
 
 .custom-file-upload input[type="file"] {
   display: none; /* Hide the default file input */
+}
+
+.custom-file-upload.file-selected {
+  background-color: var(--color-action-warning);
+}
+
+.custom-file-upload.file-selected img {
+  filter: none;
+}
+
+.custom-file-upload.file-selected:hover {
+  background-color: color-mix(in srgb, var(--color-action-warning) 90%, black);
+}
+.remove-upload-button {
+  transform: translate(30px, 20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 33px;
+  height: 33px;
+
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+  background-color: var(--color-action-error);
+  color: white;
+
+  box-shadow: var(--shadow-subtle);
+  transition: background-color 0.3s ease;
+}
+
+.remove-upload-button:hover {
+  background-color: color-mix(in srgb, var(--color-action-error) 90%, black);
 }
 
 #user-input {

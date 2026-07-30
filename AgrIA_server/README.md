@@ -33,6 +33,7 @@ After that, manually install `sen2sr` if needed:
 ```
 pip install sen2sr mlstac git+https://github.com/ESDS-Leipzig/cubo.git -q
 ```
+
 ### System environment setup:
 You will need to rename the `.env_example` file to `.env` and complete it with your own data.
   ```bash
@@ -137,8 +138,6 @@ This is a brief overview of each main directory in the project structure:
 Agria_server
 │
 ├── Dockerfile                            # Docker instructions to build the backend server image.
-├── environment-docker.yml                # Conda env used in Docker builds.
-├── environment.yml                       # Local development Conda environment file.
 ├── README.md                             # Project documentation and setup instructions.
 ├── run.py                                # Application entrypoint used by Gunicorn/Flask.
 │
@@ -198,4 +197,3 @@ Agria_server
             ├── test_rules.py
             └── test_utils.py
 ```
-

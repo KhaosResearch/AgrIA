@@ -1,9 +1,11 @@
-import io
 import pytest
 
 from unittest.mock import MagicMock
 
-from server.endpoints import chat
+from langchain_core.messages import AIMessage
+
+from src.endpoints import chat
+from src.services import chat_service
 
 
 def test_hello_world(client):
@@ -22,19 +24,65 @@ def test_hello_world(client):
     assert response.json()["response"] == MOCK_RESPONSE
 
 
+def test_send_user_input_waits_for_async_service(client, monkeypatch):
+    async def async_generate_user_response(*args, **kwargs):
+        return "Async service reply"
+
+    monkeypatch.setattr(chat, "generate_user_response", async_generate_user_response)
+
+    response = client.post(
+        "/send-user-input",
+        data={"userMessage": "Hello", "isDetailedDescription": "false", "lang": "en"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["response"] == "Async service reply"
+
+
+@pytest.mark.anyio
+async def test_generate_user_response_uses_async_graph(monkeypatch):
+    async def fake_ainvoke(inputs, config=None):
+        return {"messages": [AIMessage(content="Async graph reply")]}
+
+    monkeypatch.setattr(chat_service.agent_graph, "ainvoke", fake_ainvoke)
+    monkeypatch.setattr(
+        chat_service, "get_image_description", lambda *args, **kwargs: (["ok"], "ctx")
+    )
+
+    response = await chat_service.generate_user_response("Hello", False, "en")
+
+    assert response == "Async graph reply"
+
+
 @pytest.mark.parametrize(
-    "test_name, user_input, expected_status, expected_response",
+    "test_name, user_message, image, is_detailed_descritpion, lang, expected_status, expected_response",
     [
         pytest.param(
-            "Successful reply (200)",
+            "Successful reply all inputs (200)",
             "Normal user input",
+            "image.png",  # Mock file is inside test. We only need the `is image` flag to be true
+            "True",
+            "en",
             200,
             "Normal mock reply.",
-            id="Success_NormalInput",
+            id="Success_AllInputs",
+        ),
+        pytest.param(
+            "Successful reply missing image data (200)",
+            "Normal user input",
+            None,
+            "false",
+            "es",
+            200,
+            "Normal mock reply.",
+            id="Success_MissingImageData",
         ),
         pytest.param(
             "Failure: No user input (400)",
             None,
+            "",
+            "false",
+            "es",
             400,
             "No user input provided",
             id="Failure_NoInput",
@@ -42,80 +90,39 @@ def test_hello_world(client):
     ],
 )
 def test_send_user_input_scenarios(
-    client, monkeypatch, test_name, user_input, expected_status, expected_response
-):
-    # --- ARRANGE --- #
-    # Prepare mockups
-    monkeypatch.setattr(chat, "generate_user_response", lambda x: expected_response)
-
-    # Prepare inputs
-    data = {"userInput": user_input}
-
-    # --- ACT --- #
-    response = client.post("/send-user-input", data=data)
-
-    # --- ASSERT --- #
-    assert response.status_code == expected_status
-    if expected_status != 200:
-        assert response.json()["error"] == expected_response
-    else:
-        assert response.json()["response"] == expected_response
-
-
-@pytest.mark.parametrize(
-    "test_name, file_data, image_filename, is_detailed_desc, expected_status, expected_response",
-    [
-        pytest.param(
-            "Successful sending (200)",
-            io.BytesIO(b"This is dummy image data"),
-            "test_image.jpg",
-            "false",
-            200,
-            "A mock description of a sunny field.",
-            id="Success_ImageSent",
-        ),
-        pytest.param(
-            "Failure: No file (400)",
-            None,
-            None,
-            "true",
-            400,
-            "No image file provided",
-            id="Failure_NoFileData",
-        ),
-    ],
-)
-def test_send_image_scenarios(
     client,
     monkeypatch,
     test_name,
-    file_data,
-    image_filename,
-    is_detailed_desc,
+    user_message,
+    image,
+    is_detailed_descritpion,
+    lang,
     expected_status,
     expected_response,
 ):
-    """Tests successful image upload and description retrieval."""
-
     # --- ARRANGE --- #
     # Prepare mockups
-    monkeypatch.setattr(
-        chat,
-        "get_image_description",
-        lambda file, filename, lang, is_detailed: expected_response,
-    )
+    monkeypatch.setattr(chat, "generate_user_response", lambda *args: expected_response)
 
-    # Prepare input
+    # Prepare inputs
     data = {
-        "isDetailedDescription": is_detailed_desc,
+        "userMessage": user_message,
+        "isDetailedDescription": is_detailed_descritpion,
+        "lang": lang,
     }
-
-    files = {}
-    if file_data is not None:
-        files = {"image": (image_filename, file_data)}
+    files = None
+    if image:
+        files = {
+            "image": (
+                image,
+                b"fake image bytes",
+                "image/png",
+            )
+        }
 
     # --- ACT --- #
-    response = client.post("/send-image", data=data, files=files)
+    response = client.post("/send-user-input", data=data, files=files)
+
     # --- ASSERT --- #
     assert response.status_code == expected_status
     if expected_status != 200:
@@ -277,11 +284,11 @@ def test_get_input_suggestion_scenarios(
             id="Success_HistoryLoaded",
         ),
         pytest.param(
-            "Failure: No history available",
+            "Success: Auto-seeds welcome message on empty history",
             None,
-            400,
-            "No valid history provided.",
-            id="Failure_NoHistory",
+            200,
+            "History loaded correctly!.",
+            id="Success_EmptyHistoryAutoSeeded",
         ),
     ],
 )

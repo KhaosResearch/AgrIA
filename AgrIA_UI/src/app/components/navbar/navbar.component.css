@@ -187,7 +187,7 @@
   background-size: 20px 15px;
   max-height: 39px;
   min-width: 60px;
-  /* You might want a slightly different default look for language buttons */
+
   background-color: transparent;
   color: var(--color-text-navbar); /* Default text color */
 }
@@ -202,7 +202,6 @@
   span {
     max-width: 20px;
     font-size: 26px;
-    transform: rotate(-45deg);
   }
   &:hover {
     span {
@@ -223,7 +222,7 @@
 /* Specific flag images */
 .btn.es {
   /* padding-left: 40px; */
-  background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/89/Bandera_de_Espa%C3%B1a.svg');
+  background-image: url('https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg');
 }
 
 .btn.en {
@@ -302,4 +301,8 @@
     height: 120px;
     background-size: 80px;
   }
+}
+.light-symbol {
+  font-family: "Arial", sans-serif;
+  font-size: 32px !important;
 }

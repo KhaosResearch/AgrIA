@@ -1,7 +1,7 @@
 import { Component, EventEmitter, inject, Input, Output, signal, WritableSignal } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
-import { IFindParcelresponse } from '../../../models/parcel-finder.model';
+import { IFindParcelResponse } from '../../../models/parcel-finder.model';
 import { NotificationService } from '../../../services/notification.service/notification.service';
 import { ISigpacLocationData } from '../../../models/parcel-locator.model';
 import { ParcelFinderService } from '../../../services/parcel-finder.service/parcel-finder.service';
@@ -18,7 +18,7 @@ export class ParcelLocatorComponent {
   @Input() isLoading: WritableSignal<boolean> = signal(false);
 
   // Parcel found emmiter
-  @Output() parcelFound = new EventEmitter<IFindParcelresponse>();
+  @Output() parcelFound = new EventEmitter<IFindParcelResponse>();
   // Start loading process emmiter
   @Output() loadingStarted = new EventEmitter<number>();
   // Find parcel request emmiter
