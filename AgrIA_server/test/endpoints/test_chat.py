@@ -45,7 +45,9 @@ async def test_generate_user_response_uses_async_graph(monkeypatch):
         return {"messages": [AIMessage(content="Async graph reply")]}
 
     monkeypatch.setattr(chat_service.agent_graph, "ainvoke", fake_ainvoke)
-    monkeypatch.setattr(chat_service, "get_image_description", lambda *args, **kwargs: (["ok"], "ctx"))
+    monkeypatch.setattr(
+        chat_service, "get_image_description", lambda *args, **kwargs: (["ok"], "ctx")
+    )
 
     response = await chat_service.generate_user_response("Hello", False, "en")
 

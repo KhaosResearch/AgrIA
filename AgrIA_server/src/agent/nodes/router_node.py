@@ -55,7 +55,7 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_IN
             f"Classify the intent of the last message in this context:\n"
             f"<last_user_message>\n{text_content}\n</last_user_message>"
         )
-        
+
         response_wrapper = classifier_chat.send_message(user_prompt)
         response_text = response_wrapper.text.strip()
 

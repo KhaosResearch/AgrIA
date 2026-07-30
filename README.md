@@ -51,7 +51,7 @@ In order to run `AgrIA` properly, you will need the following:
 - `Conda` package manager (installment guide available at [conda.io](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)).
 - `Node.js` and `npm` (download tutorial available at [npmjs.com](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)).
     - `Angular CLI` (easy to get if you have `npm` by just using `npm install -g @angular/cli`).
-- Have the `AgrIA_server/.env` file setup and have the `GEOJSON_FILE` constant set (see [`AgrIA_server/README.md`](AgrIA_server/README.md)). This last file is essential if you want access to the MinIO database.
+- Have the `AgrIA_server/.env` file setup.
 
 ## 🚀 Quickstart:
 In order to get AgrIA started, you will need to assign the essential environment variables:

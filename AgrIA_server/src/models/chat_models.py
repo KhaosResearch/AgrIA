@@ -1,6 +1,5 @@
 import asyncio
 import base64
-import inspect
 import io
 import openai
 import structlog

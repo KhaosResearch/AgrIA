@@ -35,14 +35,16 @@ def validate_report_node(state: AgrIAState) -> dict:
             errors.append(
                 f"Missing critical metadata value: Total parcel area ({total_area} ha) must be explicitly stated."
             )
-    elif not "using last user message" in generated_report.lower():
+    elif "using last user message" not in generated_report.lower():
         logger.warning(
             "⚠️  No parcel land use metadata detected. Moving on with unvalid report..."
         )
-        i = len(messages) -1
+        i = len(messages) - 1
         usr_msg = None
         while i >= 0 and not usr_msg:
-            usr_msg = messages[i].content if isinstance(messages[i], HumanMessage) else None
+            usr_msg = (
+                messages[i].content if isinstance(messages[i], HumanMessage) else None
+            )
             i -= 1
         errors.append(
             f"Insert '_Using last user message as land use metadata...<br>_'at the beginning of the report and use this as metadata:\n<usr_msg>\n{usr_msg}\n</usr_msg>\n\nDo not include this in the report, only the requested insertion."
@@ -58,9 +60,7 @@ def validate_report_node(state: AgrIAState) -> dict:
         logger.warning(feedback_note)
         return {"correction_feedback": feedback_note}
 
-    state["crop_metadata"] = (
-        None  # Reset crop metadata after successful validation
-    )
+    state["crop_metadata"] = None  # Reset crop metadata after successful validation
     return {"correction_feedback": "PASSED"}
 
 

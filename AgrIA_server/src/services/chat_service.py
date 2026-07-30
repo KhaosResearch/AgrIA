@@ -1,5 +1,4 @@
 import asyncio
-import inspect
 import structlog
 
 from PIL import Image
@@ -52,7 +51,7 @@ def _generate_user_response_sync(
             "lang": lang,
             "messages": [HumanMessage(content=final_input)],
         }
-        config = {"configurable": {"thread_id": thread_id}}  # Avoids multiple users colission
+        config = {"configurable": {"thread_id": thread_id}}
         invoke_method = getattr(agent_graph, "ainvoke", None)
         if invoke_method is not None:
             output_state = asyncio.run(invoke_method(inputs, config=config))
@@ -258,19 +257,24 @@ def _get_suggestion_for_chat_sync(chat_history: list[Content], lang: str):
             + str(last_message)
             + "### LAST_OUTPUT_END ###"
         )
-        language = "Spanish" if lang == "es" else "English"
         # Load System Instructions
         raw_instruction = load_prompt_asset("SUGGESTION.md")
         system_instruction = raw_instruction.replace(
             "{lang}", "Spanish" if lang == "es" else "English"
         )
 
-
         msg = [
             ("system", system_instruction),
             (
                 "human",
-                "\n".join(["Summarised chat:", summarised_chat, "\nLast chat entry:", last_chat_output]),
+                "\n".join(
+                    [
+                        "Summarised chat:",
+                        summarised_chat,
+                        "\nLast chat entry:",
+                        last_chat_output,
+                    ]
+                ),
             ),
         ]
         suggestion = client.invoke(msg)

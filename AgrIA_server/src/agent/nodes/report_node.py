@@ -59,7 +59,7 @@ ATTENTION: Your previous output failed verification checks. You MUST fix these e
             # If the message has an ID, create a RemoveMessage instruction for LangGraph
             if hasattr(last_msg, "id") and last_msg.id:
                 message_to_remove = RemoveMessage(id=last_msg.id)
-            
+
             # Exclude the failed report from the history passed to LLM
             history_messages = history_messages[:-1]
 
@@ -88,11 +88,11 @@ Please compile the agricultural report matching the template constraints using t
     response_wrapper = chat.send_message(user_content)
 
     messages_update = []
-    
+
     # If we have a failed message to purge from state, add RemoveMessage command first
     if message_to_remove:
         messages_update.append(message_to_remove)
-        
+
     messages_update.append(AIMessage(content=response_wrapper.text))
 
     # Return updates back cleanly to the graph lifecycle state machine
