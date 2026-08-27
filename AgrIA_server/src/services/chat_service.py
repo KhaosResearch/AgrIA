@@ -153,7 +153,13 @@ def _get_parcel_description_sync(
     """
     try:
         logger.info("Retrieveing parcel data...")
-        image_context_data = generate_image_context_data(image_date, land_uses, query)
+        cleaned_land_uses = []
+        for lu in land_uses:
+            lu["uso_sigpac"] = lu.get("uso_sigpac", "").split("-")[0].strip()
+            cleaned_land_uses.append(lu)
+        image_context_data = generate_image_context_data(
+            image_date, cleaned_land_uses, query
+        )
         json_data = calculate_ecoscheme_payment(image_context_data[lang], lang)
         with open(TEMP_DIR / "ecoscheme_data.json", "w") as f:
             import json
@@ -167,11 +173,11 @@ def _get_parcel_description_sync(
         image_desc_prompt = f"\n```{image_context_data[lang]}\n```"
 
         image_indication_options = {
-            "es": "Estas son las características de la parcela cuya imagen te paso. Tenlo en cuenta para tu descripción en español. Comprueba el siguiente prompt para ver si es necesario cambiar el idioma:",
-            "en": "These are the parcel's features whose image I am sending you. Take them into account for your description in English. Check next prompt for language change if needed:",
+            "es": "Estas son las características de la parcela cuya imagen te paso. Tenlo en cuenta para tu descripción en español:",
+            "en": "These are the parcel's features whose image I am sending you. Take them into account for your description in English:",
         }
         image_indication_prompt = str(
-            f"{desc_trigger}\n{image_indication_options[lang]}\n\n{json_data}"
+            f"{desc_trigger}\n{image_indication_options[lang]}\n"
         )
         # Open image from path
         image_path = TEMP_DIR / str(image_filename).split("?")[0]
@@ -188,12 +194,15 @@ def _get_parcel_description_sync(
             # Reconstruct the text chain to model using the extracted description string
             model_payload = "\n".join(
                 [
-                    f"Visual Analysis Report of Parcel: {extracted_visual_description}",
                     image_indication_prompt,
+                    f"Visual Analysis Report of Parcel: {extracted_visual_description}",
                     image_desc_prompt,
                 ]
             )
         else:
+            logger.info(
+                "No auxiliary Multi-modal Language Model engine detected. Using only image context data for description generation..."
+            )
             model_payload = "\n".join([image_indication_prompt, image_desc_prompt])
 
         inputs = {
