@@ -134,10 +134,7 @@ async def load_active_chat_history(thread_id: str = "default_session"):
                 agent_graph.update_state(config, {"messages": [welcome_msg]})
             chat_history = [welcome_msg]
         response = get_role_and_content(chat_history)
-        with open("history.json", "w") as f:
-            import json
 
-            json.dump(response, f, indent=4)
         return {"response": response}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
