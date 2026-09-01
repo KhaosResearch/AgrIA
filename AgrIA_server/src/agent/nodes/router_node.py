@@ -72,6 +72,7 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_IN
 
         valid_intents = {
             "basic_chat",
+            "app_usage",
             "cap_query",
             "ecoschemes_rates",
             "fallback_rejection",

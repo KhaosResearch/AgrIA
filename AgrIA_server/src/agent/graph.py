@@ -3,10 +3,12 @@ import structlog
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph, START, END
 
+
 from ..config.llm_client import client, LLM_MODEL_NAME
 from ..models.state_models import AgrIAState
 from .nodes.cap_query_node import cap_query_node
 from .nodes.basic_chat_node import basic_chat_node
+from .nodes.app_usage_node import app_usage_node
 from .nodes.fallback_node import fallback_rejection_node
 from .nodes.ecoscheme_rates_node import ecoschemes_rates_node
 from .nodes.report_node import generate_report_node
@@ -33,6 +35,9 @@ def build_graph() -> StateGraph[AgrIAState]:
         "basic_chat", lambda state: basic_chat_node(state, client, model_name)
     )
     builder.add_node(
+        "app_usage", lambda state: app_usage_node(state, client, model_name)
+    )
+    builder.add_node(
         "cap_query", lambda state: cap_query_node(state, client, model_name)
     )
     builder.add_node(
@@ -55,6 +60,7 @@ def build_graph() -> StateGraph[AgrIAState]:
         route_adapter,
         {
             "basic_chat": "basic_chat",
+            "app_usage": "app_usage",
             "cap_query": "cap_query",
             "ecoschemes_rates": "ecoschemes_rates",
             "fallback_rejection": "fallback_rejection",
@@ -64,6 +70,7 @@ def build_graph() -> StateGraph[AgrIAState]:
 
     # Add terminal nodes
     builder.add_edge("basic_chat", END)
+    builder.add_edge("app_usage", END)
     builder.add_edge("cap_query", END)
     builder.add_edge("ecoschemes_rates", END)
     builder.add_edge("fallback_rejection", END)
