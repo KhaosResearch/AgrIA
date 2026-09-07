@@ -90,7 +90,19 @@ async def send_parcel_info_to_chat(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.exception("Error loading parcel to chat:\n")
+        import traceback
+
+        tb = traceback.extract_tb(e.__traceback__)
+        frame = tb[-1]
+
+        logger.error(
+            "Error loading parcel to chat:",
+            error=str(e),
+            file=frame.filename,
+            line=frame.lineno,
+            function=frame.name,
+        )
+
         raise HTTPException(status_code=500, detail=str(e))
 
 

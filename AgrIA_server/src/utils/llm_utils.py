@@ -13,6 +13,7 @@ from ..config.constants import (
     BASE_PROMPTS_PATH,
     CONTEXT_DOCUMENTS_FILE,
     PROMPT_LIST_FILE,
+    VLM_DESC_PROMPT,
     WELCOME_MESSAGE,
 )
 from ..services.llm_services import upload_context_document
@@ -250,18 +251,12 @@ def get_aux_image_description(image_obj, lang=None):
         if vlm_client is None:
             return "[No active vision language model client initialized]"
 
-        # Formulate the visual analysis directive
-        prompt_text = {
-            "en": "Describe this satellite crop image. Detail parcel boundaries, distinct zones, ground textures, and visible agricultural features in 60 words or less.",
-            "es": "Describe esta imagen satélite de cultivos. Detalla los límites de la parcela, zonas distintivas, texturas de suelo y característica agrícolas visibles en 60 palabras o menos.",
-        }
-
         # Fallback Routing to Cloud Gemini API Engine
         if isinstance(vlm_client, GeminiGenAIClient):
             logger.debug("Routing vision task via Google Cloud Gemini API Engine...")
             # The native Google SDK reads PIL Image objects directly out of the box!
             response = vlm_client.models.generate_content(
-                model="gemini-3.5-flash", contents=[image_obj, prompt_text[lang]]
+                model="gemini-3.5-flash", contents=[image_obj, VLM_DESC_PROMPT[lang]]
             )
             logger.debug(f"Cloud Response Received!\n{response.text}")
             return response.text
@@ -274,7 +269,7 @@ def get_aux_image_description(image_obj, lang=None):
         image_data_url = f"data:image/png;base64,{img_str}"
 
         message_content = [
-            {"type": "text", "text": prompt_text},
+            {"type": "text", "text": VLM_DESC_PROMPT[lang]},
             {"type": "image_url", "image_url": {"url": image_data_url}},
         ]
 
@@ -283,5 +278,16 @@ def get_aux_image_description(image_obj, lang=None):
         return response.content
 
     except Exception as e:
-        logger.error(f"Vision analysis fallback triggered: {e}")
+        import traceback
+
+        tb = traceback.extract_tb(e.__traceback__)
+        frame = tb[-1]
+
+        logger.error(
+            "Vision analysis fallback triggered:",
+            error=str(e),
+            file=frame.filename,
+            line=frame.lineno,
+            function=frame.name,
+        )
         return "[Visual representation provided but description extraction failed]"

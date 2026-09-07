@@ -1,16 +1,24 @@
 import asyncio
 import structlog
 
+from google.genai import Client as GeminiGenAIClient
 from PIL import Image
 from google.genai.types import Content
 from langchain_core.messages import HumanMessage
+from run_agent import AIAgent
 
 from ..utils.nodes_utils import load_prompt_asset
 
 from .ecoscheme_payments.main import calculate_ecoscheme_payment
 from ..agent.graph import AGRIA_GRAPH as agent_graph
 from ..config.llm_client import vlm_client
-from ..config.constants import FULL_DESC_TRIGGER, SHORT_DESC_TRIGGER, TEMP_DIR
+from ..config.constants import (
+    CUSTOM_SKILLS_DIR,
+    FULL_DESC_TRIGGER,
+    SHORT_DESC_TRIGGER,
+    TEMP_DIR,
+    VLM_DESC_PROMPT,
+)
 from ..config.llm_client import client
 from ..utils.chat_utils import generate_image_context_data, save_image_and_get_path
 from ..utils.llm_utils import get_aux_image_description
@@ -60,8 +68,19 @@ def _generate_user_response_sync(
         response = str(output_state["messages"][-1].content)
         return response
     except Exception as e:
-        logger.error(f"Error while generating response: {e}")
-        logger.exception(e)
+        import traceback
+
+        tb = traceback.extract_tb(e.__traceback__)
+        frame = tb[-1]
+
+        logger.error(
+            "Error while generating response",
+            error=str(e),
+            file=frame.filename,
+            line=frame.lineno,
+            function=frame.name,
+        )
+
         raise e
 
 
@@ -182,7 +201,29 @@ def _get_parcel_description_sync(
         # Open image from path
         image_path = TEMP_DIR / str(image_filename).split("?")[0]
         image = Image.open(image_path)
-        if vlm_client is not None:
+
+        if isinstance(vlm_client, AIAgent):
+            logger.info(
+                "Analyzing image layout using Hermes Agent with satellite-image-analysis skill..."
+            )
+
+            response = vlm_client.run_conversation(
+                user_message=(
+                    "\n".join(
+                        [
+                            VLM_DESC_PROMPT[lang],
+                            f"Use the `satellite-image-analysis skill` to analyze the image at {image_path}."
+                            f"Custom skills dir: {CUSTOM_SKILLS_DIR}",
+                        ]
+                    )
+                ),
+            )
+
+            extracted_visual_description = response["final_response"]
+
+            logger.debug("VLM image description:\n%s", extracted_visual_description)
+
+        elif isinstance(vlm_client, GeminiGenAIClient):
             logger.info(
                 "Analyzing image layout using auxiliary Multi-modal Language Model engine..."
             )
@@ -191,7 +232,8 @@ def _get_parcel_description_sync(
                 image_obj=image, lang=lang
             )
 
-            # Reconstruct the text chain to model using the extracted description string
+        # Reconstruct the text chain to model using the extracted description string
+        if extracted_visual_description:
             model_payload = "\n".join(
                 [
                     image_indication_prompt,

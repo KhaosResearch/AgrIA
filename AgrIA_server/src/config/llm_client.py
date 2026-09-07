@@ -3,6 +3,7 @@ from google import genai
 from langchain_openai import ChatOpenAI
 from .config import (
     GEMINI_API_KEY,
+    IS_VLM_TEXT_ONLY,
     LLM_API_KEY,
     LLM_BASE_URL,
     LLM_MODEL_NAME,
@@ -39,7 +40,20 @@ def init_client(
 
 client = init_client(temperature=0.6)
 vlm_client = None
-if all(v not in (None, "") for v in (VLM_BASE_URL, VLM_API_KEY, VLM_MODEL_NAME)):
-    vlm_client = init_client(VLM_BASE_URL, VLM_API_KEY, VLM_MODEL_NAME)
-elif GEMINI_API_KEY not in [None, ""]:
+if GEMINI_API_KEY not in [None, ""]:
     vlm_client = genai.Client(api_key=GEMINI_API_KEY)
+elif all(v not in (None, "") for v in (VLM_BASE_URL, VLM_API_KEY, VLM_MODEL_NAME)):
+    if not IS_VLM_TEXT_ONLY:
+        vlm_client = init_client(VLM_BASE_URL, VLM_API_KEY, VLM_MODEL_NAME)
+    else:
+        from run_agent import AIAgent
+
+        vlm_client = AIAgent(
+            model=VLM_MODEL_NAME,
+            base_url=VLM_BASE_URL,
+            api_key=VLM_API_KEY,
+            ephemeral_system_prompt="Your job is to describe high-resolution satellite images of both agricultural fields and urban landscapes. Detail parcel boundaries, distinct zones, ground textures, and visible agricultural features in 60 words or less. Avoid generic descriptions.",
+            quiet_mode=True,
+            skip_context_files=True,
+            skip_memory=True,
+        )

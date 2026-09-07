@@ -22,10 +22,17 @@ PROMPT_LIST_FILE = "prompt_list.json"
 
 TEMP_DIR = Path(ROOT_DIR / "temp/")
 
+CUSTOM_SKILLS_DIR = Path(ASSETS_DIR / "LLM_assets/skills")
+
 KML_FILENAME = (
     "S2A_OPER_GIP_TILPAR_MPC__20151209T095117_V20150622T000000_21000101T000000_B00"
 )
 KML_FILE_URL = "https://sentiwiki.copernicus.eu/__attachments/1692737/{KML_FILENAME}.zip?inst-v=4ece9b51-c9c2-42f6-96f6-479e12c9d659"
+
+VLM_DESC_PROMPT = {
+    "en": "Describe this satellite crop image. Detail parcel boundaries, distinct zones, ground textures, and visible agricultural features in 60 words or less.",
+    "es": "Describe esta imagen satélite de cultivos. Detalla los límites de la parcela, zonas distintivas, texturas de suelo y característica agrícolas visibles en 60 palabras o menos.",
+}
 
 WELCOME_MESSAGE = (
     "¡Hola!\n\nSoy tu Asistente de Imágenes Agrícolas, ¡pero puedes llamarme **AgrIA**!\n\n"
