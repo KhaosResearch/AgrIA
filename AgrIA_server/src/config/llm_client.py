@@ -52,7 +52,7 @@ elif all(v not in (None, "") for v in (VLM_BASE_URL, VLM_API_KEY, VLM_MODEL_NAME
             model=VLM_MODEL_NAME,
             base_url=VLM_BASE_URL,
             api_key=VLM_API_KEY,
-            ephemeral_system_prompt="Your job is to describe high-resolution satellite images of both agricultural fields and urban landscapes. Detail parcel boundaries, distinct zones, ground textures, and visible agricultural features in 60 words or less. Avoid generic descriptions.",
+            ephemeral_system_prompt="You are a direct geospatial data summarizer. Translate satellite metrics into a natural language description. Output ONLY the description text (50-60 words). Absolute silence on everything else: no greetings, no markdown bold headers, no bullet points, no word count stats, and no post-response justification.",
             quiet_mode=True,
             skip_context_files=True,
             skip_memory=True,

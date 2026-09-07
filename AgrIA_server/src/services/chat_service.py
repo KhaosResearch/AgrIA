@@ -212,9 +212,11 @@ def _get_parcel_description_sync(
                     "\n".join(
                         [
                             VLM_DESC_PROMPT[lang],
-                            f"Use the `satellite-image-analysis skill` to analyze the image at {image_path}."
-                            f"Custom skills dir: {CUSTOM_SKILLS_DIR}",
-                        ]
+                            f"Target File Path: {image_path}",
+                            f"Instruction: Run the satellite-image-analysis skill on target File path. "
+                            f"Execute the analyzer script to process the spatial data, then provide the resulting 60-word description narrative."
+                            f"IMPORTANT: Respond with ONLY the raw description text. Do not format with markdown sub-headers, "
+                            f"do not report word count metrics, and do not explain the scripts used."                        ]
                     )
                 ),
             )
@@ -246,6 +248,8 @@ def _get_parcel_description_sync(
                 "No auxiliary Multi-modal Language Model engine detected. Using only image context data for description generation..."
             )
             model_payload = "\n".join([image_indication_prompt, image_desc_prompt])
+        with open("model_payload.txt", "w") as f:
+            f.write(model_payload)
 
         inputs = {
             "crop_metadata": json_data,
