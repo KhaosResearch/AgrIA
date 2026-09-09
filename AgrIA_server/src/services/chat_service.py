@@ -11,6 +11,7 @@ from ..utils.nodes_utils import load_prompt_asset
 
 from .ecoscheme_payments.main import calculate_ecoscheme_payment
 from ..agent.graph import AGRIA_GRAPH as agent_graph
+from ..models.satellite_analyzer import SatelliteImageAnalyzer
 from ..config.llm_client import vlm_client
 from ..config.constants import (
     CUSTOM_SKILLS_DIR,
@@ -200,27 +201,32 @@ def _get_parcel_description_sync(
         )
         # Open image from path
         image_path = TEMP_DIR / str(image_filename).split("?")[0]
-        image = Image.open(image_path)
 
         if isinstance(vlm_client, AIAgent):
             logger.info(
                 "Analyzing image layout using Hermes Agent with satellite-image-analysis skill..."
             )
 
-            response = vlm_client.run_conversation(
-                user_message=(
-                    "\n".join(
-                        [
-                            VLM_DESC_PROMPT[lang],
-                            f"Target File Path: {image_path}",
-                            f"Instruction: Run the satellite-image-analysis skill on target File path. "
-                            f"Execute the analyzer script to process the spatial data, then provide the resulting 60-word description narrative."
-                            f"IMPORTANT: Respond with ONLY the raw description text. Do not format with markdown sub-headers, "
-                            f"do not report word count metrics, and do not explain the scripts used."                        ]
-                    )
-                ),
+            # 1. Execute analyzer in native Python (Instant < 100ms)
+            analyzer = SatelliteImageAnalyzer(image_path)
+            metrics = analyzer.analyze_patterns()
+            logger.debug("Satellite image analysis metrics:\n%s", json.dumps(metrics, indent=2))
+
+            # 2. Build direct text prompt for Hermes (No tool-call loop required)
+            prompt = (
+                f"Synthesize the following satellite imagery metrics and land use data into an organic, 50-60 word visual description.\n\n"
+                f"Visual Analysis Metrics:\n{json.dumps(metrics, indent=2)}\n\n"
+                f"SIGPAC Land Use Data:\n{json.dumps(cleaned_land_uses, indent=2)}\n\n"
+                f"Instructions:\n"
+                f"- Classify the landscape naturally (e.g., agricultural field / bare soil parcel).\n"
+                f"- Mention the dominant color tones (e.g., warm light-ochre, earthy brown) and any subtle patchiness.\n"
+                f"- Connect the absence of green vegetation (<1%) with the SIGPAC overexploited/agricultural status.\n"
+                f"- Do not infer any crop types/names from SIGPAC land use identifiers, use them as.is.\n"
+                f"- Output ONLY the final 50-60 word narrative paragraph."
             )
 
+            # 3. Call Hermes with pure text (Fast single-turn response)
+            response = vlm_client.run_conversation(user_message=prompt)
             extracted_visual_description = response["final_response"]
 
             logger.debug("VLM image description:\n%s", extracted_visual_description)
@@ -230,6 +236,7 @@ def _get_parcel_description_sync(
                 "Analyzing image layout using auxiliary Multi-modal Language Model engine..."
             )
             # Trigger your auxiliary vision model
+            image = Image.open(image_path)
             extracted_visual_description = get_aux_image_description(
                 image_obj=image, lang=lang
             )
@@ -248,8 +255,6 @@ def _get_parcel_description_sync(
                 "No auxiliary Multi-modal Language Model engine detected. Using only image context data for description generation..."
             )
             model_payload = "\n".join([image_indication_prompt, image_desc_prompt])
-        with open("model_payload.txt", "w") as f:
-            f.write(model_payload)
 
         inputs = {
             "crop_metadata": json_data,

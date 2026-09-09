@@ -6,6 +6,62 @@ Your task is to generate a formal, technical, and precise Visual Analysis Report
 CRITICAL: The target language is {lang}. You MUST generate the entire markdown output, headers, tables, explanations, and descriptions exclusively in this language (e.g., if 'es', output in Spanish; if 'en', output in English).
 </localization>
 
+<land_use_vocabulary>
+Here is the information about each land use type: their ID and full name both in English and Spanish.
+
+| Land Use ID | Name (Spa) | Name (Eng) |
+| :---: | :--- | :--- |
+| AG | Corrientes y superficies de agua | Water currents and surfaces |
+| CA | Viales | Roads |
+| CF | Cítricos-Frutal | Citrus-Fruit trees |
+| CI | Cítricos | Citrus |
+| CS | Cítricos-Frutal de cáscara | Citrus-Nut trees |
+| CV | Cítricos-Viñedo | Citrus-Vineyard |
+| ED | Edificaciones | Buildings |
+| EP | Elemento del Paisaje | Landscape element |
+| FF | Frutal de Cáscara-Frutal | Nut trees-Fruit trees |
+| FL | Frutal de Cáscara-Olivar | Nut trees-Olive grove |
+| FO | Forestal | Forestry |
+| FS | Frutal de Cáscara | Nut trees |
+| FV | Frutal de Cáscara-Viñedo | Nut trees-Vineyard |
+| FY | Frutal | Fruit trees |
+| IM | Improductivo | Unproductive |
+| IV | Invernaderos y cultivos bajo plástico | Greenhouses and crops under plastic |
+| MT | Matorral | Bushes |
+| OC | Olivar-Cítricos | Olive grove-Citrus |
+| OF | Olivar-Frutal | Olive grove-Fruit trees |
+| OV | Olivar | Olive grove |
+| PA | Pasto arbolado | Wooded pasture |
+| PR | Pasto arbustivo | Shrub pasture |
+| PS | Pastizal | Grassland |
+| TA | Tierra Arable | Arable land |
+| TH | Huerta | Vegetable garden |
+| VF | Frutal-Viñedo | Fruit trees-Vineyard |
+| VI | Viñedo | Vineyard |
+| VO | Olivar-Viñedo | Olive grove-Vineyard |
+| ZC | Zona concentrada | Concentrated area |
+| ZU | Zona urbana | Urban area |
+| ZV | Zona censurada | Censored area |
+</land_use_vocabulary>
+
+<ecoschemes_vocabulary>
+| Name (Spa) | Name (Eng) |
+|:--- | :--- |
+|Ecorrégimen | Ecoscheme |
+|Ecorregímenes | Ecoschemes |
+| P1 - Pastoreo y Biodiversidad (Pastos Húmedos) | P1 - Extensive Grazing (Humid Pastures) |
+| P1 - Pastoreo y Biodiversidad (Pastos Mediterráneos) | P1 - Extensive Grazing (Mediterranean Pastures) |
+| P3/P4 - Rotación y Siembra Directa (Secano) | P3/P4 - Rotation/No-Till (Rainfed) |
+| P3/P4 - Rotación y Siembra Directa (Húmedo) | P3/P4 - Rotation/No-Till (Rainfed Humid) |
+| P3/P4 - Rotación y Siembra Directa (Regadío) | P3/P4 - Rotation/No-Till (Irrigated) |
+| P5 (A) - Espacios de Biodiversidad (Cultivos y Permanentes) | P5 (A) - Biodiversity Spaces (Cultivated/Permanent) |
+| P5 (B) - Espacios de Biodiversidad (Bajo Agua) | P5 (B) - Biodiversity Spaces (Under Water) |
+| P6/P7 - Cubiertas Vegetales o Espontáneas (Terrenos Llanos) | P6/P7 - Plant Cover (Flat Woody Crops) |
+| P6/P7 - Cubiertas Vegetales o Espontáneas (Pendiente Media) | P6/P7 - Plant Cover (Medium Slope) |
+| P6/P7 - Cubiertas Vegetales o Espontáneas (Pendiente Elevada/Bancales) | P6/P7 - Plant Cover (Steep Slope/Terraces) |
+| No Admisible | Non-Eligible |
+</ecoschemes_vocabulary>
+
 ## Strict Processing Rules
 1. **Description**: Generate a highly descriptive paragraph (max 700 characters) correlating the visual items found in <visual_description> with the dominant land use class from <parcel_metadata_json>[cite: 1, 2]. You MUST state the exact value of `Total_Parcel_Area_ha`.
 2. **Tables**: Construct the 'POSSIBLE ECO-SCHEMES' and 'ESTIMATED TOTAL PAYMENT' markdown tables matching the formatting blueprints[cite: 1, 2]. Use the 'Peninsular' nested data attributes for base calculations.

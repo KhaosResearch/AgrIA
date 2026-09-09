@@ -12,6 +12,7 @@ graph TD
     ROUTER{{"🧠 Router Node<br/>(Fast-Path & LLM Intent Classifier)"}}
     
     CONV["💬 Basic Chat Node<br/>(basic_chat)"]
+    USG["⚙️ App Usage Node<br/>(app_usage)"]
     FALLBACK["🚫 Fallback Node<br/>(fallback_rejection)"]
     CAP["📜 CAP Query Node<br/>(cap_query)"]
     RATES["💶 Ecoscheme Rates Node<br/>(ecoscheme_rates)"]
@@ -25,6 +26,7 @@ graph TD
 
     %% Router Branching
     ROUTER -- "basic_chat" --> CONV
+    ROUTER -- "app_usage" --> USG
     ROUTER -- "fallback_rejection" --> FALLBACK
     ROUTER -- "cap_query" --> CAP
     ROUTER -- "ecoscheme_rates" --> RATES
@@ -32,6 +34,7 @@ graph TD
 
     %% Node Execution Outputs
     CONV --> END
+    USG --> END
     FALLBACK --> END
     CAP --> END
     RATES --> END
@@ -50,6 +53,7 @@ graph TD
     style CAP fill:#38a169,stroke:#9ae6b4,color:#fff
     style RATES fill:#38a169,stroke:#9ae6b4,color:#fff
     style CONV fill:#805ad5,stroke:#d6bcfa,color:#fff
+    style USG fill:#805ad5,stroke:#d6bcfa,color:#fff
     style FALLBACK fill:#e53e3e,stroke:#feb2b2,color:#fff
 ```
 
@@ -71,6 +75,7 @@ The agent maintains an immutable execution state passed between nodes:
 | :--- | :--- | :--- |
 | **Router** | `nodes/router_node.py` | Dual-mode intent classifier. Uses **Fast-Path** regex detection for rapid report triggers (`###DESCRIBE_SHORT_IMAGE###`) or a **Structured JSON LLM call** for natural language routing. |
 | **Basich Chat** | `nodes/basic_chat_node.py` | Handles general domain chit-chat, greetings, and high-level non-regulatory agricultural questions. |
+| **App Usage** | `nodes/app_usage_node.py` | Helps with general use-of-the-tool questions and guides the user with step-by-step replies on how to engage properly with the app|
 | **Fallback** | `nodes/fallback_node.py` | Out-of-scope filter. Politeness rejection for queries unrelated to agriculture, crops, or farming. |
 | **CAP Query** | `nodes/cap_query_node.py` | Local RAG pipeline powered by **ChromaDB**. Retrieves semantically relevant legal contexts from regional/national PAC regulatory PDFs and `.md` files. |
 | **Ecoscheme Rates** | `nodes/ecoscheme_rates.py` | Direct context injection node for Campaign Eco-scheme rates, financial thresholds, multi-annual premiums, and payment tables. |
