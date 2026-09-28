@@ -3,23 +3,30 @@ import json
 import numpy as np
 from PIL import Image
 
+
 class SatelliteImageAnalyzer:
     def __init__(self, image_path):
         self.raw_image = Image.open(image_path)
-        
+
         # 1. Create a mask to ignore transparent or pure white/black background margins
         if self.raw_image.mode == "RGBA":
             alpha = np.array(self.raw_image)[:, :, 3]
             self.mask = alpha > 10  # Non-transparent pixels
         else:
-            self.mask = np.ones((self.raw_image.height, self.raw_image.width), dtype=bool)
+            self.mask = np.ones(
+                (self.raw_image.height, self.raw_image.width), dtype=bool
+            )
 
         # Convert to standard RGB array
         self.rgb_image = self.raw_image.convert("RGB")
         self.image_array = np.array(self.rgb_image)
 
         # Exclude white background borders (common in GIS-cropped imagery)
-        white_bg = (self.image_array[:, :, 0] > 240) & (self.image_array[:, :, 1] > 240) & (self.image_array[:, :, 2] > 240)
+        white_bg = (
+            (self.image_array[:, :, 0] > 240)
+            & (self.image_array[:, :, 1] > 240)
+            & (self.image_array[:, :, 2] > 240)
+        )
         self.mask = self.mask & (~white_bg)
 
         # Valid field pixels
@@ -30,7 +37,11 @@ class SatelliteImageAnalyzer:
         if len(self.valid_pixels) == 0:
             return {"dominant_tones": ["unknown"], "bare_soil_pct": 0.0}
 
-        r, g, b = self.valid_pixels[:, 0], self.valid_pixels[:, 1], self.valid_pixels[:, 2]
+        r, g, b = (
+            self.valid_pixels[:, 0],
+            self.valid_pixels[:, 1],
+            self.valid_pixels[:, 2],
+        )
 
         # Bare Soil Index (Soil reflects higher Red/Orange than Green/Blue)
         bare_soil_mask = (r > g) & (g >= b) & (r > 60)
@@ -38,7 +49,7 @@ class SatelliteImageAnalyzer:
 
         # Color Tone Detection
         mean_r, mean_g, mean_b = np.mean(r), np.mean(g), np.mean(b)
-        
+
         tones = []
         if mean_r > mean_g and mean_g > mean_b:
             if mean_r > 150:
@@ -57,7 +68,11 @@ class SatelliteImageAnalyzer:
             "dominant_tone": tones[0] if tones else "heterogeneous soil",
             "bare_soil_percentage": round(bare_soil_pct, 2),
             "patchiness_score": round(patchiness_score, 2),
-            "mean_rgb": [round(float(mean_r), 1), round(float(mean_g), 1), round(float(mean_b), 1)]
+            "mean_rgb": [
+                round(float(mean_r), 1),
+                round(float(mean_g), 1),
+                round(float(mean_b), 1),
+            ],
         }
 
     def analyze_patterns(self):
@@ -67,7 +82,7 @@ class SatelliteImageAnalyzer:
         # Convert valid pixels to HSV
         hsv_img = self.rgb_image.convert("HSV")
         hsv_array = np.array(hsv_img)[self.mask]
-        
+
         hue, sat, val = hsv_array[:, 0], hsv_array[:, 1], hsv_array[:, 2]
 
         # Vegetation Detection (HSV)
@@ -82,7 +97,11 @@ class SatelliteImageAnalyzer:
 
         # Classification Logic
         # High soil percentage or low intra-field variance indicates agricultural land
-        if color_info["bare_soil_percentage"] > 40.0 or vegetation_pct > 15.0 or field_variance < 30.0:
+        if (
+            color_info["bare_soil_percentage"] > 40.0
+            or vegetation_pct > 15.0
+            or field_variance < 30.0
+        ):
             image_type = "agricultural"
         else:
             image_type = "urban"
@@ -107,8 +126,9 @@ class SatelliteImageAnalyzer:
             "dominant_color_tone": color_info["dominant_tone"],
             "patchiness_score": color_info["patchiness_score"],
             "field_structural_variance": round(field_variance, 2),
-            "phenological_stage": phenology
+            "phenological_stage": phenology,
         }
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

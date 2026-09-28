@@ -14,11 +14,9 @@ from ..agent.graph import AGRIA_GRAPH as agent_graph
 from ..models.satellite_analyzer import SatelliteImageAnalyzer
 from ..config.llm_client import vlm_client
 from ..config.constants import (
-    CUSTOM_SKILLS_DIR,
     FULL_DESC_TRIGGER,
     SHORT_DESC_TRIGGER,
     TEMP_DIR,
-    VLM_DESC_PROMPT,
 )
 from ..config.llm_client import client
 from ..utils.chat_utils import generate_image_context_data, save_image_and_get_path
@@ -210,7 +208,9 @@ def _get_parcel_description_sync(
             # 1. Execute analyzer in native Python (Instant < 100ms)
             analyzer = SatelliteImageAnalyzer(image_path)
             metrics = analyzer.analyze_patterns()
-            logger.debug("Satellite image analysis metrics:\n%s", json.dumps(metrics, indent=2))
+            logger.debug(
+                "Satellite image analysis metrics:\n%s", json.dumps(metrics, indent=2)
+            )
 
             # 2. Build direct text prompt for Hermes (No tool-call loop required)
             prompt = (
