@@ -342,7 +342,7 @@ export class ParcelDrawerComponent {
   /**
    * Scrolls view to map element.
    */
-  private scrollToMap(): void {
+  protected scrollToMap(): void {
     const mapElement = document.getElementById('map');
     if (mapElement) {
       mapElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -468,9 +468,9 @@ export class ParcelDrawerComponent {
         for (const classification of this.selectedClassifications) {
           const item = classification.classification;
           this.parcelMetadata.usos.push({
-            dn_superficie: Number(String(classification.surface).replace(',', '.')) * 10000,
+            dn_superficie: Number(String(classification.surface).replace(',', '.')),
             uso_sigpac: `${item.class}-${item.name}`,
-            superficie_admisible: Number(String(classification.surface).replace(',', '.')) * 10000,
+            superficie_admisible: Number(String(classification.surface).replace(',', '.')),
           });
         }
       }

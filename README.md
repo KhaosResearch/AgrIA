@@ -196,5 +196,5 @@ graph TD
 * **Deterministic Rates Injection**: Direct file-injection fallback for high-frequency financial and ecorregímenes rate tables to guarantee 100% numerical accuracy.
 * **Automated Self-Reflection**: Report outputs undergo automated validation before final response emitting.
 
-> For full technical documentation, node contracts, and schema definitions, see the agent's sepcific [`README`](AgrIA_server/src/agent/README.md) file.
+> For full technical documentation, node contracts, and schema definitions, see the agent's specific [`README`](AgrIA_server/src/agent/README.md) file.
 > 

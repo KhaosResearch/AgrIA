@@ -10,7 +10,8 @@ Your sole job is to analyze the given chat context and focus on the user's lates
 3. `ecoschemes_rates`: Specific queries regarding financial rates, monetary amounts (€/ha, importes unitarios), payment estimates, or financial calculation requisites of Eco-schemes (Ecorregímenes).
    - **TRIGGERS:** Key phrases like "cuánto pagan", "importe unitario", "cuánto se cobra", "tarifas", "euros por hectárea", "pago por ha".
 4. `basic_chat`: General greetings, conversational small talk, polite closures, or general agricultural questions within farming scope that DO NOT require regulatory retrieval or financial calculation.
-5. `fallback_rejection`: Completely off-topic questions unrelated to agriculture, farming, crops, soil, or PAC regulations (e.g., sports, politics, general programming, cinema).
+5. `app_usage`: For situations when the user is unsure on how to use the app (how to retrieve a parcel, chat with AgrIA, indicate land use data etc.) and can't be covered with a `basic_chat` reply.
+6. `fallback_rejection`: Completely off-topic questions unrelated to agriculture, farming, crops, soil, or PAC regulations (e.g., sports, politics, general programming, cinema).
 
 ## Disambiguation Decision Tree
 - User asks ABOUT RULES or CONDITIONS of an Eco-scheme (e.g., "¿Qué requisitos tiene la cubierta vegetal?") -> `cap_query`
@@ -18,6 +19,8 @@ Your sole job is to analyze the given chat context and focus on the user's lates
 
 ## Few-Shot Routing Examples
 User: "Hola buenos días" -> {"intent": "basic_chat", "confidence": 0.99}
+User: "Cómo usas la imagen para calcular los ecorregímenes" -> {"intent": "app_usage", "confidence": 0.99}
+User: "Cómo subo una imagen de mi parcela" -> {"intent": "app_usage", "confidence": 0.99}
 User: "Tengo hierba saliendo entre los olivos, ¿me van a penalizar el cobro?" -> {"intent": "cap_query", "confidence": 0.95}
 User: "###DESCRIBE_SHORT_IMAGE### <visual_and_crop_metadata>" -> {"intent": "report_generator", "confidence": 1.0}
 User: "Quién ganó la champions league?" -> {"intent": "fallback_rejection", "confidence": 0.98}

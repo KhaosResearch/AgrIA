@@ -6,6 +6,60 @@ Tu tarea es generar un Informe de Análisis Visual de una parcela agrícola, de 
 CRÍTICO: El idioma de destino es {lang}. DEBES generar todo el contenido en formato markdown, incluidos encabezados, tablas, explicaciones y descripciones exclusivamente en este idioma (por ejemplo, si 'es', generar en español; si 'en', generar en inglés).
 </localization>
 
+<land_use_vocabulary>
+Here is the information about each land use type: their ID and full name both in English and Spanish.
+
+| Land Use ID | Name (Spa) |
+| :--- | :--- |
+| AG | Corrientes y superficies de agua |
+| CA | Viales |
+| CF | Cítricos-Frutal |
+| CI | Cítricos |
+| CS | Cítricos-Frutal de cáscara |
+| CV | Cítricos-Viñedo |
+| ED | Edificaciones |
+| EP | Elemento del Paisaje |
+| FF | Frutal de Cáscara-Frutal |
+| FL | Frutal de Cáscara-Olivar |
+| FO | Forestal |
+| FS | Frutal de Cáscara |
+| FV | Frutal de Cáscara-Viñedo |
+| FY | Frutal |
+| IM | Improductivo |
+| IV | Invernaderos y cultivos bajo plástico |
+| MT | Matorral |
+| OC | Olivar-Cítricos |
+| OF | Olivar-Frutal |
+| OV | Olivar |
+| PA | Pasto arbolado |
+| PR | Pasto arbustivo |
+| PS | Pastizal |
+| TA | Tierra Arable |
+| TH | Huerta |
+| VF | Frutal-Viñedo |
+| VI | Viñedo |
+| VO | Olivar-Viñedo |
+| ZC | Zona concentrada |
+| ZU | Zona urbana |
+| ZV | Zona censurada |
+</land_use_vocabulary>
+
+<ecoschemes_vocabulary>
+| Name (Spa) | Name (Eng) |
+|:--- | :--- |
+| P1 - Pastoreo y Biodiversidad (Pastos Húmedos) |
+| P1 - Pastoreo y Biodiversidad (Pastos Mediterráneos) |
+| P3/P4 - Rotación y Siembra Directa (Secano) |
+| P3/P4 - Rotación y Siembra Directa (Húmedo) |
+| P3/P4 - Rotación y Siembra Directa (Regadío) |
+| P5 (A) - Espacios de Biodiversidad (Cultivos y Permanentes) |
+| P5 (B) - Espacios de Biodiversidad (Bajo Agua) |
+| P6/P7 - Cubiertas Vegetales o Espontáneas (Terrenos Llanos) |
+| P6/P7 - Cubiertas Vegetales o Espontáneas (Pendiente Media) |
+| P6/P7 - Cubiertas Vegetales o Espontáneas (Pendiente Elevada/Bancales) |
+| No Admisible |
+</ecoschemes_vocabulary>
+
 ## Reglas estrictas de procesamiento
 1. **Descripción**: Genera un párrafo muy descriptivo (máx. 700 caracteres) correlacionando los elementos visuales encontrados en <visual_description> con la clase de uso de suelo predominante de <parcel_metadata_json>. DEBES indicar el valor exacto de `Total_Parcel_Area_ha`.
 2. 2. **Tablas**: Construye las tablas en markdown 'POSIBLES ECO-ESQUEMAS' y 'PAGO TOTAL ESTIMADO' siguiendo los modelos de formato. Usa los atributos de datos anidados 'Peninsular' para los cálculos base.

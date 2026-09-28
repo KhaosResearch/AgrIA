@@ -90,7 +90,19 @@ async def send_parcel_info_to_chat(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.exception("Error loading parcel to chat:\n")
+        import traceback
+
+        tb = traceback.extract_tb(e.__traceback__)
+        frame = tb[-1]
+
+        logger.error(
+            "Error loading parcel to chat:",
+            error=str(e),
+            file=frame.filename,
+            line=frame.lineno,
+            function=frame.name,
+        )
+
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -134,10 +146,7 @@ async def load_active_chat_history(thread_id: str = "default_session"):
                 agent_graph.update_state(config, {"messages": [welcome_msg]})
             chat_history = [welcome_msg]
         response = get_role_and_content(chat_history)
-        with open("history.json", "w") as f:
-            import json
 
-            json.dump(response, f, indent=4)
         return {"response": response}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

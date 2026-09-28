@@ -1,16 +1,25 @@
 import asyncio
 import structlog
 
+from google.genai import Client as GeminiGenAIClient
 from PIL import Image
 from google.genai.types import Content
 from langchain_core.messages import HumanMessage
+from run_agent import AIAgent
 
 from ..utils.nodes_utils import load_prompt_asset
 
 from .ecoscheme_payments.main import calculate_ecoscheme_payment
 from ..agent.graph import AGRIA_GRAPH as agent_graph
+from ..models.satellite_analyzer import SatelliteImageAnalyzer
 from ..config.llm_client import vlm_client
-from ..config.constants import FULL_DESC_TRIGGER, SHORT_DESC_TRIGGER, TEMP_DIR
+from ..config.constants import (
+    CUSTOM_SKILLS_DIR,
+    FULL_DESC_TRIGGER,
+    SHORT_DESC_TRIGGER,
+    TEMP_DIR,
+    VLM_DESC_PROMPT,
+)
 from ..config.llm_client import client
 from ..utils.chat_utils import generate_image_context_data, save_image_and_get_path
 from ..utils.llm_utils import get_aux_image_description
@@ -60,8 +69,19 @@ def _generate_user_response_sync(
         response = str(output_state["messages"][-1].content)
         return response
     except Exception as e:
-        logger.error(f"Error while generating response: {e}")
-        logger.exception(e)
+        import traceback
+
+        tb = traceback.extract_tb(e.__traceback__)
+        frame = tb[-1]
+
+        logger.error(
+            "Error while generating response",
+            error=str(e),
+            file=frame.filename,
+            line=frame.lineno,
+            function=frame.name,
+        )
+
         raise e
 
 
@@ -153,7 +173,13 @@ def _get_parcel_description_sync(
     """
     try:
         logger.info("Retrieveing parcel data...")
-        image_context_data = generate_image_context_data(image_date, land_uses, query)
+        cleaned_land_uses = []
+        for lu in land_uses:
+            lu["uso_sigpac"] = lu.get("uso_sigpac", "").split("-")[0].strip()
+            cleaned_land_uses.append(lu)
+        image_context_data = generate_image_context_data(
+            image_date, cleaned_land_uses, query
+        )
         json_data = calculate_ecoscheme_payment(image_context_data[lang], lang)
         with open(TEMP_DIR / "ecoscheme_data.json", "w") as f:
             import json
@@ -167,33 +193,67 @@ def _get_parcel_description_sync(
         image_desc_prompt = f"\n```{image_context_data[lang]}\n```"
 
         image_indication_options = {
-            "es": "Estas son las características de la parcela cuya imagen te paso. Tenlo en cuenta para tu descripción en español. Comprueba el siguiente prompt para ver si es necesario cambiar el idioma:",
-            "en": "These are the parcel's features whose image I am sending you. Take them into account for your description in English. Check next prompt for language change if needed:",
+            "es": "Estas son las características de la parcela cuya imagen te paso. Tenlo en cuenta para tu descripción en español:",
+            "en": "These are the parcel's features whose image I am sending you. Take them into account for your description in English:",
         }
         image_indication_prompt = str(
-            f"{desc_trigger}\n{image_indication_options[lang]}\n\n{json_data}"
+            f"{desc_trigger}\n{image_indication_options[lang]}\n"
         )
         # Open image from path
         image_path = TEMP_DIR / str(image_filename).split("?")[0]
-        image = Image.open(image_path)
-        if vlm_client is not None:
+
+        if isinstance(vlm_client, AIAgent):
+            logger.info(
+                "Analyzing image layout using Hermes Agent with satellite-image-analysis skill..."
+            )
+
+            # 1. Execute analyzer in native Python (Instant < 100ms)
+            analyzer = SatelliteImageAnalyzer(image_path)
+            metrics = analyzer.analyze_patterns()
+            logger.debug("Satellite image analysis metrics:\n%s", json.dumps(metrics, indent=2))
+
+            # 2. Build direct text prompt for Hermes (No tool-call loop required)
+            prompt = (
+                f"Synthesize the following satellite imagery metrics and land use data into an organic, 50-60 word visual description.\n\n"
+                f"Visual Analysis Metrics:\n{json.dumps(metrics, indent=2)}\n\n"
+                f"SIGPAC Land Use Data:\n{json.dumps(cleaned_land_uses, indent=2)}\n\n"
+                f"Instructions:\n"
+                f"- Classify the landscape naturally (e.g., agricultural field / bare soil parcel).\n"
+                f"- Mention the dominant color tones (e.g., warm light-ochre, earthy brown) and any subtle patchiness.\n"
+                f"- Connect the absence of green vegetation (<1%) with the SIGPAC overexploited/agricultural status.\n"
+                f"- Do not infer any crop types/names from SIGPAC land use identifiers, use them as.is.\n"
+                f"- Output ONLY the final 50-60 word narrative paragraph."
+            )
+
+            # 3. Call Hermes with pure text (Fast single-turn response)
+            response = vlm_client.run_conversation(user_message=prompt)
+            extracted_visual_description = response["final_response"]
+
+            logger.debug("VLM image description:\n%s", extracted_visual_description)
+
+        elif isinstance(vlm_client, GeminiGenAIClient):
             logger.info(
                 "Analyzing image layout using auxiliary Multi-modal Language Model engine..."
             )
             # Trigger your auxiliary vision model
+            image = Image.open(image_path)
             extracted_visual_description = get_aux_image_description(
                 image_obj=image, lang=lang
             )
 
-            # Reconstruct the text chain to model using the extracted description string
+        # Reconstruct the text chain to model using the extracted description string
+        if extracted_visual_description:
             model_payload = "\n".join(
                 [
-                    f"Visual Analysis Report of Parcel: {extracted_visual_description}",
                     image_indication_prompt,
+                    f"Visual Analysis Report of Parcel: {extracted_visual_description}",
                     image_desc_prompt,
                 ]
             )
         else:
+            logger.info(
+                "No auxiliary Multi-modal Language Model engine detected. Using only image context data for description generation..."
+            )
             model_payload = "\n".join([image_indication_prompt, image_desc_prompt])
 
         inputs = {

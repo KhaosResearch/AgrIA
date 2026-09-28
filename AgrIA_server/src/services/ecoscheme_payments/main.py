@@ -17,18 +17,12 @@ logger = structlog.get_logger()
 # --- Main Calculation Function (Modified) ---
 
 
-def calculate_ecoscheme_payment(
-    input_data_str: str,
-    lang: str = LANG,
-    rules_json_filepath: str = OG_CLASSIFICATION_FILEPATH,
-) -> dict:
+def get_eligible_ecoschemes_data(
+    rules_json_filepath: str = OG_CLASSIFICATION_FILEPATH, lang: str = LANG
+) -> tuple:
     """
-    Processes land use input data and calculates estimated Eco-scheme payments
-    by applying the Critical Exclusivity Rule (choosing the highest payment/ha
-    across all rate types) and including both Peninsular and Insular calculations.
+    Retrieves eligible ecoschemes based on the provided rules and language.
     """
-
-    # --- 1. PREPARE RULES AND CONSTANTS ---
     with open(rules_json_filepath, "r") as file:
         all_rules_list = json.load(file)
     rules_json_str = json.dumps(all_rules_list[lang.upper()])
@@ -43,11 +37,28 @@ def calculate_ecoscheme_payment(
         rules_data_list
     )
 
+    return eligible_schemes_by_land_use, non_eligible_uses
+
+
+def calculate_ecoscheme_payment(
+    input_data_str: str,
+    lang: str = LANG,
+    rules_json_filepath: str = OG_CLASSIFICATION_FILEPATH,
+) -> dict:
+    """
+    Processes land use input data and calculates estimated Eco-scheme payments
+    by applying the Critical Exclusivity Rule (choosing the highest payment/ha
+    across all rate types) and including both Peninsular and Insular calculations.
+    """
+
+    # --- 1. PREPARE RULES AND CONSTANTS ---
+    eligible_schemes_by_land_use, non_eligible_uses = get_eligible_ecoschemes_data()
+
     # --- 2. PARSE INPUT DATA AND CALCULATE TOTAL AREA ---
 
     land_use_regex = {
-        "en": r"- Land Use: ([A-Z]{2})\s*- Eligible surface \(ha\): ([\d\.]+)\s*- Irrigation Coeficient: ([\d\.]+%)\s*(?:- Slope Coeficient: ([\d\.]+%))?",
-        "es": r"- Tipo de Uso:\s*([A-Z]{2})\s*- Superficie admisible \(ha\):\s*([\d\.]+)\s*- Coef\. de Regadío:\s*([\d\.]+%)\s*(?:- Pendiente media:\s*([\d\.]+%))?",
+        "en": r"- Land Use:\s*(.*?)\s*- Eligible surface \(ha\):\s*([\d.]+)\s*- Irrigation Coeficient:\s*([\d.]+%)\s*(?:- Slope Coeficient:\s*([\d.]+%))?",
+        "es": r"- Tipo de Uso:\s*(.*?)\s*- Superficie admisible \(ha\):\s*([\d.]+)\s*- Coef\. de Regadío:\s*([\d.]+%)\s*(?:- Pendiente media:\s*([\d.]+%))?",
     }
     land_use_blocks = re.findall(
         land_use_regex[lang.lower()], input_data_str, re.DOTALL

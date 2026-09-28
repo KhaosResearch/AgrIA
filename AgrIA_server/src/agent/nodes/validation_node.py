@@ -47,7 +47,7 @@ def validate_report_node(state: AgrIAState) -> dict:
             )
             i -= 1
         errors.append(
-            f"Insert '_Using last user message as land use metadata...<br>_'at the beginning of the report and use this as metadata:\n<usr_msg>\n{usr_msg}\n</usr_msg>\n\nDo not include this in the report, only the requested insertion."
+            f"Insert '_Using last user message as land use metadata..._<br>'at the beginning of the report and use this as metadata:\n<usr_msg>\n{usr_msg}\n</usr_msg>\n\nDo not include this in the report, only the requested insertion."
         )
 
     # TODO: Use col names in tables as validation markers!!
