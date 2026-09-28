@@ -9,57 +9,55 @@ CRÍTICO: El idioma de destino es {lang}. DEBES generar todo el contenido en for
 <land_use_vocabulary>
 Here is the information about each land use type: their ID and full name both in English and Spanish.
 
-| Land Use ID | Name (Spa) | Name (Eng) |
-| :---: | :--- | :--- |
-| AG | Corrientes y superficies de agua | Water currents and surfaces |
-| CA | Viales | Roads |
-| CF | Cítricos-Frutal | Citrus-Fruit trees |
-| CI | Cítricos | Citrus |
-| CS | Cítricos-Frutal de cáscara | Citrus-Nut trees |
-| CV | Cítricos-Viñedo | Citrus-Vineyard |
-| ED | Edificaciones | Buildings |
-| EP | Elemento del Paisaje | Landscape element |
-| FF | Frutal de Cáscara-Frutal | Nut trees-Fruit trees |
-| FL | Frutal de Cáscara-Olivar | Nut trees-Olive grove |
-| FO | Forestal | Forestry |
-| FS | Frutal de Cáscara | Nut trees |
-| FV | Frutal de Cáscara-Viñedo | Nut trees-Vineyard |
-| FY | Frutal | Fruit trees |
-| IM | Improductivo | Unproductive |
-| IV | Invernaderos y cultivos bajo plástico | Greenhouses and crops under plastic |
-| MT | Matorral | Bushes |
-| OC | Olivar-Cítricos | Olive grove-Citrus |
-| OF | Olivar-Frutal | Olive grove-Fruit trees |
-| OV | Olivar | Olive grove |
-| PA | Pasto arbolado | Wooded pasture |
-| PR | Pasto arbustivo | Shrub pasture |
-| PS | Pastizal | Grassland |
-| TA | Tierra Arable | Arable land |
-| TH | Huerta | Vegetable garden |
-| VF | Frutal-Viñedo | Fruit trees-Vineyard |
-| VI | Viñedo | Vineyard |
-| VO | Olivar-Viñedo | Olive grove-Vineyard |
-| ZC | Zona concentrada | Concentrated area |
-| ZU | Zona urbana | Urban area |
-| ZV | Zona censurada | Censored area |
+| Land Use ID | Name (Spa) |
+| :--- | :--- |
+| AG | Corrientes y superficies de agua |
+| CA | Viales |
+| CF | Cítricos-Frutal |
+| CI | Cítricos |
+| CS | Cítricos-Frutal de cáscara |
+| CV | Cítricos-Viñedo |
+| ED | Edificaciones |
+| EP | Elemento del Paisaje |
+| FF | Frutal de Cáscara-Frutal |
+| FL | Frutal de Cáscara-Olivar |
+| FO | Forestal |
+| FS | Frutal de Cáscara |
+| FV | Frutal de Cáscara-Viñedo |
+| FY | Frutal |
+| IM | Improductivo |
+| IV | Invernaderos y cultivos bajo plástico |
+| MT | Matorral |
+| OC | Olivar-Cítricos |
+| OF | Olivar-Frutal |
+| OV | Olivar |
+| PA | Pasto arbolado |
+| PR | Pasto arbustivo |
+| PS | Pastizal |
+| TA | Tierra Arable |
+| TH | Huerta |
+| VF | Frutal-Viñedo |
+| VI | Viñedo |
+| VO | Olivar-Viñedo |
+| ZC | Zona concentrada |
+| ZU | Zona urbana |
+| ZV | Zona censurada |
 </land_use_vocabulary>
 
 <ecoschemes_vocabulary>
 | Name (Spa) | Name (Eng) |
 |:--- | :--- |
-|Ecorrégimen | Ecoscheme |
-|Ecorregímenes | Ecoschemes |
-| P1 - Pastoreo y Biodiversidad (Pastos Húmedos) | P1 - Extensive Grazing (Humid Pastures) |
-| P1 - Pastoreo y Biodiversidad (Pastos Mediterráneos) | P1 - Extensive Grazing (Mediterranean Pastures) |
-| P3/P4 - Rotación y Siembra Directa (Secano) | P3/P4 - Rotation/No-Till (Rainfed) |
-| P3/P4 - Rotación y Siembra Directa (Húmedo) | P3/P4 - Rotation/No-Till (Rainfed Humid) |
-| P3/P4 - Rotación y Siembra Directa (Regadío) | P3/P4 - Rotation/No-Till (Irrigated) |
-| P5 (A) - Espacios de Biodiversidad (Cultivos y Permanentes) | P5 (A) - Biodiversity Spaces (Cultivated/Permanent) |
-| P5 (B) - Espacios de Biodiversidad (Bajo Agua) | P5 (B) - Biodiversity Spaces (Under Water) |
-| P6/P7 - Cubiertas Vegetales o Espontáneas (Terrenos Llanos) | P6/P7 - Plant Cover (Flat Woody Crops) |
-| P6/P7 - Cubiertas Vegetales o Espontáneas (Pendiente Media) | P6/P7 - Plant Cover (Medium Slope) |
-| P6/P7 - Cubiertas Vegetales o Espontáneas (Pendiente Elevada/Bancales) | P6/P7 - Plant Cover (Steep Slope/Terraces) |
-| No Admisible | Non-Eligible |
+| P1 - Pastoreo y Biodiversidad (Pastos Húmedos) |
+| P1 - Pastoreo y Biodiversidad (Pastos Mediterráneos) |
+| P3/P4 - Rotación y Siembra Directa (Secano) |
+| P3/P4 - Rotación y Siembra Directa (Húmedo) |
+| P3/P4 - Rotación y Siembra Directa (Regadío) |
+| P5 (A) - Espacios de Biodiversidad (Cultivos y Permanentes) |
+| P5 (B) - Espacios de Biodiversidad (Bajo Agua) |
+| P6/P7 - Cubiertas Vegetales o Espontáneas (Terrenos Llanos) |
+| P6/P7 - Cubiertas Vegetales o Espontáneas (Pendiente Media) |
+| P6/P7 - Cubiertas Vegetales o Espontáneas (Pendiente Elevada/Bancales) |
+| No Admisible |
 </ecoschemes_vocabulary>
 
 ## Reglas estrictas de procesamiento
