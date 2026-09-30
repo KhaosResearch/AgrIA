@@ -23,63 +23,120 @@ The following diagram displays the core processes involved:
 
 ## Components Diagram
 ```mermaid
-graph TD
-    subgraph Frontend[AgrIA_UI]
-        App[App Component] --> Nav[Navbar Component]
+graph LR
+    %% ============================================================
+    %% FRONTEND
+    %% ============================================================
+    subgraph Frontend["AgrIA UI"]
 
-        subgraph Homepage[Homepage View]
-            Home[Home Page Component]
+        App["App"]
+        Nav["Navbar"]
+
+        subgraph Views["Views"]
+            Home["Homepage"]
+            Chat["Chat"]
+            Parcel["Parcel Finder"]
         end
 
+        subgraph ChatSystem["Chat"]
+            ChatAsst["Chat Assistant"]
+            ChatService["Chat Service"]
+        end
+
+        subgraph ParcelSystem["Parcel Finder"]
+            ParcelCad["Cadastral"]
+            ParcelLoc["Locator"]
+            ParcelDraw["Drawer"]
+            ParcelDisp["Display"]
+            ParcelService["Parcel Service"]
+        end
+
+        Notification["Notification Service"]
+        API["HTTP Client"]
+
+        App --> Nav
         Nav --> Home
-        Nav --> Chat[Chat Component]
-        Nav --> Parcel[Parcel Finder Component]
-        
-        subgraph Parcel_System[Parcel Finder View]
-            Parcel --> ParcelCad[Parcel Cadastral]
-            Parcel --> ParcelLoc[Parcel Locator]
-            Parcel --> ParcelDraw[Parcel Drawer]
-            Parcel --> ParcelDisp[Parcel Display]
-            ParcelLoc & ParcelCad & ParcelDraw --> ParcelService[Parcel Finder Service]
-        end
-        
-        subgraph Chat_System[Chat View]
-            Chat --> ChatAsst[Chat Assistant Component]
-            ChatAsst --> ChatService[Chat Assistant Services]
-        end
+        Nav --> Chat
+        Nav --> Parcel
 
-        ChatService & ParcelService --> Notification[Notification Service]
-        ChatService & ParcelService --> API_Client[HTTP Client]
+        Chat --> ChatAsst
+        ChatAsst --> ChatService
+
+        Parcel --> ParcelCad
+        Parcel --> ParcelLoc
+        Parcel --> ParcelDraw
+        Parcel --> ParcelDisp
+
+        ParcelCad --> ParcelService
+        ParcelLoc --> ParcelService
+        ParcelDraw --> ParcelService
+
+        ChatService --> Notification
+        ParcelService --> Notification
+
+        ChatService --> API
+        ParcelService --> API
+
     end
 
-    API_Client -- "REST API" --> Server
 
-    subgraph Backend[AgrIA_server]
-        Server[Server Entry Point] --> Router[API Router/Controllers/Endpoints]
-        
-        subgraph Assets[Assets & Docs]
-            LLM_Assets[LLM Assets / Context Docs]
-            Geo_Assets[GeoJSON Assets]
-            CAP_Docs[CAP Reference Docs]
+    %% ============================================================
+    %% FRONTEND → BACKEND
+    %% ============================================================
+    API -->|"REST API"| Server
+
+
+    %% ============================================================
+    %% BACKEND
+    %% ============================================================
+    subgraph Backend["AgrIA Server"]
+
+        Server["Server Entry Point"]
+        Router["API Router / Controllers / Endpoints"]
+        Agent["AgrIA Agent Graph"]
+        subgraph Logic["Core Logic"]
+
+            GeoLogic["GeoJSON / Spatial Logic"]
+            ChatLogic["Chat Logic / LLM Processing"]
+            ClassifLogic["Ecoschemes Classification"]
+
         end
 
-        subgraph Core_Logic[Core Logic]
-            ChatLogic[Chat Logic / LLM Processing]
-            GeoLogic[GeoJSON / Spatial Logic]
-            ClassifLogic[Ecoschemes Classif. Algorithm]
+        subgraph Assets["Assets & Docs"]
+
+            GeoAssets["GeoJSON Assets"]
+            LLMAssets["LLM Context Docs"]
+            CAPDocs["CAP Reference Docs"]
+
         end
 
-        Router --> Core_Logic
-        Assets --> Core_Logic
+        SR["Image Super-Resolution"]
+        LLMEval["LLM Ecoscheme Evaluation"]
+        Response["Full LLM Response"]
 
-        GeoLogic --> SR_Module[Image Super-Resolution Module]
-        ChatLogic & ClassifLogic--> LLM_Eval[LLM Ecoscheme Evaluation]
-        
-        SR_Module & LLM_Eval --> Response[Full LLM Response]
+        Server --> Router
+        Router -- Sends input and Chat State to --> Agent
+
+        Agent --> GeoLogic
+        Agent --> ChatLogic
+        Agent --> ClassifLogic
+
+        GeoAssets --> GeoLogic
+        LLMAssets --> ChatLogic
+        CAPDocs --> ClassifLogic
+
+        GeoLogic --> SR
+
+        ChatLogic --> LLMEval
+        ClassifLogic --> LLMEval
+
+        SR --> Response
+        LLMEval --> Response
+
     end
 ```
-The two main components are comprised of both smaller components and services that allow comunication between frontend and backend:
 
+The two main components are comprised of both smaller components and services that allow comunication between frontend and backend:
 ### Frontend
 
 - **Chat:** A basic chat interface that communicates with the AI model. It displays the different buttons for the chat as well as the parcel image and chat views.

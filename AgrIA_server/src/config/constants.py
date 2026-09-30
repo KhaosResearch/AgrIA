@@ -14,15 +14,16 @@ VECTOR_DB_PATH = ROOT_DIR / "db"
 COLLECTION_NAME = "cap_regulations"
 
 BASE_GEOJSON_PATH = Path(ASSETS_DIR / "geojson_assets")
-BASE_CONTEXT_PATH = Path(ASSETS_DIR / "LLM_assets/context")
-BASE_PROMPTS_PATH = Path(ASSETS_DIR / "LLM_assets/prompts")
+LLM_ASSETS_PATH = Path(ASSETS_DIR / "LLM_assets/")
+BASE_CONTEXT_PATH = Path(LLM_ASSETS_PATH / "context")
+BASE_PROMPTS_PATH = Path(LLM_ASSETS_PATH / "prompts")
 
 CONTEXT_DOCUMENTS_FILE = "context_document_links.json"
 PROMPT_LIST_FILE = "prompt_list.json"
 
 TEMP_DIR = Path(ROOT_DIR / "temp/")
 
-CUSTOM_SKILLS_DIR = Path(ASSETS_DIR / "LLM_assets/skills")
+CUSTOM_SKILLS_DIR = Path(LLM_ASSETS_PATH / "skills")
 
 KML_FILENAME = (
     "S2A_OPER_GIP_TILPAR_MPC__20151209T095117_V20150622T000000_21000101T000000_B00"
@@ -120,3 +121,41 @@ if GET_SR_BENCHMARK:
     logger.warning(
         "⚠️  WARNING: SUPER-RES BENCHMARK IS ACTIVE. This will execute both SR4S and SEN2SR pipelines (in that order), which will slow down all parcel fetching processes. To deactivate it, set the `GET_SR_BENCHMARK` to `False` in the `AgrIA/AgrIA_server/server/config/constants.py` file"
     )
+
+# CAP FORM CONSTANTS
+
+CAP_FORMS_PATH = Path(LLM_ASSETS_PATH / "forms")
+
+SENSITIVE_INFO_FORM_FIELD_NAMES = [
+    "Número Solicitud",
+    "Campaña",
+    "Número de expediente histórico",
+    "CIF/NIF",
+    "Nombre",
+    "Nombre / Razón social",
+    "Primer Apellido",
+    "Segundo Apellido",
+    "NIF gerente Explotación",
+    "F. Nacimiento",
+    "Género",
+    "Email",
+    "Teléfono",
+    "Móvil",
+    "CIF/NIF Empresa Matriz",
+    "Razón Social",
+    "CIF/NIF Empresa Matriz Última",
+    "IBAN",
+    "Entidad",
+    "Sucursal",
+    "DC",
+    "Número de Cuenta",
+    "Régimen Matrimonial",
+    "Tipo vía",
+    "Nombre vía",
+    "Código Postal",
+    "Provincia",
+    "Municipio",
+]
+IMPORTANT_INFO_FORM_KEYWORD = (
+    "SOLICITA"  # Most sensitive info is found before the keyword in the PDF file
+)
