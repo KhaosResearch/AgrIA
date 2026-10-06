@@ -47,7 +47,7 @@ def process_cap_document(
 
     response = llm_response
 
-        # Handle different response types gracefully
+    # Handle different response types gracefully
     if isinstance(response, CAPFullApplicationSchema):
         output_data = response.model_dump_json(indent=4, warnings=False)
     elif isinstance(response, dict):

@@ -11,13 +11,14 @@ logger = structlog.get_logger(__file__)
 
 
 def load_prompt_asset(filename: str, lang: str = "") -> str:
-    """Reads modular markdown text prompts directly from filesystem."""
+    """Reads modular markdown text prompts directly from filesystem.
+
+    Raises `FileNotFoundError` when the asset is missing. A silent fallback to a
+    generic chatbot instruction would hide typos in prompt names and quietly
+    degrade node behaviour, so the failure must surface.
+    """
     file_path = BASE_PROMPTS_PATH / lang / filename
-    try:
-        return file_path.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        # Fallback block to prevent server crash
-        return "You are AgrIA, an agricultural AI chatbot assistant."
+    return file_path.read_text(encoding="utf-8")
 
 
 def execute_scoped_chat(

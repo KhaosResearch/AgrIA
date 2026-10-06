@@ -60,8 +60,10 @@ def validate_report_node(state: AgrIAState) -> dict:
         logger.warning(feedback_note)
         return {"correction_feedback": feedback_note}
 
-    state["crop_metadata"] = None  # Reset crop metadata after successful validation
-    return {"correction_feedback": "PASSED"}
+    # Clear the metadata in the returned update: the previous in-place assignment
+    # was discarded by LangGraph, so the value survived into the next turn.
+    # Safe because a PASSED verdict exits the graph immediately.
+    return {"correction_feedback": "PASSED", "crop_metadata": None}
 
 
 def evaluation_router_edge(state: AgrIAState) -> Literal["report_generator", "__end__"]:

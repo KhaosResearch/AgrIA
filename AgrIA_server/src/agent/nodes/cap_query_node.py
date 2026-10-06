@@ -50,4 +50,10 @@ def cap_query_node(state: AgrIAState, client, model_name: str) -> dict:
 
     response_wrapper = chat.send_message(user_payload)
 
-    return {"messages": [AIMessage(content=response_wrapper.text)]}
+    # The application is complete and the farmer is back in advisory mode: drop
+    # the pending slot so the next free-text message is routed normally instead
+    # of resuming the clarification loop.
+    return {
+        "messages": [AIMessage(content=response_wrapper.text)],
+        "pending_action": None,
+    }

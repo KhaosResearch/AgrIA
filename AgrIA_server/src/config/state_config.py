@@ -10,5 +10,13 @@ AGRIA_STATE = AgrIAState(
         "crop_metadata": None,
         "visual_description": None,
         "correction_feedback": None,
+        # CAP workflow starts empty on every conversation; the slot guard and
+        # application nodes are the only writers of these fields.
+        "cap_form_data": None,
+        "assessment_report": None,
+        "pending_action": None,
+        "cap_workflow": None,
+        "cap_alignment": None,
+        "cap_rates": None,
     }
 )

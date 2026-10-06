@@ -260,6 +260,7 @@ def _get_parcel_description_sync(
             "crop_metadata": json_data,
             "lang": lang,
             "messages": [HumanMessage(content=model_payload)],
+            "visual_description": extracted_visual_description,
         }
         config = {"configurable": {"thread_id": thread_id}}
         output_state = agent_graph.invoke(inputs, config=config)

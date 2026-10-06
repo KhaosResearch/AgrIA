@@ -3,7 +3,6 @@ import structlog
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph, START, END
 
-
 from ..config.llm_client import client, LLM_MODEL_NAME
 from ..models.state_models import AgrIAState
 from .nodes.cap_query_node import cap_query_node
@@ -12,10 +11,23 @@ from .nodes.app_usage_node import app_usage_node
 from .nodes.fallback_node import fallback_rejection_node
 from .nodes.ecoscheme_rates_node import ecoschemes_rates_node
 from .nodes.report_node import generate_report_node
-from .nodes.router_node import deterministic_router
+from .nodes.router_node import deterministic_router, clear_cap_workflow
 from .nodes.validation_node import validate_report_node, evaluation_router_edge
+from .nodes.cap_document_inspector_node import cap_document_inspector_node
+from .nodes.cap_slot_guard_node import cap_slot_guard_node
+from .nodes.cap_application_node import cap_application_node
 
 logger = structlog.get_logger(__file__)
+
+
+def inspector_edge(state: AgrIAState) -> str:
+    """Route a document inspection result.
+
+    The inspector only ever produces evidence in `cap_alignment`, which
+    `cap_application_node` is the sole consumer of, so its result always goes
+    there: routing to the advisory query would drop the extracted slots.
+    """
+    return "cap_application" if state.get("cap_alignment") else "cap_query"
 
 
 # Define graph routing logic
@@ -29,7 +41,6 @@ def build_graph() -> StateGraph[AgrIAState]:
     builder = StateGraph(AgrIAState)
     model_name = LLM_MODEL_NAME
 
-    # Register our worker nodes
     # We use simple lambda wrappers to pass your custom client runtime arguments
     builder.add_node(
         "basic_chat", lambda state: basic_chat_node(state, client, model_name)
@@ -54,6 +65,21 @@ def build_graph() -> StateGraph[AgrIAState]:
     )
     builder.add_node("validate_report", validate_report_node)  # Fast code checking node
 
+    # CAP clarification chain: document / guard -> application -> advisory
+    builder.add_node(
+        "cap_document_inspector",
+        lambda state: cap_document_inspector_node(state, client, model_name),
+    )
+    builder.add_node(
+        "cap_slot_guard",
+        lambda state: cap_slot_guard_node(state, client, model_name),
+    )
+    builder.add_node(
+        "cap_application",
+        lambda state: cap_application_node(state, client, model_name),
+    )
+    builder.add_node("clear_cap_workflow", clear_cap_workflow)
+
     # Wire up the graph flow topology
     builder.add_conditional_edges(
         START,
@@ -65,6 +91,9 @@ def build_graph() -> StateGraph[AgrIAState]:
             "ecoschemes_rates": "ecoschemes_rates",
             "fallback_rejection": "fallback_rejection",
             "report_generator": "report_generator",
+            "cap_document_inspector": "cap_document_inspector",
+            "cap_slot_guard": "cap_slot_guard",
+            "cap_application": "cap_application",
         },
     )
 
@@ -85,6 +114,25 @@ def build_graph() -> StateGraph[AgrIAState]:
             "__end__": END,  # Exits to user if perfect
         },
     )
+
+    # CAP clarification: both entry points feed the application node, which
+    # merges slots, validates and decides between the next question and the
+    # advisory answer. `pending_action` alone drives resumability.
+    builder.add_conditional_edges(
+        "cap_document_inspector",
+        inspector_edge,
+        {
+            "cap_application": "cap_application",
+            "cap_query": "cap_query",
+        },
+    )
+    builder.add_edge("cap_slot_guard", "cap_application")
+    # `cap_application` always ends the turn. Looping here would re-ask the
+    # question without the farmer having answered: resumability comes from
+    # `pending_action` surviving the checkpointer, and the router sends the
+    # next user message back through `cap_slot_guard`.
+    builder.add_edge("cap_application", END)
+    builder.add_edge("clear_cap_workflow", END)
 
     return builder
 

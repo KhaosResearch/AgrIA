@@ -18,6 +18,10 @@ llm_formatted_out/
 *.json
 *.log
 
+# Runtime LLM assets are JSON, but they are required at runtime and must ship
+!AgrIA_server/assets/LLM_assets/prompts/CAP_RATES.json
+!AgrIA_server/assets/LLM_assets/prompts/CAP_SLOTS.json
+
 # Custom
 misc/
 
