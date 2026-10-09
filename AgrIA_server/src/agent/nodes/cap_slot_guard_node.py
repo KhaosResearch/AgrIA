@@ -25,7 +25,9 @@ GUARD_CONTEXT_TOKENS = 4000
 GUARD_MAX_ATTEMPTS = 2
 
 
-def _schema_block(slots: Optional[dict], pending_action: Optional[str], lang: str) -> str:
+def _schema_block(
+    slots: Optional[dict], pending_action: Optional[str], lang: str
+) -> str:
     """Bilingual schema + current-state block fed to the guard."""
     schema, _ = load_cap_slots()
     question_key = "question_en" if lang == "en" else "question_es"

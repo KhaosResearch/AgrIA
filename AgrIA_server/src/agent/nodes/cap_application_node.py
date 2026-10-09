@@ -58,7 +58,11 @@ def _apply_alignment(
     alignment = state.get("cap_alignment") or {}
     incoming = alignment.get("slots") or {}
     merged = merge_slots(state.get("cap_form_data"), incoming)
-    new_names = [name for name in incoming if merged.get(name) != (state.get("cap_form_data") or {}).get(name)]
+    new_names = [
+        name
+        for name in incoming
+        if merged.get(name) != (state.get("cap_form_data") or {}).get(name)
+    ]
     return merged, new_names
 
 
@@ -148,9 +152,7 @@ def cap_application_node(state: AgrIAState, client, model_name: str) -> Dict[str
     raw_instruction = load_prompt_asset("CAP_APPLICATION.md").replace(
         "{lang}", "Spanish" if lang == "es" else "English"
     )
-    system_instruction = (
-        f"{raw_instruction}\n\n<classification>\n{_load_ecoscheme_classification()}\n</classification>"
-    )
+    system_instruction = f"{raw_instruction}\n\n<classification>\n{_load_ecoscheme_classification()}\n</classification>"
 
     # The mapping and amounts are precomputed here: the LLM may only narrate
     # them, never recompute or adjust a figure.

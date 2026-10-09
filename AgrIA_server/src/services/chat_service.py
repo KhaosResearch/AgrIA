@@ -9,7 +9,7 @@ from run_agent import AIAgent
 
 from ..utils.nodes_utils import load_prompt_asset
 
-from .ecoscheme_payments.main import calculate_ecoscheme_payment
+from .ecoscheme_payments.main import get_ecoscheme_payments_data
 from ..agent.graph import AGRIA_GRAPH as agent_graph
 from ..models.satellite_analyzer import SatelliteImageAnalyzer
 from ..config.llm_client import vlm_client
@@ -178,7 +178,7 @@ def _get_parcel_description_sync(
         image_context_data = generate_image_context_data(
             image_date, cleaned_land_uses, query
         )
-        json_data = calculate_ecoscheme_payment(image_context_data[lang], lang)
+        json_data = get_ecoscheme_payments_data(image_context_data[lang], lang)
         with open(TEMP_DIR / "ecoscheme_data.json", "w") as f:
             import json
 

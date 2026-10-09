@@ -1,0 +1,436 @@
+2026-10-07 12:11:48 [warning  ] Warning: 'GEMINI_API_KEY' was not set correctly in '.env' file. Detected value: {GEMINI_API_KEY}
+2026-10-07 12:11:48 [warning  ] Set a valid value to access AgrIA's Chat Assistant services!
+Selected SECUENCIALES:
+[np.int64(638945), np.int64(1382847), np.int64(25519), np.int64(1382042), np.int64(1398501), np.int64(625002), np.int64(255217), np.int64(1406793), np.int64(1368318), np.int64(52429), np.int64(1409348), np.int64(202183), np.int64(133204), np.int64(1333614), np.int64(129074), np.int64(1393940), np.int64(383032), np.int64(1512802), np.int64(1420624), np.int64(290451)]
+
+Reading AYUDAS sample...
+AYUDAS rows: 298
+
+Reading SUPERFICIES sample...
+SUPERFICIES rows: 160
+
+================ AYUDAS ================
+   SECUENCIAL  ...                                           DESC_LNA
+0      638945  ...             Cubierta vegetal espontánea o sembrada
+1      638945  ...  Ayuda básica a la renta para la sostenibilidad...
+2      638945  ...  Ayuda a los productores de frutos secos en áre...
+3      638945  ...             Cubierta vegetal espontánea o sembrada
+4     1382847  ...  Ayuda básica a la renta para la sostenibilidad...
+
+[5 rows x 4 columns]
+
+Columns:
+['SECUENCIAL', 'REC_CODIGO', 'LNA_CODIGO', 'DESC_LNA']
+
+================ SUPERFICIES ================
+   SECUENCIAL        REC_CODIGO  ...  SUP_RIEGO_HA  SUP_TOTAL_HA
+0      383032  1700000005116291  ...          0.51          0.51
+1      383032  1700000005116298  ...          0.00          6.53
+2      383032  1700000005116292  ...          0.43          0.43
+3      383032  1700000005116293  ...          0.02          0.02
+4      383032  1700000005116300  ...          0.00          0.76
+
+[5 rows x 12 columns]
+
+Columns:
+['SECUENCIAL', 'REC_CODIGO', 'PRO_CODIGO', 'MSP_CODIGO', 'REC_POLIGONO', 'REC_PARCELA', 'REC_RECINTO', 'PRD_CODIGO', 'PRD_DESC', 'SUP_SECANO_HA', 'SUP_RIEGO_HA', 'SUP_TOTAL_HA']
+
+================ AYUDAS PER PARCEL ================
+     SECUENCIAL        REC_CODIGO  N_AYUDAS
+24       202183  1700000002965417         3
+31       202183  1700000002965424         3
+23       202183  1700000002965416         3
+68      1368318          -1467273         3
+71      1368318          -1467270         3
+69      1368318          -1467272         3
+74      1368318          -1467208         3
+83      1368318           -566521         3
+93      1368318           -148719         3
+95      1368318           -148513         3
+92      1368318           -148797         3
+59      1333614           5481257         3
+56       638945  1700000006371748         3
+106     1393940  1700000004510864         3
+132     1409348  1700000002735164         3
+107     1393940  1700000004510865         3
+65      1368318          -1467277         3
+66      1368318          -1467276         3
+67      1368318          -1467274         3
+60      1333614           5481258         3
+57       638945  1700000006371749         3
+58       638945  1700000006371750         3
+4         25519  1700000004453723         2
+0         25519  1700000004453719         2
+15        52429  1700000002756549         2
+28       202183  1700000002965421         2
+26       202183  1700000002965419         2
+25       202183  1700000002965418         2
+22       133204  1700000003084002         2
+1         25519  1700000004453720         2
+
+================ SUPERFICIES PER PARCEL ================
+    SECUENCIAL        REC_CODIGO  N_SUPERFICIES
+0        25519  1700000004453719              1
+1        25519  1700000004453720              1
+2        25519  1700000004453721              1
+3        25519  1700000004453722              1
+4        25519  1700000004453723              1
+5        25519  1700000004453724              1
+6        52429  1700000002756540              1
+7        52429  1700000002756541              1
+8        52429  1700000002756542              1
+9        52429  1700000002756543              1
+10       52429  1700000002756544              1
+11       52429  1700000002756545              1
+12       52429  1700000002756546              1
+13       52429  1700000002756547              1
+14       52429  1700000002756548              1
+15       52429  1700000002756549              1
+16       52429  1700000002756550              1
+17       52429  1700000002756551              1
+18       52429  1700000002756552              1
+19      129074  1700000002801751              1
+20      129074  1700000002801752              1
+21      129074  1700000002801753              1
+22      133204  1700000003084002              1
+23      202183  1700000002965416              1
+24      202183  1700000002965417              1
+25      202183  1700000002965418              1
+26      202183  1700000002965419              1
+27      202183  1700000002965420              1
+28      202183  1700000002965421              1
+29      202183  1700000002965422              1
+
+================ RELATIONSHIP ================
+     SECUENCIAL        REC_CODIGO  N_AYUDAS  N_SUPERFICIES
+23       202183  1700000002965416         3              1
+24       202183  1700000002965417         3              1
+31       202183  1700000002965424         3              1
+56       638945  1700000006371748         3              1
+57       638945  1700000006371749         3              1
+58       638945  1700000006371750         3              1
+59      1333614           5481257         3              1
+60      1333614           5481258         3              1
+65      1368318          -1467277         3              1
+66      1368318          -1467276         3              1
+67      1368318          -1467274         3              1
+68      1368318          -1467273         3              1
+69      1368318          -1467272         3              1
+71      1368318          -1467270         3              1
+74      1368318          -1467208         3              1
+83      1368318           -566521         3              1
+92      1368318           -148797         3              1
+93      1368318           -148719         3              1
+95      1368318           -148513         3              1
+106     1393940  1700000004510864         3              1
+107     1393940  1700000004510865         3              1
+132     1409348  1700000002735164         3              1
+0         25519  1700000004453719         2              1
+1         25519  1700000004453720         2              1
+2         25519  1700000004453721         2              1
+3         25519  1700000004453722         2              1
+4         25519  1700000004453723         2              1
+5         25519  1700000004453724         2              1
+6         52429  1700000002756540         2              1
+7         52429  1700000002756541         2              1
+15        52429  1700000002756549         2              1
+22       133204  1700000003084002         2              1
+25       202183  1700000002965418         2              1
+26       202183  1700000002965419         2              1
+27       202183  1700000002965420         2              1
+28       202183  1700000002965421         2              1
+29       202183  1700000002965422         2              1
+30       202183  1700000002965423         2              1
+36       290451          -1125324         2              1
+37       290451  1700000005502561         2              1
+38       290451  1700000005502564         2              1
+39       383032          -1457973         2              1
+40       383032          -1214607         2              1
+41       383032  1700000005116290         2              1
+42       383032  1700000005116291         2              1
+43       383032  1700000005116292         2              1
+44       383032  1700000005116293         2              1
+45       383032  1700000005116294         2              1
+46       383032  1700000005116296         2              1
+47       383032  1700000005116297         2              1
+
+================ EXAMPLE SURFACES ================
+ SECUENCIAL       REC_CODIGO  PRO_CODIGO  MSP_CODIGO  REC_POLIGONO  REC_PARCELA  REC_RECINTO  PRD_CODIGO PRD_DESC  SUP_SECANO_HA  SUP_RIEGO_HA  SUP_TOTAL_HA
+     638945 1700000006371748          18          99            16          457            1         104 ALMENDRO           0.49           0.0          0.49
+     638945 1700000006371749          18          99            25           30            1         104 ALMENDRO           2.68           0.0          2.68
+     638945 1700000006371750          18          99            25           66            1         104 ALMENDRO           1.50           0.0          1.50
+
+================ EXAMPLE APPLICATION ================
+ SECUENCIAL       REC_CODIGO  LNA_CODIGO                                                                       DESC_LNA
+     638945 1700000006371748          18                          Ayuda básica a la renta para la sostenibilidad (ABRS)
+     638945 1700000006371748         213 Ayuda a los productores de frutos secos en áreas con riesgo de desertificación
+     638945 1700000006371748         510                                         Cubierta vegetal espontánea o sembrada
+     638945 1700000006371749          18                          Ayuda básica a la renta para la sostenibilidad (ABRS)
+     638945 1700000006371749         213 Ayuda a los productores de frutos secos en áreas con riesgo de desertificación
+     638945 1700000006371749         510                                         Cubierta vegetal espontánea o sembrada
+     638945 1700000006371750          18                          Ayuda básica a la renta para la sostenibilidad (ABRS)
+     638945 1700000006371750         213 Ayuda a los productores de frutos secos en áreas con riesgo de desertificación
+     638945 1700000006371750         510                                         Cubierta vegetal espontánea o sembrada
+
+================================================================================
+
+
+================ DUPLICATE PARCEL KEYS ================
+Duplicate SECUENCIAL + REC_CODIGO combinations: 0
+Empty DataFrame
+Columns: [SECUENCIAL, REC_CODIGO, COUNT]
+Index: []
+
+================ STRUCTURE OF REC_CODIGO ================
+Empty DataFrame
+Columns: [SECUENCIAL, REC_CODIGO, N_PRO, N_MSP, N_POLIGONO, N_PARCELA, N_RECINTO, N_PRD]
+Index: []
+
+================ ECOSCHEMES ================
+     SECUENCIAL  ...                                      DESC_LNA
+18        25519  ...        Cubierta vegetal espontánea o sembrada
+20        25519  ...        Cubierta vegetal espontánea o sembrada
+22        25519  ...        Cubierta vegetal espontánea o sembrada
+24        25519  ...        Cubierta vegetal espontánea o sembrada
+26        25519  ...        Cubierta vegetal espontánea o sembrada
+..          ...  ...                                           ...
+204     1512802  ...  Rotación de cultivos con especies mejorantes
+218     1512802  ...  Rotación de cultivos con especies mejorantes
+221     1512802  ...  Rotación de cultivos con especies mejorantes
+223     1512802  ...  Rotación de cultivos con especies mejorantes
+225     1512802  ...  Rotación de cultivos con especies mejorantes
+
+[100 rows x 4 columns]
+
+================ MULTIPLE ECOSCHEMES ================
+Parcels with >1 ecoscheme: 0
+Empty DataFrame
+Columns: [SECUENCIAL, REC_CODIGO, N_ECOSCHEMES]
+Index: []
+
+================ ECOSCHEME COMBINATIONS ================
+    SECUENCIAL        REC_CODIGO ECOSCHEMES
+0        25519  1700000004453719      [510]
+1        25519  1700000004453720      [510]
+2        25519  1700000004453721      [510]
+3        25519  1700000004453722      [510]
+4        25519  1700000004453723      [510]
+5        25519  1700000004453724      [510]
+6        52429  1700000002756540      [509]
+7        52429  1700000002756541      [509]
+8        52429  1700000002756549      [509]
+9       202183  1700000002965416      [510]
+10      202183  1700000002965417      [510]
+11      202183  1700000002965418      [510]
+12      202183  1700000002965419      [510]
+13      202183  1700000002965420      [510]
+14      202183  1700000002965421      [510]
+15      202183  1700000002965422      [510]
+16      202183  1700000002965423      [510]
+17      202183  1700000002965424      [510]
+18      383032          -1457973      [509]
+19      383032          -1214607      [509]
+20      383032  1700000005116290      [509]
+21      383032  1700000005116291      [509]
+22      383032  1700000005116292      [509]
+23      383032  1700000005116293      [509]
+24      383032  1700000005116294      [509]
+25      383032  1700000005116296      [509]
+26      383032  1700000005116297      [510]
+27      383032  1700000005116298      [510]
+28      383032  1700000005116299      [510]
+29      383032  1700000005116300      [510]
+30      625002  1700000005265011      [510]
+31      625002  1700000005265012      [509]
+32      625002  1700000005265013      [509]
+33      625002  1700000005265014      [509]
+34      625002  1700000005265015      [509]
+35      638945  1700000006371748      [510]
+36      638945  1700000006371749      [510]
+37      638945  1700000006371750      [510]
+38     1333614           5481257      [510]
+39     1333614           5481258      [510]
+40     1333614           5481276      [510]
+41     1333614  1700000002265861      [510]
+42     1368318          -1467309      [509]
+43     1368318          -1467277      [510]
+44     1368318          -1467276      [510]
+45     1368318          -1467274      [510]
+46     1368318          -1467273      [510]
+47     1368318          -1467272      [510]
+48     1368318          -1467271      [510]
+49     1368318          -1467270      [510]
+
+================ AID STRUCTURE ================
+     SECUENCIAL        REC_CODIGO  TOTAL_AIDS  ECOSCHEMES  OTHER_AIDS
+24       202183  1700000002965417           3           1           2
+31       202183  1700000002965424           3           1           2
+23       202183  1700000002965416           3           1           2
+68      1368318          -1467273           3           1           2
+71      1368318          -1467270           3           1           2
+69      1368318          -1467272           3           1           2
+74      1368318          -1467208           3           1           2
+83      1368318           -566521           3           1           2
+93      1368318           -148719           3           1           2
+95      1368318           -148513           3           1           2
+92      1368318           -148797           3           1           2
+59      1333614           5481257           3           1           2
+56       638945  1700000006371748           3           1           2
+106     1393940  1700000004510864           3           1           2
+132     1409348  1700000002735164           3           1           2
+107     1393940  1700000004510865           3           1           2
+65      1368318          -1467277           3           1           2
+66      1368318          -1467276           3           1           2
+67      1368318          -1467274           3           1           2
+60      1333614           5481258           3           1           2
+57       638945  1700000006371749           3           1           2
+58       638945  1700000006371750           3           1           2
+4         25519  1700000004453723           2           1           1
+0         25519  1700000004453719           2           1           1
+15        52429  1700000002756549           2           1           1
+28       202183  1700000002965421           2           1           1
+26       202183  1700000002965419           2           1           1
+25       202183  1700000002965418           2           1           1
+22       133204  1700000003084002           2           0           2
+1         25519  1700000004453720           2           1           1
+2         25519  1700000004453721           2           1           1
+3         25519  1700000004453722           2           1           1
+159     1512802  1700000006682858           2           1           1
+154     1512802           5249148           2           1           1
+153     1512802           5249147           2           1           1
+155     1512802  1700000006682850           2           1           1
+149     1512802           -470381           2           1           1
+101     1382847  1700000002304560           2           1           1
+99      1382847  1700000002304558           2           1           1
+97      1382042  1700000004805507           2           1           1
+108     1393940  1700000004510866           2           1           1
+103     1382847  1700000002304562           2           1           1
+105     1393940  1700000004510863           2           1           1
+104     1382847  1700000002304563           2           1           1
+109     1398501           -177311           2           1           1
+27       202183  1700000002965420           2           1           1
+30       202183  1700000002965423           2           1           1
+29       202183  1700000002965422           2           1           1
+7         52429  1700000002756541           2           1           1
+6         52429  1700000002756540           2           1           1
+
+================ MULTIPLE AIDS ================
+Parcels with multiple aids: 116
+    SECUENCIAL        REC_CODIGO  TOTAL_AIDS  ECOSCHEMES  OTHER_AIDS
+0        25519  1700000004453719           2           1           1
+1        25519  1700000004453720           2           1           1
+2        25519  1700000004453721           2           1           1
+3        25519  1700000004453722           2           1           1
+4        25519  1700000004453723           2           1           1
+5        25519  1700000004453724           2           1           1
+6        52429  1700000002756540           2           1           1
+7        52429  1700000002756541           2           1           1
+15       52429  1700000002756549           2           1           1
+22      133204  1700000003084002           2           0           2
+23      202183  1700000002965416           3           1           2
+24      202183  1700000002965417           3           1           2
+25      202183  1700000002965418           2           1           1
+26      202183  1700000002965419           2           1           1
+27      202183  1700000002965420           2           1           1
+28      202183  1700000002965421           2           1           1
+29      202183  1700000002965422           2           1           1
+30      202183  1700000002965423           2           1           1
+31      202183  1700000002965424           3           1           2
+36      290451          -1125324           2           0           2
+37      290451  1700000005502561           2           0           2
+38      290451  1700000005502564           2           0           2
+39      383032          -1457973           2           1           1
+40      383032          -1214607           2           1           1
+41      383032  1700000005116290           2           1           1
+42      383032  1700000005116291           2           1           1
+43      383032  1700000005116292           2           1           1
+44      383032  1700000005116293           2           1           1
+45      383032  1700000005116294           2           1           1
+46      383032  1700000005116296           2           1           1
+47      383032  1700000005116297           2           1           1
+48      383032  1700000005116298           2           1           1
+49      383032  1700000005116299           2           1           1
+50      383032  1700000005116300           2           1           1
+51      625002  1700000005265011           2           1           1
+52      625002  1700000005265012           2           1           1
+53      625002  1700000005265013           2           1           1
+54      625002  1700000005265014           2           1           1
+55      625002  1700000005265015           2           1           1
+56      638945  1700000006371748           3           1           2
+57      638945  1700000006371749           3           1           2
+58      638945  1700000006371750           3           1           2
+59     1333614           5481257           3           1           2
+60     1333614           5481258           3           1           2
+61     1333614           5481276           2           1           1
+62     1333614  1700000002265861           2           1           1
+64     1368318          -1467309           2           1           1
+65     1368318          -1467277           3           1           2
+66     1368318          -1467276           3           1           2
+67     1368318          -1467274           3           1           2
+
+================ AID COMBINATIONS ================
+    SECUENCIAL  ...                                       DESCRIPTIONS
+0        25519  ...  [Ayuda básica a la renta para la sostenibilida...
+1        25519  ...  [Ayuda básica a la renta para la sostenibilida...
+2        25519  ...  [Ayuda básica a la renta para la sostenibilida...
+3        25519  ...  [Ayuda básica a la renta para la sostenibilida...
+4        25519  ...  [Ayuda básica a la renta para la sostenibilida...
+5        25519  ...  [Ayuda básica a la renta para la sostenibilida...
+6        52429  ...  [Ayuda básica a la renta para la sostenibilida...
+7        52429  ...  [Ayuda básica a la renta para la sostenibilida...
+8        52429  ...  [Ayuda básica a la renta para la sostenibilida...
+9        52429  ...  [Ayuda básica a la renta para la sostenibilida...
+10       52429  ...  [Ayuda básica a la renta para la sostenibilida...
+11       52429  ...  [Ayuda básica a la renta para la sostenibilida...
+12       52429  ...  [Ayuda básica a la renta para la sostenibilida...
+13       52429  ...  [Ayuda básica a la renta para la sostenibilida...
+14       52429  ...  [Ayuda básica a la renta para la sostenibilida...
+15       52429  ...  [Ayuda básica a la renta para la sostenibilida...
+16       52429  ...  [Ayuda básica a la renta para la sostenibilida...
+17       52429  ...  [Ayuda básica a la renta para la sostenibilida...
+18       52429  ...  [Ayuda básica a la renta para la sostenibilida...
+19      129074  ...  [Ayuda básica a la renta para la sostenibilida...
+20      129074  ...  [Ayuda básica a la renta para la sostenibilida...
+21      129074  ...  [Ayuda básica a la renta para la sostenibilida...
+22      133204  ...  [Ayuda al olivar con dificultades específicas ...
+23      202183  ...  [Ayuda al olivar con dificultades específicas ...
+24      202183  ...  [Ayuda al olivar con dificultades específicas ...
+25      202183  ...  [Ayuda básica a la renta para la sostenibilida...
+26      202183  ...  [Ayuda básica a la renta para la sostenibilida...
+27      202183  ...  [Ayuda básica a la renta para la sostenibilida...
+28      202183  ...  [Ayuda básica a la renta para la sostenibilida...
+29      202183  ...  [Ayuda básica a la renta para la sostenibilida...
+30      202183  ...  [Ayuda básica a la renta para la sostenibilida...
+31      202183  ...  [Ayuda al olivar con dificultades específicas ...
+32      255217  ...  [Ayuda básica a la renta para la sostenibilida...
+33      255217  ...  [Ayuda básica a la renta para la sostenibilida...
+34      255217  ...  [Ayuda básica a la renta para la sostenibilida...
+35      255217  ...  [Ayuda básica a la renta para la sostenibilida...
+36      290451  ...  [Ayuda a la producción tradicional de uva pasa...
+37      290451  ...  [Ayuda a la producción tradicional de uva pasa...
+38      290451  ...  [Ayuda a la producción tradicional de uva pasa...
+39      383032  ...  [Ayuda básica a la renta para la sostenibilida...
+40      383032  ...  [Ayuda básica a la renta para la sostenibilida...
+41      383032  ...  [Ayuda básica a la renta para la sostenibilida...
+42      383032  ...  [Ayuda básica a la renta para la sostenibilida...
+43      383032  ...  [Ayuda básica a la renta para la sostenibilida...
+44      383032  ...  [Ayuda básica a la renta para la sostenibilida...
+45      383032  ...  [Ayuda básica a la renta para la sostenibilida...
+46      383032  ...  [Ayuda básica a la renta para la sostenibilida...
+47      383032  ...  [Ayuda básica a la renta para la sostenibilida...
+48      383032  ...  [Ayuda básica a la renta para la sostenibilida...
+49      383032  ...  [Ayuda básica a la renta para la sostenibilida...
+
+[50 rows x 4 columns]
+
+================ AYUDAS WITHOUT SUPERFICIES ================
+AYUDAS parcel keys without SUPERFICIES: 0
+Empty DataFrame
+Columns: [SECUENCIAL, REC_CODIGO, _merge]
+Index: []
+
+================ SUPERFICIES WITHOUT AYUDAS ================
+SUPERFICIES parcel keys without AYUDAS: 0
+Empty DataFrame
+Columns: [SECUENCIAL, REC_CODIGO, _merge]
+Index: []

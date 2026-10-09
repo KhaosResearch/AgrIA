@@ -29,7 +29,7 @@ from .constants import (
     USE_PAPER_DATA,
     LANG,
 )
-from ...services.ecoscheme_payments.main import calculate_ecoscheme_payment
+from ...services.ecoscheme_payments.main import get_ecoscheme_payments_data
 from .llm_setup import generate_system_instructions
 from .utils import n_random_dates_between
 
@@ -155,7 +155,7 @@ def get_llm_full_desc(
     if not lang:
         lang = LANG
 
-    json_data = calculate_ecoscheme_payment(parcel_desc, lang)
+    json_data = get_ecoscheme_payments_data(parcel_desc, lang)
 
     prompt_en = f"Produce a full English parcel description with the following information. Combine it with the image for a 700-character max description:\n\n{json_data}"
     desc_en = "The satellite image displays a **31.18-hectare** agricultural parcel dominated by **dry, reddish-brown tones**, indicative of **low vegetation cover** or recently worked soil, typical of Mediterranean woody crops or extensive grazing lands. This visual assessment directly correlates with the digital land use analysis. The largest area, **Olive Groves (OV)**, accounts for **30.72 ha** and has been assigned to the Eco-scheme **P6/P7 (Plant Cover)**, based on the highest payment/ha. A smaller portion of **Shrub Pastures (PR)**, **0.36 ha**, is assigned to **P1 (Extensive Grazing)**.The overall low vegetation signal in the image is consistent with the extensive farming practices suggested by the two applicable Eco-schemes, particularly the large area of OV allocated to the P6/P7 scheme using the Tier 2 rate."

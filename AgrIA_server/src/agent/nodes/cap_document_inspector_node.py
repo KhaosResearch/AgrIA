@@ -156,26 +156,30 @@ def cap_document_inspector_node(
         verdict = _parse_slots(getattr(response, "text", str(response)))
         # The extractor answers with the guard's verdict shape, so the values
         # live under "slots"; parsing the wrapper directly would drop them all.
-        proposed = verdict.get("slots") if isinstance(verdict.get("slots"), dict) else verdict
+        proposed = (
+            verdict.get("slots") if isinstance(verdict.get("slots"), dict) else verdict
+        )
         slots = normalise_slots(proposed)
     except Exception as exc:  # defensive: transport/provider failure
         logger.warning("cap_pdf_extraction_failed", path=pdf_path, error=str(exc))
         return {"cap_alignment": None}
 
-    logger.info("cap_pdf_slots_extracted", count=len(slots), fields=sorted(slots.keys()))
+    logger.info(
+        "cap_pdf_slots_extracted", count=len(slots), fields=sorted(slots.keys())
+    )
 
     found = len(slots)
     if lang == "en":
         confirmation = (
-            f"I read {found} field(s) from your document: "
-            f"{', '.join(sorted(slots))}. " if found else
-            "I could not identify any CAP fields in that document. "
+            f"I read {found} field(s) from your document: {', '.join(sorted(slots))}. "
+            if found
+            else "I could not identify any CAP fields in that document. "
         )
     else:
         confirmation = (
-            f"He leído {found} dato(s) de tu documento: "
-            f"{', '.join(sorted(slots))}. " if found else
-            "No he identificado ningún dato de la solicitud CAP en ese documento. "
+            f"He leído {found} dato(s) de tu documento: {', '.join(sorted(slots))}. "
+            if found
+            else "No he identificado ningún dato de la solicitud CAP en ese documento. "
         )
 
     return {

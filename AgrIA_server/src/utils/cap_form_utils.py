@@ -195,7 +195,11 @@ def missing_required_slots(slots: Optional[dict]) -> list[str]:
     """Names of required slots that have no usable value yet."""
     schema = load_cap_slots()[0]
     data = slots or {}
-    return [name for name, spec in schema.items() if spec["required"] and not _has_value(data.get(name))]
+    return [
+        name
+        for name, spec in schema.items()
+        if spec["required"] and not _has_value(data.get(name))
+    ]
 
 
 def missing_slot_descriptions(lang: str = "es") -> list[dict]:
@@ -256,7 +260,9 @@ def validate_application(slots: Optional[dict]) -> dict[str, Any]:
 
     return {
         "valid": not errors,
-        "missing_required": [e.split(":", 1)[1] for e in errors if e.startswith("missing_required")],
+        "missing_required": [
+            e.split(":", 1)[1] for e in errors if e.startswith("missing_required")
+        ],
         "errors": errors,
         "warnings": warnings,
     }
@@ -308,7 +314,9 @@ def build_form_mapping(slots: Optional[dict]) -> dict[str, Any]:
     }
 
 
-def estimated_amounts(slots: Optional[dict], rates: Optional[dict] = None) -> dict[str, Any]:
+def estimated_amounts(
+    slots: Optional[dict], rates: Optional[dict] = None
+) -> dict[str, Any]:
     """Reproduce estimated amounts from a supplied rate table.
 
     The rate table is passed in (never guessed) so that any figure the agent

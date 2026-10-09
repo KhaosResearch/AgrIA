@@ -47,6 +47,7 @@ def _reply(text: str) -> MagicMock:
 
 def _stub_chat(monkeypatch, free_text: str) -> None:
     """Answer guard calls with a JSON verdict and summary calls with prose."""
+
     def _send(self, *args, **kwargs):
         payload = str(args[0]) if args else str(kwargs.get("message", ""))
         if "<allowed_fields>" in payload:
@@ -75,7 +76,10 @@ def _state(text: str = "hola", **overrides) -> AgrIAState:
 
 
 def _config(thread_id: str) -> RunnableConfig:
-    return cast(RunnableConfig, {"configurable": {"thread_id": thread_id}, "recursion_limit": 12})
+    return cast(
+        RunnableConfig,
+        {"configurable": {"thread_id": thread_id}, "recursion_limit": 12},
+    )
 
 
 class TestInspectorEdge:

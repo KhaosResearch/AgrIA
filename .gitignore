@@ -2,6 +2,7 @@
 .git-credentials
 
 # Backend
+data/
 *db/ 
 .env
 *temp*
@@ -12,7 +13,6 @@
 *.png
 *.tif*
 *.tsv
-*data*
 *res*
 llm_formatted_out/
 *.json

@@ -86,7 +86,9 @@ class TestParseNumber:
 
     def test_prefers_explicit_hectare_value_over_parcel_id(self):
         # A cadastral reference contains digits that must not be mistaken for a surface.
-        assert parse_number("26002A001000010000EQ: 3,000,25 ha") == pytest.approx(3000.25)
+        assert parse_number("26002A001000010000EQ: 3,000,25 ha") == pytest.approx(
+            3000.25
+        )
 
     def test_percent_sign_ignored(self):
         assert parse_number("45%") == pytest.approx(45.0)
@@ -101,7 +103,9 @@ class TestParseNumber:
 # --------------------------------------------------------------------------- #
 class TestCoercion:
     def test_number_slot_accepts_locale_string(self):
-        assert coerce_value("parcels[].declared_surface_ha", "1.234,5") == pytest.approx(1234.5)
+        assert coerce_value(
+            "parcels[].declared_surface_ha", "1.234,5"
+        ) == pytest.approx(1234.5)
 
     def test_array_slot_splits_on_comma(self):
         assert coerce_value("requested_aid_lines", "base, eco") == ["base", "eco"]
@@ -121,7 +125,9 @@ class TestCoercion:
 
 class TestNormaliseSlots:
     def test_drops_unknown_fields(self):
-        result = normalise_slots({"beneficiary.nif_cif": "12345678Z", "evil_field": "x"})
+        result = normalise_slots(
+            {"beneficiary.nif_cif": "12345678Z", "evil_field": "x"}
+        )
         assert result == {"beneficiary.nif_cif": "12345678Z"}
 
     def test_drops_uncoercible_values(self):
@@ -142,7 +148,9 @@ class TestNormaliseSlots:
 # --------------------------------------------------------------------------- #
 class TestMergeSlots:
     def test_incoming_overrides_existing(self):
-        merged = merge_slots({"beneficiary.full_name": "Ana"}, {"beneficiary.full_name": "Eva"})
+        merged = merge_slots(
+            {"beneficiary.full_name": "Ana"}, {"beneficiary.full_name": "Eva"}
+        )
         assert merged["beneficiary.full_name"] == "Eva"
 
     def test_empty_values_do_not_clear_prior_value(self):
@@ -193,7 +201,9 @@ class TestValidation:
     def test_eco_surface_cannot_exceed_parcel(self):
         slots = {**VALID_SLOTS, "eco_schemes[].applied_surface_ha": 99.0}
         report = validate_application(slots)
-        assert any(err.startswith("eco_surface_exceeds_parcel:") for err in report["errors"])
+        assert any(
+            err.startswith("eco_surface_exceeds_parcel:") for err in report["errors"]
+        )
 
     def test_missing_optional_fields_are_only_warnings(self):
         slots = dict(VALID_SLOTS)
@@ -268,7 +278,9 @@ class TestEstimatedAmounts:
         assert amounts["estimated_eco_scheme_eur"] == pytest.approx(336.0)
 
     def test_amounts_are_deterministic(self):
-        assert estimated_amounts(VALID_SLOTS, self.RATES) == estimated_amounts(VALID_SLOTS, self.RATES)
+        assert estimated_amounts(VALID_SLOTS, self.RATES) == estimated_amounts(
+            VALID_SLOTS, self.RATES
+        )
 
     def test_empty_slots_produce_no_eur_figures(self):
         assert "estimated_base_eur" not in estimated_amounts({}, self.RATES)

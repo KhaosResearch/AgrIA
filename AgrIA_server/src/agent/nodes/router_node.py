@@ -51,7 +51,14 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_IN
         last_text = str(last_msg.content).strip().lower()
         if any(
             keyword in last_text
-            for keyword in ["pdf", "document", "documento", "formulario", "form", "solicitud"]
+            for keyword in [
+                "pdf",
+                "document",
+                "documento",
+                "formulario",
+                "form",
+                "solicitud",
+            ]
         ):
             return "cap_document_inspector"
         # Any other reply moves on to text-based clarification rather than

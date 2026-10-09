@@ -77,7 +77,9 @@ class TestPdfPathDiscovery:
     def test_extracts_pdf_path(self, content, expected):
         assert _pdf_path_from(content) == expected
 
-    @pytest.mark.parametrize("content", ["", "/tmp/formulario.docx", [{"text": "hola"}], None])
+    @pytest.mark.parametrize(
+        "content", ["", "/tmp/formulario.docx", [{"text": "hola"}], None]
+    )
     def test_returns_none_without_pdf(self, content):
         assert _pdf_path_from(content) is None
 
@@ -90,7 +92,9 @@ class TestSlotParsing:
         reply = '```json\n{"a": 2}\n```\nHope that helps.'
         assert _parse_slots(reply) == {"a": 2}
 
-    @pytest.mark.parametrize("reply", ["", "no json here", "{broken", "[1, 2]", "{'a': 1}"])
+    @pytest.mark.parametrize(
+        "reply", ["", "no json here", "{broken", "[1, 2]", "{'a': 1}"]
+    )
     def test_tolerates_unparseable_replies(self, reply):
         assert _parse_slots(reply) == {}
 
@@ -99,7 +103,9 @@ class TestDocumentInspector:
     def test_ignores_non_human_message(self):
         state = _state()
         state["messages"] = [AIMessage(content="¿NIF?")]
-        assert cap_document_inspector_node(state, MagicMock(), "m") == {"cap_alignment": None}
+        assert cap_document_inspector_node(state, MagicMock(), "m") == {
+            "cap_alignment": None
+        }
 
     def test_ignores_message_without_pdf(self):
         result = cap_document_inspector_node(_state("hola"), MagicMock(), "m")
@@ -108,7 +114,9 @@ class TestDocumentInspector:
     def test_extracts_only_supported_slots(self, monkeypatch):
         monkeypatch.setattr(
             "src.agent.nodes.cap_document_inspector_node._read_pdf_text",
-            lambda path: "NIF 12345678Z. Parcel 26002A001000010000EQ de 4,2 ha de cebada en regadio.",
+            lambda path: (
+                "NIF 12345678Z. Parcel 26002A001000010000EQ de 4,2 ha de cebada en regadio."
+            ),
         )
         monkeypatch.setattr(
             "src.models.chat_models.LocalChat.send_message",
@@ -127,7 +135,9 @@ class TestDocumentInspector:
             "src.agent.nodes.cap_document_inspector_node._read_pdf_text",
             lambda path: "",
         )
-        result = cap_document_inspector_node(_state("/tmp/a.pdf", lang="en"), MagicMock(), "m")
+        result = cap_document_inspector_node(
+            _state("/tmp/a.pdf", lang="en"), MagicMock(), "m"
+        )
         assert "cap_form_data" not in result
         assert "PDF" in result["messages"][0].content
 
@@ -168,9 +178,13 @@ class TestSlotGuard:
     def test_unknown_classification_becomes_topic_change(self, monkeypatch):
         monkeypatch.setattr(
             "src.models.chat_models.LocalChat.send_message",
-            lambda self, *a, **k: _reply('{"classification": "banana", "confidence": 2, "slots": {}}'),
+            lambda self, *a, **k: _reply(
+                '{"classification": "banana", "confidence": 2, "slots": {}}'
+            ),
         )
-        alignment = cap_slot_guard_node(_state("hola"), MagicMock(), "m")["cap_alignment"]
+        alignment = cap_slot_guard_node(_state("hola"), MagicMock(), "m")[
+            "cap_alignment"
+        ]
         assert alignment["classification"] == "topic_change"
         assert alignment["confidence"] == 1.0
 
@@ -190,12 +204,19 @@ class TestSlotGuard:
         assert alignment["slots"] == {"beneficiary.full_name": "Ana Ruiz"}
 
     def test_second_attempt_can_succeed(self, monkeypatch):
-        replies = iter(["no json", '{"classification": "answer", "slots": {"beneficiary.iban": "ES91"}}'])
+        replies = iter(
+            [
+                "no json",
+                '{"classification": "answer", "slots": {"beneficiary.iban": "ES91"}}',
+            ]
+        )
         monkeypatch.setattr(
             "src.models.chat_models.LocalChat.send_message",
             lambda self, *a, **k: _reply(next(replies)),
         )
-        alignment = cap_slot_guard_node(_state("ES91"), MagicMock(), "m")["cap_alignment"]
+        alignment = cap_slot_guard_node(_state("ES91"), MagicMock(), "m")[
+            "cap_alignment"
+        ]
         assert alignment["slots"] == {"beneficiary.iban": "ES91"}
 
     def test_fallback_rejects_text_that_fails_validation(self, monkeypatch):
@@ -215,7 +236,9 @@ class TestSlotGuard:
             "src.models.chat_models.LocalChat.send_message",
             lambda self, *a, **k: _reply("no json"),
         )
-        alignment = cap_slot_guard_node(_state("Ana Ruiz"), MagicMock(), "m")["cap_alignment"]
+        alignment = cap_slot_guard_node(_state("Ana Ruiz"), MagicMock(), "m")[
+            "cap_alignment"
+        ]
         assert alignment["classification"] == "topic_change"
 
 
@@ -259,7 +282,9 @@ class TestRouterPrecedence:
         assert deterministic_router(state, MagicMock(), "m") == "cap_application"
 
     def test_clear_cap_workflow_resets_state(self):
-        state = _state(pending_action="AWAITING_SLOT:beneficiary.iban", cap_workflow="collect")
+        state = _state(
+            pending_action="AWAITING_SLOT:beneficiary.iban", cap_workflow="collect"
+        )
         assert clear_cap_workflow(state) == {
             "pending_action": None,
             "cap_workflow": None,
@@ -301,7 +326,10 @@ class TestApplicationNode:
             return _reply("Estimated 666.10 EUR in total.")
 
         monkeypatch.setattr("src.models.chat_models.LocalChat.send_message", _capture)
-        slots = {**COMPLETE_EXCEPT_IBAN, "beneficiary.iban": "ES91 2100 0418 4502 0005 1332"}
+        slots = {
+            **COMPLETE_EXCEPT_IBAN,
+            "beneficiary.iban": "ES91 2100 0418 4502 0005 1332",
+        }
         state = _state("todo listo", cap_form_data=slots, cap_rates=RATES)
         result = cap_application_node(state, MagicMock(), "m")
 
@@ -322,8 +350,13 @@ class TestApplicationNode:
             return _reply("Your application is ready.")
 
         monkeypatch.setattr("src.models.chat_models.LocalChat.send_message", _capture)
-        slots = {**COMPLETE_EXCEPT_IBAN, "beneficiary.iban": "ES91 2100 0418 4502 0005 1332"}
-        result = cap_application_node(_state("todo listo", cap_form_data=slots), MagicMock(), "m")
+        slots = {
+            **COMPLETE_EXCEPT_IBAN,
+            "beneficiary.iban": "ES91 2100 0418 4502 0005 1332",
+        }
+        result = cap_application_node(
+            _state("todo listo", cap_form_data=slots), MagicMock(), "m"
+        )
 
         assert result["cap_workflow"] == "ready"
         # Without an explicit rate table the agent must not invent a figure.
@@ -338,8 +371,13 @@ class TestApplicationNode:
             return _reply("Your application is ready.")
 
         monkeypatch.setattr("src.models.chat_models.LocalChat.send_message", _capture)
-        slots = {**COMPLETE_EXCEPT_IBAN, "beneficiary.iban": "ES91 2100 0418 4502 0005 1332"}
-        result = cap_application_node(_state("todo listo", cap_form_data=slots), MagicMock(), "m")
+        slots = {
+            **COMPLETE_EXCEPT_IBAN,
+            "beneficiary.iban": "ES91 2100 0418 4502 0005 1332",
+        }
+        result = cap_application_node(
+            _state("todo listo", cap_form_data=slots), MagicMock(), "m"
+        )
 
         assert result["cap_workflow"] == "ready"
         # The shipped asset publishes no base/practice rate, so still no figure.
@@ -353,8 +391,13 @@ class TestApplicationNode:
             return _reply("Your application is ready.")
 
         monkeypatch.setattr("src.models.chat_models.LocalChat.send_message", _capture)
-        slots = {**COMPLETE_EXCEPT_IBAN, "beneficiary.iban": "ES91 2100 0418 4502 0005 1332"}
-        cap_application_node(_state("listo", cap_form_data=slots, cap_rates=RATES), MagicMock(), "m")
+        slots = {
+            **COMPLETE_EXCEPT_IBAN,
+            "beneficiary.iban": "ES91 2100 0418 4502 0005 1332",
+        }
+        cap_application_node(
+            _state("listo", cap_form_data=slots, cap_rates=RATES), MagicMock(), "m"
+        )
 
         assert '"estimated_base_eur": 506.1' in captured["payload"]
 
@@ -371,7 +414,12 @@ class TestApplicationNode:
         assert "beneficiary.full_name" not in content
 
     def test_alignment_is_consumed_after_merge(self):
-        alignment = {"classification": "answer", "slots": {"beneficiary.nif_cif": "12345678Z"}}
-        result = cap_application_node(_state("12345678Z", cap_alignment=alignment), MagicMock(), "m")
+        alignment = {
+            "classification": "answer",
+            "slots": {"beneficiary.nif_cif": "12345678Z"},
+        }
+        result = cap_application_node(
+            _state("12345678Z", cap_alignment=alignment), MagicMock(), "m"
+        )
         assert result["cap_alignment"] is None
         assert result["cap_form_data"]["beneficiary.nif_cif"] == "12345678Z"
