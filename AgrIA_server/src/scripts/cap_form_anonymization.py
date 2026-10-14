@@ -171,7 +171,6 @@ def redact_sensitive_data_from_pdf(
     else:
         logger.debug(f"Detected terms to redact: {terms_to_redact}")
 
-
     # Sort out_file value
     if out_file == "":
         filename, ext = os.path.splitext(os.path.basename(in_file))

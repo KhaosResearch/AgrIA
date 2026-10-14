@@ -133,8 +133,8 @@ def main(processed_output_file: str, merged_output_file: str):
 
 if __name__ == "__main__":
     years = [2023, 2024]
-    OUT_DIR.mkdir()
-    DATA_DIR.mkdir()
+    OUT_DIR.mkdir(exist_ok=True)
+    DATA_DIR.mkdir(exist_ok=True)
     for year in years:
         merged_output_file = str(OUT_DIR / f"PAC_{year}_MERGED.csv")
         processed_output_file = str(OUT_DIR / f"PAC_{year}_PROCESSED.csv")
