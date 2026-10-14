@@ -123,6 +123,7 @@ def redact_sensitive_data_from_pdf(
     in_file: str | Path,
     out_file: str | Path = "",
     field_names: list[str] = SENSITIVE_INFO_FORM_FIELD_NAMES,
+    terms_to_redact: list[str] = None,
 ) -> None:
     """
     PDF data redaction pipeline for sensitive and personal CAP form data fields (including address and bank details).
@@ -133,7 +134,8 @@ def redact_sensitive_data_from_pdf(
     Args:
         in_file (str): Input file path.
         out_file (str, optional): Output file path. By default, saves the output to the `CAP_FORMS_PATH` dir with the `in_file` basename and the `"_redacted"` tag.
-        field_names (list[str], optional): List of all field names with sensitive data. By defautl, is `SENSITIVE_INFO_FORM_FIELD_NAMES`.
+        field_names (list[str], optional): List of all field names with sensitive data. By default, is `SENSITIVE_INFO_FORM_FIELD_NAMES`.
+        terms_to_redact (list[str], optional): List of all sensitive data terms to redact. Overrides `field_names` when set. `None` by default.
     """
     # Open PDF and parse to MD
     doc = pymupdf.open(in_file)
@@ -141,30 +143,34 @@ def redact_sensitive_data_from_pdf(
     md_text = pymupdf4llm.to_markdown(in_file)
     text_data = f"This is the relevant text:\nSTART\n{md_text}\nEND"
 
-    # Compose LLM input for term list extraction
-    human_msg = f"Locate all of the sensitive data terms, like personal data, address and bank information and extract them from the text. Use these terms to locate the fields on the text: {field_names}"
+    if terms_to_redact is None or not isinstance(terms_to_redact, list):
+        # Compose LLM input for term list extraction
+        human_msg = f"Locate all of the sensitive data terms, like personal data, address and bank information and extract them from the text. Use these terms to locate the fields on the text: {field_names}"
 
-    msg = [
-        ("system", SYS_INS),
-        ("human", f"{human_msg + '\n' + text_data}"),
-    ]
-    summary_method = getattr(client, "ainvoke", None)
-    if summary_method is not None:
-        llm_response = asyncio.run(summary_method(msg))
-    else:
-        llm_response = client.invoke(msg)
+        msg = [
+            ("system", SYS_INS),
+            ("human", f"{human_msg + '\n' + text_data}"),
+        ]
+        summary_method = getattr(client, "ainvoke", None)
+        if summary_method is not None:
+            llm_response = asyncio.run(summary_method(msg))
+        else:
+            llm_response = client.invoke(msg)
 
-    response_dict = _parse_llm_dict(llm_response.content)
+        response_dict = _parse_llm_dict(llm_response.content)
 
-    # Get terms to redact and remove them from PDF
-    terms_to_redact = list(
-        dict.fromkeys(
-            item["extracted_value"]
-            for item in response_dict["extracted_sensitive_values"]
-            if item["extracted_value"] not in (None, "null")
+        # Get terms to redact and remove them from PDF
+        terms_to_redact = list(
+            dict.fromkeys(
+                item["extracted_value"]
+                for item in response_dict["extracted_sensitive_values"]
+                if item["extracted_value"] not in (None, "null")
+            )
         )
-    )
-    logger.debug(f"All sensitive data found: {terms_to_redact}")
+        logger.debug(f"All sensitive data found: {terms_to_redact}")
+    else:
+        logger.debug(f"Detected terms to redact: {terms_to_redact}")
+
 
     # Sort out_file value
     if out_file == "":
