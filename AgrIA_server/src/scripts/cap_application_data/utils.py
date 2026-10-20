@@ -5,7 +5,7 @@ import pandas as pd
 
 from typing import Generator, List, Dict, Any, Optional
 
-from AgrIA_server.src.scripts.cap_application_data.constants import DATA_DIR
+from .constants import DATA_DIR
 
 from ...config.constants import ASSETS_DIR
 

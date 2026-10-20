@@ -2,9 +2,11 @@ import json
 import structlog
 
 from langchain_core.messages import AIMessage
+from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from ...benchmark.vlm.constants import OG_CLASSIFICATION_FILEPATH
+from ...config.constants import CAP_FORMS_PATH
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
 from .cap_slot_guard_node import guard_ack, topic_change_message
@@ -152,7 +154,12 @@ def cap_application_node(state: AgrIAState, client, model_name: str) -> Dict[str
     raw_instruction = load_prompt_asset("CAP_APPLICATION.md").replace(
         "{lang}", "Spanish" if lang == "es" else "English"
     )
-    system_instruction = f"{raw_instruction}\n\n<classification>\n{_load_ecoscheme_classification()}\n</classification>"
+    cap_form_example = Path(
+        CAP_FORMS_PATH / "cap_form_redacted_JM_completed.md"
+    ).read_text(encoding="utf-8")
+    cap_form_instructions = f"Use the following example of cap form for plant cover ecoscheme application to guide the user. Use the corresponding headers and options on the form to help the user apply for all calculated ecoschemes on their parcel:\n\n<cap_form_example>\n{cap_form_example}\n<cap_form_example>"
+
+    system_instruction = f"{raw_instruction}\n\n<classification>\n{_load_ecoscheme_classification()}\n</classification>\n\n{cap_form_instructions}"
 
     # The mapping and amounts are precomputed here: the LLM may only narrate
     # them, never recompute or adjust a figure.

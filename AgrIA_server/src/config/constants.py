@@ -124,7 +124,7 @@ if GET_SR_BENCHMARK:
 
 # CAP FORM CONSTANTS
 
-CAP_FORMS_PATH = Path(LLM_ASSETS_PATH / "forms")
+CAP_FORMS_PATH = Path(LLM_ASSETS_PATH / "context" / "forms")
 
 SENSITIVE_INFO_FORM_FIELD_NAMES = [
     "Número Solicitud",
