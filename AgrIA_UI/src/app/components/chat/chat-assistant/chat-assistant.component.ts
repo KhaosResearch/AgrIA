@@ -93,6 +93,18 @@ export class ChatAssistantComponent {
           };
         }
       }
+      if (msg.content.includes('```markdown\n')) {
+        let parts = msg.content.split('```markdown\n');
+        console.log("parts", parts)
+        if (parts.length > 1) {
+          // parts = parts.slice(0, -1);
+          return {
+            ...msg,
+            content: parts[0]
+          };
+        }
+        
+      }
       return msg;
     });
     

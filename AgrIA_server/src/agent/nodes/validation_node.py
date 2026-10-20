@@ -25,7 +25,7 @@ def validate_report_node(state: AgrIAState) -> dict:
         )
 
     # Rule 2: Critical Data Check (Must reference the total parcel area value)
-    print("GENERATED REP\n", generated_report)
+    logger.debug(f"GENERATED REPORT:\n{generated_report}")
 
     if metadata:
         total_area = str(metadata.get("Total_Parcel_Area_ha", ""))

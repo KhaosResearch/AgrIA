@@ -1,4 +1,7 @@
 import asyncio
+import io
+import os
+import pdfplumber
 import structlog
 
 from google.genai import Client as GeminiGenAIClient
@@ -15,6 +18,7 @@ from ..models.satellite_analyzer import SatelliteImageAnalyzer
 from ..config.llm_client import vlm_client
 from ..config.constants import (
     FULL_DESC_TRIGGER,
+    PDF_CONTEXT_HEADER,
     SHORT_DESC_TRIGGER,
     TEMP_DIR,
 )
@@ -46,14 +50,20 @@ def _generate_user_response_sync(
     try:
         final_input = user_input
         if None not in [file, filename]:
-            input_for_llm, image_context_prompt = get_image_description(
-                file, filename, lang, is_detailed_description
-            )
-            final_input = str(
-                "\n\n".join(
-                    [image_context_prompt, "\n".join(input_for_llm), user_input]
+            ext = os.path.splitext(filename)[-1]
+            if ext in [".png", ".jpg", ".jpeg"]:
+                input_for_llm, image_context_prompt = get_image_description(
+                    file, filename, lang, is_detailed_description
                 )
-            )
+                final_input = str(
+                    "\n\n".join(
+                        [image_context_prompt, "\n".join(input_for_llm), user_input]
+                    )
+                )
+            elif ext == ".pdf":
+                pdf_payload = extract_structured_pdf_content(file, filename, lang)
+                final_input = str("\n---\n".join([user_input, pdf_payload]))
+
         inputs = {
             "lang": lang,
             "messages": [HumanMessage(content=final_input)],
@@ -146,6 +156,76 @@ def get_image_description(file, filename, lang, is_detailed_description):
         input_for_llm = text[lang]
 
     return input_for_llm, image_context_prompt[lang]
+
+
+def extract_structured_pdf_content(file, filename, lang) -> str:
+    """
+    Reads a SpooledTemporaryFile stream of an administrative form PDF,
+    extracting clean text, checkboxes, and tables as structured Markdown.
+    """
+    try:
+        # Seek to start and read into memory
+        file.seek(0)
+        pdf_bytes = io.BytesIO(file.read())
+        file.seek(0)  # Always reset stream cursor back to start
+
+        pages_output = []
+
+        with pdfplumber.open(pdf_bytes) as pdf:
+            for page_idx, page in enumerate(pdf.pages):
+                page_lines = []
+                page_lines.append(f"### PAGE {page_idx + 1}\n")
+
+                # 1. Extract tables formatted as Markdown Tables
+                tables = page.extract_tables()
+                if tables:
+                    for table in tables:
+                        if not table or len(table) < 1:
+                            continue
+
+                        # Process table header
+                        header = [
+                            str(cell).strip().replace("\n", " ") if cell else ""
+                            for cell in table[0]
+                        ]
+                        page_lines.append("| " + " | ".join(header) + " |")
+                        page_lines.append(
+                            "| " + " | ".join(["---"] * len(header)) + " |"
+                        )
+
+                        # Process table rows
+                        for row in table[1:]:
+                            cleaned_row = [
+                                str(cell).strip().replace("\n", " ") if cell else ""
+                                for cell in row
+                            ]
+                            page_lines.append("| " + " | ".join(cleaned_row) + " |")
+
+                        page_lines.append("")  # Blank line after table
+
+                # 2. Extract regular page text (preserves unicode checkboxes like ☑ and ☐)
+                text = page.extract_text(layout=False)
+                if text:
+                    # Clean double blank lines while keeping line integrity
+                    cleaned_text = "\n".join(
+                        [line.strip() for line in text.splitlines() if line.strip()]
+                    )
+                    page_lines.append(cleaned_text)
+
+                pages_output.append("\n".join(page_lines))
+
+        # Format PDF payload to LLM
+        pdf_text = "\n\n---\n\n".join(pages_output)
+        header = PDF_CONTEXT_HEADER.get(
+            lang, PDF_CONTEXT_HEADER[lang].format(filename=filename)
+        )
+        pdf_payload = f"{header}```markdown\n{pdf_text}\n```"
+
+        return pdf_payload
+
+    except Exception as e:
+        logger.error(f"Error parsing structured PDF with pdfplumber: {e}")
+        return f"[PDF Parsing Error: Unable to parse document due to {str(e)}]"
 
 
 def _get_parcel_description_sync(

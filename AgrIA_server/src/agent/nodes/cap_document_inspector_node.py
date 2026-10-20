@@ -12,7 +12,7 @@ from ...utils.nodes_utils import load_prompt_asset
 
 logger = structlog.get_logger(__name__)
 
-INSPECTOR_CONTEXT_TOKENS = 20000
+INSPECTOR_CONTEXT_TOKENS = 25000
 
 
 def _pdf_path_from(content: Any) -> Optional[str]:

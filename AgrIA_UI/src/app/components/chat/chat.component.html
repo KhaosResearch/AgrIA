@@ -6,7 +6,7 @@
           <h2>{{ 'chat.uploadImage.title' | translate }}</h2>
         </div>
         <div class="image-preview">
-          @if (imagePreviewUrl) {
+          @if (imagePreviewUrl != null) {
             <img [src]="imagePreviewUrl" alt="{{ 'parcelFinder.previewAlt' | translate }}" />
           } @else {
             <img class="image-icon" src="img/image-icon.png" alt="{{ 'parcelFinder.uploadImageAlt' | translate }}" />
@@ -31,7 +31,7 @@
 
     <div id="input">
       <div  style="align-items: center; justify-content: center; vertical-align: middle;">
-        @if (uploadImageFile) {
+        @if (uploadedFile) {
           <button
             type="button"
             class="remove-upload-button"
@@ -42,12 +42,12 @@
         }
         <label
           class="custom-file-upload"
-          [class.file-selected]="uploadImageFile">
+          [class.file-selected]="uploadedFile">
           <img
             src="img/upload-icon1.png"
             alt="{{ 'parcelFinder.uploadImageAlt' | translate }}"
             title="{{ 'parcelFinder.uploadImageAlt' | translate }}" />
-          <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+          <input type="file" accept="image/*, .pdf" (change)="onFileSelected($event)" />
         </label>
       </div>
       <textarea

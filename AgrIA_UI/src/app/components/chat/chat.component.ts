@@ -22,7 +22,7 @@ export class ChatComponent {
   // Image URL/path for the preview module
   public imagePreviewUrl: string | null = null;
   // Pending Uploaded Image file (waiting to be sent)
-  public uploadImageFile: File | null = null;
+  public uploadFile: File | null = null;
   // Pending Image URL/path (waiting to be sent)
   public uploadImagePreviewUrl: string | null = null;
   // Parcel's image information
@@ -149,16 +149,20 @@ export class ChatComponent {
   public onFileSelected(event: any): void {
     const files = event.target.files;
     if (files.length > 0) {
-      this.uploadImageFile = files[0] as File;
+      const uploadedFile = files[0] as File
+      this.uploadFile = uploadedFile;
 
       // Create a preview URL
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.uploadImagePreviewUrl = e.target.result;
-      };
-      reader.readAsDataURL(this.uploadImageFile as Blob);
-    } else {
-      this.uploadImageFile = null;
+        const reader = new FileReader();
+      if (uploadedFile.type.includes("image")) {
+        reader.onload = (e: any) => {
+          this.uploadImagePreviewUrl = e.target.result;
+        };
+      }
+      reader.readAsDataURL(this.uploadFile as Blob);
+    } 
+    else {
+      this.uploadFile = null;
       this.uploadImagePreviewUrl = null;
     }
   }
@@ -167,7 +171,7 @@ export class ChatComponent {
    * Removes uploaded file
    */
   public removeUploadedFile() {
-    this.uploadImageFile = null;
+    this.uploadFile = null;
     this.uploadImagePreviewUrl = null;
 
   }
@@ -199,15 +203,15 @@ export class ChatComponent {
       return;
     }
     if (this.userInput.trim()) {
-      this.chatAssistant.addUserMessage(this.userInput, this.uploadImageFile, this.isDetailedDescription);
-      if(this.uploadImageFile){
-        this.imageFile = this.uploadImageFile;
+      this.chatAssistant.addUserMessage(this.userInput, this.uploadFile, this.isDetailedDescription);
+      if(this.uploadFile?.type.includes("image")){
+        this.imageFile = this.uploadFile;
         this.imagePreviewUrl = this.uploadImagePreviewUrl;
 
         const reader = new FileReader();
-        reader.readAsDataURL(this.uploadImageFile as Blob);
+        reader.readAsDataURL(this.uploadFile as Blob);
 
-        this.uploadImageFile = null;
+        this.uploadFile = null;
         this.uploadImagePreviewUrl = null;
         this.parcelImageInfo = "..."
       }

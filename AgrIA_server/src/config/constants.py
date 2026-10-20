@@ -69,6 +69,10 @@ If the 'Rates' object contains 'Tier_1' (`Tramo_1` in Spanish) and 'Tier_2' (`Tr
 FULL_DESC_TRIGGER = "###DESCRIBE_LONG_IMAGE###"
 SHORT_DESC_TRIGGER = "###DESCRIBE_SHORT_IMAGE###"
 
+PDF_CONTEXT_HEADER = {
+    "en": "--- ATTACHED FORM DOCUMENT CONTEXT ({filename}) ---\n",
+    "es": "--- CONTEXTO DEL DOCUMENTO DE FORMULARIO ADJUNTO ({filename}) ---\n",
+}
 MIME_TYPES = {
     "txt": "text/plain",
     "md": "text/markdown",
