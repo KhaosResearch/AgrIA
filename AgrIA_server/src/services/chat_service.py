@@ -216,8 +216,8 @@ def extract_structured_pdf_content(file, filename, lang) -> str:
 
         # Format PDF payload to LLM
         pdf_text = "\n\n---\n\n".join(pages_output)
-        header = PDF_CONTEXT_HEADER.get(
-            lang, PDF_CONTEXT_HEADER[lang].format(filename=filename)
+        header = PDF_CONTEXT_HEADER.get(lang, PDF_CONTEXT_HEADER["en"]).format(
+            filename=filename
         )
         pdf_payload = f"{header}```markdown\n{pdf_text}\n```"
 

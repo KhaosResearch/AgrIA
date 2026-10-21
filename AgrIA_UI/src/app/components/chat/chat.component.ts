@@ -22,7 +22,7 @@ export class ChatComponent {
   // Image URL/path for the preview module
   public imagePreviewUrl: string | null = null;
   // Pending Uploaded Image file (waiting to be sent)
-  public uploadFile: File | null = null;
+  public uploadImageFile: File | null = null;
   // Pending Image URL/path (waiting to be sent)
   public uploadImagePreviewUrl: string | null = null;
   // Parcel's image information
@@ -150,7 +150,7 @@ export class ChatComponent {
     const files = event.target.files;
     if (files.length > 0) {
       const uploadedFile = files[0] as File
-      this.uploadFile = uploadedFile;
+      this.uploadImageFile = uploadedFile;
 
       // Create a preview URL
         const reader = new FileReader();
@@ -159,10 +159,10 @@ export class ChatComponent {
           this.uploadImagePreviewUrl = e.target.result;
         };
       }
-      reader.readAsDataURL(this.uploadFile as Blob);
+      reader.readAsDataURL(this.uploadImageFile as Blob);
     } 
     else {
-      this.uploadFile = null;
+      this.uploadImageFile = null;
       this.uploadImagePreviewUrl = null;
     }
   }
@@ -171,7 +171,7 @@ export class ChatComponent {
    * Removes uploaded file
    */
   public removeUploadedFile() {
-    this.uploadFile = null;
+    this.uploadImageFile = null;
     this.uploadImagePreviewUrl = null;
 
   }
@@ -203,18 +203,18 @@ export class ChatComponent {
       return;
     }
     if (this.userInput.trim()) {
-      this.chatAssistant.addUserMessage(this.userInput, this.uploadFile, this.isDetailedDescription);
-      if(this.uploadFile?.type.includes("image")){
-        this.imageFile = this.uploadFile;
+      this.chatAssistant.addUserMessage(this.userInput, this.uploadImageFile, this.isDetailedDescription);
+      if(this.uploadImageFile?.type.includes("image")){
+        this.imageFile = this.uploadImageFile;
         this.imagePreviewUrl = this.uploadImagePreviewUrl;
 
         const reader = new FileReader();
-        reader.readAsDataURL(this.uploadFile as Blob);
+        reader.readAsDataURL(this.uploadImageFile as Blob);
 
-        this.uploadFile = null;
-        this.uploadImagePreviewUrl = null;
         this.parcelImageInfo = "..."
       }
+        this.uploadImageFile = null;
+        this.uploadImagePreviewUrl = null;
 
       this.clearUserInput();
     }

@@ -31,7 +31,7 @@
 
     <div id="input">
       <div  style="align-items: center; justify-content: center; vertical-align: middle;">
-        @if (uploadedFile) {
+        @if (uploadImageFile) {
           <button
             type="button"
             class="remove-upload-button"
@@ -42,7 +42,7 @@
         }
         <label
           class="custom-file-upload"
-          [class.file-selected]="uploadedFile">
+          [class.file-selected]="uploadImageFile">
           <img
             src="img/upload-icon1.png"
             alt="{{ 'parcelFinder.uploadImageAlt' | translate }}"
