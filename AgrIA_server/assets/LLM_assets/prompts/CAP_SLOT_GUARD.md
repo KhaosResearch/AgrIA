@@ -10,7 +10,7 @@ explanation outside the JSON, and no field that is not in <allowed_fields>.
 Output format (exactly these keys):
 
 {
-  "classification": "answer | correction | missing_information | topic_change",
+  "classification": "answer | correction | missing_information | topic_change | pause | cancel | resume",
   "confidence": 0.0,
   "slots": { "<field name>": "<value>" },
   "reason": "<max 15 words>"
@@ -22,23 +22,26 @@ Classification rules:
 - "correction": the message fixes a value already present in <current_slots>.
 - "missing_information": the message volunteers a value for another allowed
   field, whether or not it was asked for.
-- "topic_change": the message is unrelated to the CAP application (weather,
-  general agronomy chat, a different farm, small talk, or a new unrelated task).
+- "topic_change": the user asks an unrelated question, changes topic, or starts
+  another task. This includes questions that deserve a normal conversational
+  answer rather than a rejection.
+- "pause": the user explicitly asks to pause or temporarily stop the CAP
+  application. Do not interpret uncertainty or an invalid answer as a pause.
+- "cancel": the user clearly asks to cancel or abandon the current CAP
+  application. Do not interpret a pause, an unrelated question, or an invalid
+  answer as cancellation.
+- "resume": the user explicitly wants to continue a previously paused CAP
+  application. Use this classification only when <workflow_status> is "paused".
 
-Extraction rules:
+Priority rules:
 
-- Only use field names that appear verbatim in <allowed_fields>.
-- Copy values as written in the message; do not translate, reformat, convert
-  units, or compute anything. Keep surfaces exactly as stated, including any
-  unit text such as "4,2 ha". Keep numbers as they appear.
-- If the message gives no usable value for any field, return an empty "slots".
-- A field mentioned but with an unusable value (a question, a refusal, "no lo
-  sé") is not a value. Omit it.
-- If the message both answers the pending field and supplies other fields,
-  classify it as "answer" and include every field you can extract.
+- Explicit cancellation takes precedence over all other classifications.
+- Explicit pause takes precedence over field extraction.
+- When the workflow is paused, an explicit request to resume takes precedence
+  over field extraction.
+- Otherwise, if the message supplies usable CAP field values, follow the
+  normal answer/correction/missing_information rules.
+- Do not classify an ordinary unrelated question as pause or cancel.
 
-Language: the farmer may write in Spanish or English. Understand both. Always
-answer in the language of the message in "reason".
-
-Never invent a parcel identifier, a surface, a beneficiary or an amount. An
-empty slots object is the correct and expected answer far more often than not.
+Extraction rules remain unchanged. For pause, cancel, resume, and topic_change,
+return an empty slots object unless a normal field-answer classification applies.

@@ -45,7 +45,7 @@ def cap_query_node(state: AgrIAState, client, model_name: str) -> dict:
         model_name=model_name,
         system_instruction=system_instruction,
         history_init=get_recent_history(state["messages"][:-1]),
-        max_context_tokens=20000,
+        max_context_tokens=25000,
     )
 
     response_wrapper = chat.send_message(user_payload)

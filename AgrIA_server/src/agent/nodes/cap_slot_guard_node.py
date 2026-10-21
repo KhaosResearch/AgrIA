@@ -14,9 +14,18 @@ logger = structlog.get_logger(__name__)
 
 # Only these verdicts let the CAP workflow advance; anything else keeps us
 # collecting so an unrelated message never gets written into the form.
-ACCEPTED_CLASSIFICATIONS = {"answer", "correction", "missing_information"}
-VALID_CLASSIFICATIONS = ACCEPTED_CLASSIFICATIONS | {"topic_change"}
+ACCEPTED_CLASSIFICATIONS = {
+    "answer",
+    "correction",
+    "missing_information",
+}
 
+VALID_CLASSIFICATIONS = ACCEPTED_CLASSIFICATIONS | {
+    "topic_change",
+    "pause",
+    "cancel",
+    "resume",
+}
 GUARD_CONTEXT_TOKENS = 4000
 
 # The guard is a short, constrained JSON reply, so a malformed one is a rare
@@ -128,6 +137,7 @@ def cap_slot_guard_node(
     system_instruction = load_prompt_asset("CAP_SLOT_GUARD.md")
     user_payload = (
         f"{_schema_block(state.get('cap_form_data'), state.get('pending_action'), lang)}\n\n"
+        f"<workflow_status>{state.get('cap_workflow') or 'none'}</workflow_status>\n\n"
         f"<user_message>\n{user_text}\n</user_message>"
     )
 

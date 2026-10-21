@@ -6,12 +6,13 @@ from langgraph.graph import StateGraph, START, END
 from ..config.llm_client import client, LLM_MODEL_NAME
 from ..models.state_models import AgrIAState
 from .nodes.cap_query_node import cap_query_node
+from .nodes.cap_interruption_node import cap_interruption_node
 from .nodes.basic_chat_node import basic_chat_node
 from .nodes.app_usage_node import app_usage_node
 from .nodes.fallback_node import fallback_rejection_node
 from .nodes.ecoscheme_rates_node import ecoschemes_rates_node
 from .nodes.report_node import generate_report_node
-from .nodes.router_node import deterministic_router, clear_cap_workflow
+from .nodes.router_node import cap_guard_edge, deterministic_router, clear_cap_workflow
 from .nodes.validation_node import validate_report_node, evaluation_router_edge
 from .nodes.cap_document_inspector_node import cap_document_inspector_node
 from .nodes.cap_slot_guard_node import cap_slot_guard_node
@@ -78,6 +79,10 @@ def build_graph() -> StateGraph[AgrIAState]:
         "cap_application",
         lambda state: cap_application_node(state, client, model_name),
     )
+    builder.add_node(
+        "cap_interruption",
+        lambda state: cap_interruption_node(state, client, model_name),
+    )
     builder.add_node("clear_cap_workflow", clear_cap_workflow)
 
     # Wire up the graph flow topology
@@ -126,11 +131,16 @@ def build_graph() -> StateGraph[AgrIAState]:
             "cap_query": "cap_query",
         },
     )
-    builder.add_edge("cap_slot_guard", "cap_application")
-    # `cap_application` always ends the turn. Looping here would re-ask the
-    # question without the farmer having answered: resumability comes from
-    # `pending_action` surviving the checkpointer, and the router sends the
-    # next user message back through `cap_slot_guard`.
+    builder.add_conditional_edges(
+        "cap_slot_guard",
+        cap_guard_edge,
+        {
+            "cap_interruption": "cap_interruption",
+            "cap_application": "cap_application",
+        },
+    )
+
+    builder.add_edge("cap_interruption", END)
     builder.add_edge("cap_application", END)
     builder.add_edge("clear_cap_workflow", END)
 

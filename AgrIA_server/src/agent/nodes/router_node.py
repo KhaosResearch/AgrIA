@@ -86,7 +86,7 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_IN
             model_name=model_name,
             system_instruction=system_instruction,
             history_init=get_recent_history(messages[:-1], max_turns=4),
-            max_context_tokens=8000,
+            max_context_tokens=25000,
         )
 
         user_prompt = (
@@ -139,3 +139,15 @@ def clear_cap_workflow(state: AgrIAState) -> dict:
     """
     logger.info("cap_workflow_cleared", pending_action=state.get("pending_action"))
     return {"pending_action": None, "cap_workflow": None, "cap_alignment": None}
+
+
+def cap_guard_edge(state: AgrIAState) -> str:
+    """Separate interruption intents from normal CAP field extraction."""
+
+    alignment = state.get("cap_alignment") or {}
+    classification = alignment.get("classification")
+
+    if classification in {"topic_change", "pause", "cancel", "resume"}:
+        return "cap_interruption"
+
+    return "cap_application"
