@@ -2,6 +2,8 @@
 .git-credentials
 
 # Backend
+data/
+out/
 *db/ 
 .env
 *temp*
@@ -12,11 +14,14 @@
 *.png
 *.tif*
 *.tsv
-*data*
 *res*
 llm_formatted_out/
 *.json
 *.log
+
+# Runtime LLM assets are JSON, but they are required at runtime and must ship
+!AgrIA_server/assets/LLM_assets/prompts/CAP_RATES.json
+!AgrIA_server/assets/LLM_assets/prompts/CAP_SLOTS.json
 
 # Custom
 misc/

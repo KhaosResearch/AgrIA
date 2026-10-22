@@ -5,7 +5,7 @@ import structlog
 from decimal import Decimal
 
 from ...benchmark.vlm.constants import CLASSIFICATION_OUT_DIR
-from ...services.ecoscheme_payments.main import calculate_ecoscheme_payment
+from ...services.ecoscheme_payments.main import get_ecoscheme_payments_data
 from ...utils.parcel_finder_utils import reset_dir
 
 
@@ -259,7 +259,7 @@ def demo():
         # Get ecoschemes classification
         data_dict = cad_ref_dict[lang.lower()]
         for key in data_dict.keys():
-            output_dict = calculate_ecoscheme_payment(data_dict[key], lang)
+            output_dict = get_ecoscheme_payments_data(data_dict[key], lang)
             out_path = CLASSIFICATION_OUT_DIR / f"{key}_example_{lang}.json"
             with open(out_path, "w") as file:
                 json.dump(output_dict, file, indent=4)

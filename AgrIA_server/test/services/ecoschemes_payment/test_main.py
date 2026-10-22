@@ -1,4 +1,4 @@
-from src.services.ecoscheme_payments.main import calculate_ecoscheme_payment
+from src.services.ecoscheme_payments.main import get_ecoscheme_payments_data
 
 
 def test_main_calculation_output(sample_input_data_str, mocker):
@@ -9,7 +9,7 @@ def test_main_calculation_output(sample_input_data_str, mocker):
         "src.benchmark.vlm.constants.OG_CLASSIFICATION_FILEPATH", "dummy_path.json"
     )
 
-    output = calculate_ecoscheme_payment(sample_input_data_str)
+    output = get_ecoscheme_payments_data(sample_input_data_str)
 
     # Check Final Summary
     assert output["Total_Parcel_Area_ha"] == 45.7332

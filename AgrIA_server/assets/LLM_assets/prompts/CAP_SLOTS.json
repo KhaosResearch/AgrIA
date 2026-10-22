@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0.0",
+  "updated": "2026-10-05",
+  "description": "CAP (Solicitud Unica) slot schema. Deterministic source of truth for which fields the agent may populate; the LLM may only propose values for fields listed here.",
+  "slots": [
+    {
+      "name": "beneficiary.nif_cif",
+      "type": "string",
+      "required": true,
+      "sensitive": true,
+      "question_es": "¿Cual es su NIF/CIF?",
+      "question_en": "What is your NIF/CIF?",
+      "aliases_es": ["nif", "cif", "dni", "nif/cif", "identificacion fiscal"],
+      "aliases_en": ["nif", "cif", "tax id", "tax identification number"]
+    },
+    {
+      "name": "beneficiary.full_name",
+      "type": "string",
+      "required": true,
+      "sensitive": true,
+      "question_es": "¿A nombre de quien se solicita la ayuda?",
+      "question_en": "Who is the aid requested for?",
+      "aliases_es": ["nombre", "razon social", "titular", "apellidos"],
+      "aliases_en": ["name", "full name", "applicant", "holder"]
+    },
+    {
+      "name": "beneficiary.iban",
+      "type": "string",
+      "required": true,
+      "sensitive": true,
+      "question_es": "¿Cual es la cuenta bancaria (IBAN) para el pago?",
+      "question_en": "What is the bank account (IBAN) for payment?",
+      "aliases_es": ["iban", "cuenta bancaria", "cuenta", "domiciliacion"],
+      "aliases_en": ["iban", "bank account", "account"]
+    },
+    {
+      "name": "parcels[].parcel_id",
+      "type": "string",
+      "required": true,
+      "sensitive": false,
+      "question_es": "¿Cual es el identificador SIGPAC de la parcela (poligono, parcela y recinto)?",
+      "question_en": "What is the SIGPAC parcel identifier (polygon, plot and enclosure)?",
+      "aliases_es": ["sigpac", "poligono", "parcela", "recinto", "referencia catastral", "id de parcela"],
+      "aliases_en": ["sigpac", "polygon", "plot", "enclosure", "parcel id", "cadastral reference"]
+    },
+    {
+      "name": "parcels[].declared_crop",
+      "type": "string",
+      "required": true,
+      "sensitive": false,
+      "question_es": "¿Que cultivo o aprovechamiento declara en la parcela?",
+      "question_en": "Which crop or land use do you declare on the parcel?",
+      "aliases_es": ["cultivo", "aprovechamiento", "uso", "cevada", "trigo", "barbecho", "pastos"],
+      "aliases_en": ["crop", "land use", "wheat", "barley", "fallow", "pasture"]
+    },
+    {
+      "name": "parcels[].declared_surface_ha",
+      "type": "number",
+      "required": true,
+      "sensitive": false,
+      "unit": "ha",
+      "question_es": "¿Cual es la superficie declarada en hectareas?",
+      "question_en": "What is the declared surface in hectares?",
+      "aliases_es": ["superficie", "hectareas", "ha", "ha%", "tamano", "extension"],
+      "aliases_en": ["surface", "hectares", "area", "size", "acres"]
+    },
+    {
+      "name": "parcels[].irrigation_type",
+      "type": "string",
+      "required": true,
+      "sensitive": false,
+      "enum": ["Secano", "Regadio"],
+      "question_es": "¿La parcela es de secano o de regadio?",
+      "question_en": "Is the parcel rainfed or irrigated?",
+      "aliases_es": ["secano", "regadio", "regimen hidrico", "riego"],
+      "aliases_en": ["rainfed", "irrigated", "irrigation", "dryland"]
+    },
+    {
+      "name": "requested_aid_lines",
+      "type": "array",
+      "required": true,
+      "sensitive": false,
+      "question_es": "¿Que lineas de ayuda desea solicitar (ecorregimenes, AKR, ayudas directas)?",
+      "question_en": "Which aid lines do you want to apply for (eco-schemes, AKR, direct aids)?",
+      "aliases_es": ["ecorregimen", "ecorregimenes", "linea", "ayuda", "akr", "solicitar"],
+      "aliases_en": ["eco-scheme", "eco-schemes", "aid line", "scheme", "apply"]
+    },
+    {
+      "name": "eco_schemes[].practice_code",
+      "type": "string",
+      "required": false,
+      "sensitive": false,
+      "question_es": "¿Que codigo de practica del ecorregimen quiere solicitar?",
+      "question_en": "Which eco-scheme practice code do you want to apply for?",
+      "aliases_es": ["codigo de practica", "practica", "p6", "p7", "codigo"],
+      "aliases_en": ["practice code", "practice", "code"]
+    },
+    {
+      "name": "eco_schemes[].applied_surface_ha",
+      "type": "number",
+      "required": false,
+      "sensitive": true,
+      "unit": "ha",
+      "question_es": "¿Cual es la superficie que solicita para esa practica?",
+      "question_en": "Which surface do you request for that practice?",
+      "aliases_es": ["superficie solicitada", "superficie de la practica", "solicita"],
+      "aliases_en": ["requested surface", "practice surface", "apply for"]
+    }
+  ]
+}

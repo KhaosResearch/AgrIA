@@ -81,7 +81,7 @@ Please compile the agricultural report matching the template constraints using t
         model_name=model_name,
         system_instruction=system_instruction,
         history_init=get_recent_history(history_messages),
-        max_context_tokens=20000,
+        max_context_tokens=25000,
     )
 
     # Send payload through your standard class invocation pipeline
@@ -93,13 +93,19 @@ Please compile the agricultural report matching the template constraints using t
     if message_to_remove:
         messages_update.append(message_to_remove)
 
-    messages_update.append(AIMessage(content=response_wrapper.text))
-
-    # Return updates back cleanly to the graph lifecycle state machine
-    return {
-        "messages": messages_update,
+    # Keep the report in state rather than only on disk, so later nodes
+    # (notably the CAP application) receive the assessment as graph state and
+    # nothing depends on a shared temp file.
+    update = {
+        "messages": messages_update + [AIMessage(content=response_wrapper.text)],
         "correction_feedback": None,  # Reset feedback after every attempt
     }
+
+    if feedback is None or feedback == "PASSED":
+        update["assessment_report"] = response_wrapper.text
+
+    # Return updates back cleanly to the graph lifecycle state machine
+    return update
 
 
 if __name__ == "__main__":

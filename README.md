@@ -143,40 +143,75 @@ AgrIA utilizes a stateful **LangGraph** orchestration architecture to route user
 ### 📐 Graph Topology
 
 ```mermaid
-graph TD
+graph LR
     %% Node Definitions
-    START([🚀 User Input / State Initialization])
-    ROUTER{{"🧠 Router Node<br/>(Fast-Path & LLM Intent Classifier)"}}
-    
-    CONV["💬 Conversation Node<br/>(basic_chat)"]
-    FALLBACK["🚫 Fallback Node<br/>(fallback_rejection)"]
-    CAP["📜 CAP Regulatory Node<br/>(cap_query_node)"]
-    RATES["💶 Ecoscheme Rates Node<br/>(ecoscheme_rates_node)"]
-    REPORT["📊 Report Node<br/>(report_generator)"]
-    VALIDATION["✅ Validation Node<br/>(report_validation)"]
-    
-    END([🏁 Final State Response / Output])
+    START(["🚀 User Input / State Initialization"])
+    ROUTER{{"🧠 State-Aware Router<br/>(Reads Msg + AgrIAState Flags)"}}
 
-    %% Flow Connections
+    CONV["💬 Conversation Node<br/>(basic_chat)"]
+    APP_USAGE["📖 App Usage Node<br/>(app_usage)"]
+    FALLBACK["🚫 Fallback Node<br/>(fallback_rejection)"]
+
+    CAP_INSPECT["🔍 CAP Document Inspector<br/>(cap_document_inspector_node)"]
+    CAP_GUARD["🛡️ CAP Slot Guard<br/>(cap_slot_guard_node)<br/>Classifies intent + extracts slots"]
+    CAP_INTERRUPT["🔀 CAP Interruption Handler<br/>(cap_interruption_node)<br/>Topic change / Pause / Cancel / Resume"]
+    CAP_APP["📋 CAP Application Node<br/>(cap_application_node)<br/>Merge slots + Validate + Collect"]
+    CAP["📜 CAP Regulatory Query<br/>(cap_query_node)"]
+
+    RATES["💶 Ecoscheme Rates Node<br/>(ecoschemes_rates_node)"]
+    REPORT["📊 Report Generator<br/>(generate_report_node)"]
+    VALIDATION["✅ Report Validation Node<br/>(validate_report_node)"]
+
+    CLEAR_CAP["🧹 Clear CAP Workflow<br/>(clear_cap_workflow)"]
+
+    END(["🏁 Output & State Persistence"])
+
+    %% Entry Point
     START --> ROUTER
 
     %% Router Branching
     ROUTER -- "basic_chat" --> CONV
+    ROUTER -- "app_usage" --> APP_USAGE
     ROUTER -- "fallback_rejection" --> FALLBACK
-    ROUTER -- "cap_query_node" --> CAP
-    ROUTER -- "ecoscheme_rates" --> RATES
+    ROUTER -- "cap_query" --> CAP
+    ROUTER -- "ecoschemes_rates" --> RATES
     ROUTER -- "report_generator" --> REPORT
+    ROUTER -- "cap_document_inspector" --> CAP_INSPECT
+    ROUTER -- "cap_slot_guard" --> CAP_GUARD
+    ROUTER -- "cap_application" --> CAP_APP
 
-    %% Node Execution Outputs
+    %% CAP Document Inspection
+    CAP_INSPECT -- "Extracted alignment / slots available" --> CAP_APP
+    CAP_INSPECT -- "No alignment available" --> CAP
+
+    %% CAP Slot Guard and Intent Routing
+    CAP_GUARD -- "answer / correction / missing_information" --> CAP_APP
+    CAP_GUARD -- "topic_change / pause / cancel / resume" --> CAP_INTERRUPT
+
+    %% CAP Application Workflow
+    CAP_APP -- "Missing or invalid required fields" --> END
+    CAP_APP -- "Valid application / estimated amounts" --> END
+
+    %% CAP Interruption Handling
+    CAP_INTERRUPT -- "Unrelated question answered" --> END
+    CAP_INTERRUPT -- "Pause: preserve form + pending_action" --> END
+    CAP_INTERRUPT -- "Cancel: clear active form + pending_action" --> END
+    CAP_INTERRUPT -- "Resume: re-enter application validation" --> CAP_APP
+
+    %% Other Node Outputs
     CONV --> END
+    APP_USAGE --> END
     FALLBACK --> END
     CAP --> END
     RATES --> END
 
-    %% Validation Loop Sub-Graph
+    %% Report Validation Loop
     REPORT --> VALIDATION
     VALIDATION -- "Approved" --> END
-    VALIDATION -- "Correction Required" --> REPORT
+    VALIDATION -- "Correction required" --> REPORT
+
+    %% Workflow Clearing
+    CLEAR_CAP --> END
 
     %% Styling
     style START fill:#2d3748,stroke:#cbd5e0,color:#fff
@@ -184,10 +219,16 @@ graph TD
     style ROUTER fill:#3182ce,stroke:#63b3ed,color:#fff
     style REPORT fill:#d69e2e,stroke:#f6e05e,color:#fff
     style VALIDATION fill:#d69e2e,stroke:#f6e05e,color:#fff
+    style CAP_INSPECT fill:#319795,stroke:#81e6d9,color:#fff
+    style CAP_GUARD fill:#2b6cb0,stroke:#90cdf4,color:#fff
+    style CAP_INTERRUPT fill:#805ad5,stroke:#d6bcfa,color:#fff
+    style CAP_APP fill:#38a169,stroke:#9ae6b4,color:#fff
     style CAP fill:#38a169,stroke:#9ae6b4,color:#fff
     style RATES fill:#38a169,stroke:#9ae6b4,color:#fff
     style CONV fill:#805ad5,stroke:#d6bcfa,color:#fff
+    style APP_USAGE fill:#805ad5,stroke:#d6bcfa,color:#fff
     style FALLBACK fill:#e53e3e,stroke:#feb2b2,color:#fff
+    style CLEAR_CAP fill:#718096,stroke:#cbd5e0,color:#fff
 ```
 
 ### ⚡ Highlights

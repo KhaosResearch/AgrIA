@@ -40,22 +40,7 @@ def get_eligible_ecoschemes_data(
     return eligible_schemes_by_land_use, non_eligible_uses
 
 
-def calculate_ecoscheme_payment(
-    input_data_str: str,
-    lang: str = LANG,
-    rules_json_filepath: str = OG_CLASSIFICATION_FILEPATH,
-) -> dict:
-    """
-    Processes land use input data and calculates estimated Eco-scheme payments
-    by applying the Critical Exclusivity Rule (choosing the highest payment/ha
-    across all rate types) and including both Peninsular and Insular calculations.
-    """
-
-    # --- 1. PREPARE RULES AND CONSTANTS ---
-    eligible_schemes_by_land_use, non_eligible_uses = get_eligible_ecoschemes_data()
-
-    # --- 2. PARSE INPUT DATA AND CALCULATE TOTAL AREA ---
-
+def parse_land_use_data(input_data_str: str, lang: str) -> tuple:
     land_use_regex = {
         "en": r"- Land Use:\s*(.*?)\s*- Eligible surface \(ha\):\s*([\d.]+)\s*- Irrigation Coeficient:\s*([\d.]+%)\s*(?:- Slope Coeficient:\s*([\d.]+%))?",
         "es": r"- Tipo de Uso:\s*(.*?)\s*- Superficie admisible \(ha\):\s*([\d.]+)\s*- Coef\. de Regadío:\s*([\d.]+%)\s*(?:- Pendiente media:\s*([\d.]+%))?",
@@ -76,15 +61,10 @@ def calculate_ecoscheme_payment(
             "irrigation_coef": irrigation_coef,
             "slope_coef": slope_coef,
         }
+    return parsed_data, total_parcel_area
 
-    # --- 3. APPLY EXCLUSIVITY RULE (Determine best ES/ha for each LU) ---
 
-    land_use_assignments = get_exclusivity_land_uses(
-        eligible_schemes_by_land_use, non_eligible_uses, parsed_data
-    )
-
-    # --- 4. GROUP RESULTS AND CALCULATE TOTAL PAYMENTS ---
-
+def calculate_ecoscheme_payments(parsed_data, land_use_assignments):
     final_scheme_results = get_ecoschemes_rates_and_totals(
         parsed_data, land_use_assignments
     )
@@ -92,8 +72,9 @@ def calculate_ecoscheme_payment(
     estimated_payments = []
     total_aid_no_pluriannuality = Decimal("0.0")
     total_aid_with_pluriannuality = Decimal("0.0")
-    pluri_area = Decimal("0.0")
     applicable_ecoschemes = []
+
+    pluri_area = Decimal("0.0")
 
     sorted_keys = sorted(
         [k for k in final_scheme_results.keys() if k != "Non-Eligible"]
@@ -184,9 +165,48 @@ def calculate_ecoscheme_payment(
                     "Insular": insular_results,
                 }
             )
+    return (
+        estimated_payments,
+        total_aid_no_pluriannuality,
+        total_aid_with_pluriannuality,
+        applicable_ecoschemes,
+    )
+
+
+def get_ecoscheme_payments_data(
+    input_data_str: str,
+    lang: str = LANG,
+) -> dict:
+    """
+    Processes land use input data and calculates estimated Eco-scheme payments
+    by applying the Critical Exclusivity Rule (choosing the highest payment/ha
+    across all rate types) and including both Peninsular and Insular calculations.
+    """
+
+    # --- 1. PREPARE RULES AND CONSTANTS ---
+    eligible_schemes_by_land_use, non_eligible_uses = get_eligible_ecoschemes_data()
+
+    # --- 2. PARSE INPUT DATA AND CALCULATE TOTAL AREA ---
+    parsed_data, total_parcel_area = parse_land_use_data(input_data_str, lang)
+    print("parsed_data", parsed_data)
+
+    # --- 3. APPLY EXCLUSIVITY RULE (Determine best ES/ha for each LU) ---
+
+    land_use_assignments = get_exclusivity_land_uses(
+        eligible_schemes_by_land_use, non_eligible_uses, parsed_data
+    )
+
+    # --- 4. GROUP RESULTS AND CALCULATE TOTAL PAYMENTS ---
+
+    (
+        estimated_payments,
+        total_aid_no_pluriannuality,
+        total_aid_with_pluriannuality,
+        applicable_ecoschemes,
+    ) = calculate_ecoscheme_payments(parsed_data, land_use_assignments)
 
     # -------------------------------------------------------------
-    # --- 5. FINAL RESULTS SUMMARY (Reporting Peninsular Only) ---
+    # --- 5. FINAL RESULTS SUMMARY (Reporting Peninsular Only)  ---
     # -------------------------------------------------------------
 
     final_results = {
@@ -201,7 +221,6 @@ def calculate_ecoscheme_payment(
                 ROUNDING_PAYMENT, rounding=ROUND_HALF_UP
             )
         ),
-        # "Clarifications": clarifications
     }
 
     # Final Output Structure - Update Context

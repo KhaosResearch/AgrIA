@@ -1,0 +1,264 @@
+PRD_CODIGO, PRD_DESC                                     , total_occurrences, SIGPAC_CLASS
+       1.0, TRIGO BLANDO                                 ,             80512, TA
+       2.0, ESPELTA                                      ,                66, TA
+       3.0, TRIGO DURO                                   ,             88890, TA
+       4.0, MAÍZ                                         ,              4608, TA
+       5.0, CEBADA                                       ,             91058, TA
+       6.0, CENTENO                                      ,              2360, TA
+       7.0, SORGO                                        ,              1499, TA
+       8.0, AVENA                                        ,             93395, TA
+      10.0, MIJO                                         ,                16, TA
+      11.0, ALPISTE                                      ,                31, TA
+      12.0, TRANQUILLÓN                                  ,             25365, TA
+      13.0, TRITICALE                                    ,             36647, TA
+      14.0, TRITORDEUM                                   ,                10, TA
+      19.0, TEFF                                         ,                16, TA
+      20.0, BARBECHO TRADICIONAL                         ,            211135, TA
+      23.0, BARBECHO MEDIOAMBIENTAL                      ,               898, TA
+      33.0, GIRASOL                                      ,             91881, TA
+      35.0, COLZA                                        ,              1902, TA
+      36.0, CAMELINA                                     ,                 6, TA
+      40.0, GUISANTE                                     ,             34034, TA
+      41.0, HABA                                         ,             18325, TA
+      43.0, ALTRAMUZ BLANCO                              ,              1172, TA
+      49.0, ALUBIA                                       ,               530, TA
+      50.0, GARBANZO                                     ,             28941, TA
+      51.0, LENTEJA                                      ,                58, TA
+      52.0, VEZA                                         ,              8722, TA
+      53.0, YEROS                                        ,              4723, TA
+      60.0, ALFALFA                                      ,              7877, TA
+      61.0, ALHOLVA                                      ,                10, TA
+      62.0, PASTOS PERMANENTES DE 5 O MÁS AÑOS           ,            532599, PS
+      63.0, PASTOS DE MENOS DE 5 AÑOS                    ,             40141, TA
+      67.0, ESPARCETA                                    ,               100, TA
+      68.0, FESTUCA                                      ,                28, TA
+      69.0, RAYGRASS PERENNE                             ,               225, TA
+      76.0, ZULLA                                        ,                56, TA
+      77.0, TRÉBOL                                       ,               156, TA
+      78.0, RAYGRASS ANUAL                               ,              1397, TA
+      80.0, ARROZ                                        ,              1201, TA
+      81.0, ALGODÓN                                      ,             51311, TA
+      82.0, REMOLACHA                                    ,              4109, TA
+      83.0, TABACO                                       ,                23, TA
+      84.0, LÚPULO                                       ,                 6, TA
+      85.0, LINO                                         ,                96, TA
+      86.0, CÁÑAMO                                       ,                 3, TA
+      88.0, CÁRTAMO                                      ,              2130, TA
+      91.0, FLORES                                       ,               278, TA
+      96.0, ESPECIES AROMÁTICAS HERBÁCEAS                ,               116, TA
+      97.0, SETAS                                        ,                 3, TA
+      99.0, PATATA                                       ,              5185, TA
+     101.0, OLIVO                                        ,           3306766, OV
+     102.0, VIÑA                                         ,             25786, VI
+     104.0, ALMENDRO                                     ,            348052, FS
+     105.0, MELOCOTONERO                                 ,              3588, FY
+     106.0, NECTARINO                                    ,              1034, FY
+     107.0, ALBARICOQUERO                                ,              1062, FY
+     108.0, PERAL                                        ,               775, FY
+     109.0, MANZANO                                      ,               893, FY
+     110.0, CEREZO                                       ,              2777, FY
+     111.0, CIRUELO                                      ,              1336, FY
+     112.0, NOGAL                                        ,              1568, FS
+     113.0, OTROS FRUTALES                               ,              9491, FY
+     116.0, CHOPO                                        ,              1453, FO
+     117.0, CASTAÑO                                      ,              6341, FS
+     118.0, ESPECIES AROMÁTICAS LEÑOSAS                  ,                37, FY
+     119.0, VIVERO - PRODUCTOR MVR                       ,               650, TA
+     120.0, VIÑA - OLIVAR                                ,              2471, VO
+     121.0, BONIATO                                      ,               636, TA
+     122.0, ALGARROBO                                    ,              1694, FS
+     123.0, AVELLANO                                     ,                 6, FS
+     124.0, PISTACHO                                     ,              8879, FS
+     125.0, FRUTOS DE CÁSCARA                            ,              1127, FS
+     147.0, ENCINA                                       ,               147, FO
+     149.0, ZARZAMORA                                    ,                21, FY
+     151.0, PUERRO                                       ,               228, TA
+     152.0, PIMIENTO                                     ,              5795, TA
+     153.0, MELÓN                                        ,              1282, TA
+     154.0, BRÓCOLI                                      ,               888, TA
+     155.0, LECHUGA                                      ,              1206, TA
+     156.0, SANDÍA                                       ,              2595, TA
+     157.0, CEBOLLA                                      ,              2050, TA
+     158.0, APIO                                         ,                84, TA
+     159.0, COLIRRÁBANO                                  ,                 2, TA
+     160.0, COLIFLOR                                     ,               760, TA
+     162.0, BERENJENA                                    ,               555, TA
+     163.0, CALABACÍN                                    ,              1619, TA
+     164.0, ALCACHOFA                                    ,               850, TA
+     165.0, PEPINO                                       ,               689, TA
+     166.0, ACELGA                                       ,                34, TA
+     167.0, CEBOLLETA                                    ,                39, TA
+     169.0, AJO                                          ,              2578, TA
+     171.0, CHIRIVÍA                                     ,                28, TA
+     172.0, REPOLLO                                      ,                42, TA
+     173.0, COL ROJA O LOMBARDA                          ,                34, TA
+     174.0, COL MILÁN                                    ,                34, TA
+     175.0, BERZA                                        ,                37, TA
+     176.0, COL DE BRUSELAS                              ,                56, TA
+     177.0, ENDIVIA                                      ,                 1, TA
+     178.0, ZANAHORIA                                    ,               674, TA
+     179.0, NABO                                         ,                29, TA
+     182.0, GUINDILLA                                    ,                 2, TA
+     183.0, ESPINACA                                     ,               214, TA
+     184.0, CARDO                                        ,                21, TA
+     185.0, CALABAZA                                     ,               443, TA
+     186.0, CALABAZA DEL PEREGRINO                       ,                 2, TA
+     187.0, BORRAJA                                      ,                 2, TA
+     189.0, ESCAROLA                                     ,               132, TA
+     190.0, RÁBANO                                       ,                11, TA
+     191.0, BERRO DE AGUA                                ,                14, TA
+     192.0, FRAMBUESA                                    ,               961, FY
+     193.0, HUERTA                                       ,              6937, TH
+     194.0, CHAMPIÑÓN                                    ,                 3, TA
+     197.0, TOMATE                                       ,              5795, TA
+     200.0, PAULONIA                                     ,                12, FO
+     201.0, PLATERINA                                    ,                 2, FY
+     202.0, PARAGUAYO                                    ,               132, FY
+     203.0, ENDRINO o ARAÑÓN                             ,                 1, FY
+     204.0, CLEMENTINA                                   ,              1968, CI
+     205.0, SATSUMA                                      ,               110, CI
+     206.0, NARANJO                                      ,             43064, CI
+     207.0, LIMONERO                                     ,             10155, CI
+     208.0, POMELO O TORONJA                             ,              1122, CI
+     209.0, MANDARINO                                    ,              4945, CI
+     210.0, MANDARINO HÍBRIDO                            ,              4638, CI
+     211.0, MEMBRILLO                                    ,              2005, FY
+     212.0, KIWI                                         ,                 6, FY
+     213.0, CAQUI o PALOSANTO                            ,               799, FY
+     214.0, NÍSPERO                                      ,               267, FY
+     215.0, GROSELLERO                                   ,                 3, FY
+     216.0, ARÁNDANO                                     ,              2496, FY
+     217.0, GRANADO                                      ,              1031, FY
+     218.0, HIGUERA                                      ,              5652, FY
+     219.0, FRESA                                        ,              1517, TA
+     220.0, CAÑA DE AZÚCAR                               ,                13, TA
+     222.0, QUINOA                                       ,               152, TA
+     225.0, EUCALIPTO                                    ,               216, FO
+     226.0, OPUNTIA                                      ,                70, FY
+     227.0, SAUCE                                        ,                 8, FO
+     238.0, ALTRAMUZ AMARILLO                            ,               266, TA
+     239.0, ALMORTA                                      ,                 4, TA
+     240.0, TITARROS                                     ,               477, TA
+     241.0, MEZCLA AVENA-VEZA                            ,              8765, TA
+     242.0, MEZCLA TRITICALE-VEZA                        ,              1177, TA
+     243.0, MEZCLA TRIGO-VEZA                            ,               470, TA
+     244.0, MEZCLA CEBADA-VEZA                           ,               593, TA
+     245.0, MEZCLA AVENA-ZULLA                           ,               148, TA
+     246.0, MEZCLA CEBADA-ZULLA                          ,                62, TA
+     247.0, CULTIVOS MIXTOS DE ESPECIES PRATENSES        ,               316, TA
+     248.0, ALGARROBA                                    ,                 4, TA
+     249.0, ALVERJA                                      ,               130, TA
+     250.0, ALBERJÓN                                     ,                30, TA
+     251.0, AJEDREA                                      ,                 1, TA
+     252.0, CILANTRO                                     ,              1046, TA
+     253.0, ANÍS DULCE                                   ,              1720, TA
+     254.0, ENELDO                                       ,                 6, TA
+     260.0, HINOJO                                       ,                14, TA
+     261.0, PEREJIL                                      ,                28, TA
+     262.0, AZAFRÁN                                      ,                26, TA
+     263.0, TOMILLO                                      ,                74, TA
+     264.0, ALBAHACA                                     ,                29, TA
+     266.0, MENTA                                        ,                 2, TA
+     267.0, ORÉGANO                                      ,                27, TA
+     268.0, SALVIA                                       ,                36, TA
+     271.0, MEJORANA                                     ,                 5, TA
+     274.0, ESTEVIA                                      ,                23, TA
+     276.0, HIERBABUENA                                  ,                20, TA
+     277.0, VERBENA                                      ,                 2, TA
+     278.0, FRUTOS DEL BOSQUE                            ,               182, FY
+     279.0, ESPÁRRAGO                                    ,              7371, TA
+     280.0, TRUFA                                        ,               120, FO
+     281.0, LAVANDA                                      ,                51, TA
+     282.0, LAVANDÍN                                     ,               108, TA
+     283.0, ALCAPARRA                                    ,                27, TA
+     285.0, ESPLIEGO                                     ,               118, TA
+     288.0, ROMERO                                       ,                35, TA
+     290.0, ALOE VERA                                    ,               102, TA
+     298.0, MEZCLA CEBADA-GUISANTE                       ,               227, TA
+     299.0, MEZCLA AVENA-GUISANTE                        ,              1671, TA
+     304.0, COL CHINA                                    ,                20, TA
+     305.0, MEZCLA AVENA-TRIGO                           ,              1436, TA
+     306.0, MEZCLA AVENA-CEBADA                          ,              5817, TA
+     307.0, MEZCLA AVENA-TRITICALE                       ,              1874, TA
+     308.0, AGRIMONIA                                    ,                 3, TA
+     309.0, BARDANA                                      ,                 2, TA
+     312.0, EQUINACEA                                    ,                 2, TA
+     317.0, MANZANILLA AMARGA                            ,                 6, TA
+     318.0, MANZANILLA DULCE                             ,                 4, TA
+     322.0, ROMPEPIEDRA                                  ,                 3, TA
+     328.0, PASTO DEL SUDÁN                              ,               183, TA
+     331.0, MORINGA                                      ,                11, TA
+     332.0, MOSTAZA                                      ,                29, TA
+     334.0, BARBECHO DE BIODIVERSIDAD (INCLUYE MELÍFERAS),              1127, TA
+     335.0, CABECERA DE CULTIVO PERMANENTE               ,              2369, FY
+     338.0, MEZCLA RAYGRASS-VEZA                         ,               197, TA
+     339.0, MEZCLA AVENA-YEROS                           ,                98, TA
+     340.0, MEZCLA CEBADA-YEROS                          ,                71, TA
+     343.0, AGUACATE                                     ,             11336, FY
+     344.0, MANGO                                        ,              3511, FY
+     345.0, CHIRIMOYO                                    ,               168, FY
+     346.0, PAPAYA                                       ,                20, FY
+     347.0, MORERA                                       ,                38, FY
+     348.0, VIÑA - FRUTAL                                ,               128, VF
+     349.0, OLIVAR - FRUTAL                              ,               394, OF
+     352.0, NARANJO-AGUACATE                             ,                10, CF
+     353.0, CEREZO-OLIVAR                                ,                23, OF
+     354.0, CEREZO-ALGARROBO                             ,                 1, FF
+     356.0, NARANJO AMARGO                               ,               202, CI
+     358.0, MEZCLA DE FORESTALES                         ,              2639, FO
+     359.0, HIERBA DE GUINEA                             ,                 2, TA
+     390.0, HABONCILLO                                   ,               490, TA
+     395.0, PANIZO                                       ,                 2, TA
+     397.0, JUDÍA ESCARLATA                              ,                94, TA
+     401.0, CEBOLLINO                                    ,                 3, TA
+     403.0, ANÍS ESTRELLADO                              ,                 2, TA
+     419.0, BERRO HORTELANO                              ,                 1, TA
+     421.0, VERDOLAGA                                    ,                 1, TA
+     428.0, JUDÍA DE LIMA                                ,                80, TA
+     429.0, COLLEJA                                      ,                 5, TA
+     444.0, ZUMAQUE                                      ,                 1, TA
+     445.0, COL CRESPA                                   ,                14, TA
+     447.0, MEZCLA CEREAL-RAYGRASS                       ,                86, TA
+     449.0, MEZCLA HABA-VEZA                             ,               885, TA
+     450.0, MEZCLA CEBADA-TRIGO                          ,               589, TA
+     451.0, MEZCLA CENTENO-TRIGO                         ,                29, TA
+     454.0, MEZCLA ALTRAMUZ-AVENA                        ,                 6, TA
+     455.0, MEZCLA AVENA-CENTENO                         ,                13, TA
+     461.0, MELILOTO AMARILLO                            ,                32, TA
+     463.0, CHOISUM                                      ,                 2, TA
+     464.0, BRÓCOLI CHINO                                ,                19, TA
+     467.0, LEMONGRASS                                   ,                 2, TA
+     470.0, JUDÍA DE EGIPTO                              ,                19, TA
+     478.0, COLINABO                                     ,                 2, TA
+     483.0, VEZA VELLOSA                                 ,               163, TA
+     484.0, GRELOS                                       ,                10, TA
+     485.0, BAYAS DE GOJI                                ,                 2, FY
+     490.0, MEDICAGO                                     ,                 6, TA
+     496.0, MEZCLA RAYGRASS-TREBOL                       ,                22, TA
+     904.0, CROTALARIA JUNCEA                            ,                30, TA
+     907.0, AZUFAIFO                                     ,                20, FY
+     910.0, LITCHI                                       ,                 4, FY
+     911.0, KUMQUAT                                      ,                27, CI
+     912.0, LIMEQUAT                                     ,                 2, CI
+     913.0, MANO DE BUDA                                 ,                 1, CI
+     914.0, CAVIAR CÍTRICO/ FINGER LIME                  ,                22, CI
+     915.0, LIMA                                         ,               162, CI
+     916.0, KALE                                         ,                 3, TA
+     918.0, ARGÁN                                        ,                 8, FY
+     919.0, PITAYA                                       ,               131, FY
+     923.0, GUAYABO                                      ,                 6, FY
+     924.0, ZAPOTE                                       ,                 2, FY
+     926.0, BATATA                                       ,                 8, TA
+     927.0, OKRA                                         ,                 1, TA
+     928.0, PHYSALIS                                     ,                 4, FY
+     932.0, PLANTAS ORNAMENTALES                         ,                16, TA
+     938.0, FRESÓN                                       ,                70, TA
+     939.0, ALMENDRO-OLIVAR                              ,               300, FL
+     940.0, NARANJO-CAQUI                                ,                10, CF
+     941.0, NARANJO-MANDARINO                            ,                32, CI
+     943.0, PALMERA DATILERA                             ,                14, FY
+     944.0, MARACUYÁ o FRUTO DE LA PASIÓN                ,                47, FY
+     945.0, MEZCLA AVENA-HABA                            ,               185, TA
+     946.0, MEZCLA AVENA-CEBADA-VEZA                     ,               521, TA
+     947.0, JOJOBA                                       ,                 3, TA
+          ,                                              ,             18603, UNKNOWN

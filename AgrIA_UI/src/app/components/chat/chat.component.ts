@@ -149,15 +149,19 @@ export class ChatComponent {
   public onFileSelected(event: any): void {
     const files = event.target.files;
     if (files.length > 0) {
-      this.uploadImageFile = files[0] as File;
+      const uploadedFile = files[0] as File
+      this.uploadImageFile = uploadedFile;
 
       // Create a preview URL
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.uploadImagePreviewUrl = e.target.result;
-      };
+        const reader = new FileReader();
+      if (uploadedFile.type.includes("image")) {
+        reader.onload = (e: any) => {
+          this.uploadImagePreviewUrl = e.target.result;
+        };
+      }
       reader.readAsDataURL(this.uploadImageFile as Blob);
-    } else {
+    } 
+    else {
       this.uploadImageFile = null;
       this.uploadImagePreviewUrl = null;
     }
@@ -200,17 +204,17 @@ export class ChatComponent {
     }
     if (this.userInput.trim()) {
       this.chatAssistant.addUserMessage(this.userInput, this.uploadImageFile, this.isDetailedDescription);
-      if(this.uploadImageFile){
+      if(this.uploadImageFile?.type.includes("image")){
         this.imageFile = this.uploadImageFile;
         this.imagePreviewUrl = this.uploadImagePreviewUrl;
 
         const reader = new FileReader();
         reader.readAsDataURL(this.uploadImageFile as Blob);
 
-        this.uploadImageFile = null;
-        this.uploadImagePreviewUrl = null;
         this.parcelImageInfo = "..."
       }
+        this.uploadImageFile = null;
+        this.uploadImagePreviewUrl = null;
 
       this.clearUserInput();
     }

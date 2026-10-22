@@ -12,21 +12,60 @@ from ...utils.nodes_utils import load_prompt_asset
 logger = structlog.get_logger(__name__)
 
 VALID_INTENTS = Literal[
-    "report_generator", "cap_query", "basic_chat", "fallback_rejection"
+    "report_generator",
+    "basic_chat",
+    "app_usage",
+    "cap_query",
+    "ecoschemes_rates",
+    "fallback_rejection",
+    "cap_document_inspector",
+    "cap_slot_guard",
+    "cap_application",
 ]
+
+# A pending CAP slot question outranks every other intent: the farmer is
+# answering a field, so the message must reach the guard, not the LLM router.
+CAP_SLOT_PREFIX = "AWAITING_SLOT:"
 
 
 def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_INTENTS:
     """
     Hybrid Graph Router:
-    1. Fast-Path: Checks for explicit system tags or empty input (zero latency).
+    1. Fast-Path: Resumable CAP workflows and explicit system tags (zero LLM cost).
     2. LLM Intent Classifier: Evaluates natural language phrasing via structured JSON.
     """
     messages = state.get("messages", [])
     if not messages:
         return "basic_chat"
 
-    last_msg: BaseMessage = messages[-1]
+    pending_action = state.get("pending_action") or ""
+
+    # The guard decides whether the message answers the pending field or shifts
+    # topic; routing is deterministic and language-agnostic by construction.
+    if pending_action.startswith(CAP_SLOT_PREFIX):
+        logger.info("router_resuming_cap_clarification", slot=pending_action)
+        return "cap_slot_guard"
+
+    if pending_action == "AWAITING_CAP_DOC":
+        last_msg: BaseMessage = messages[-1]
+        last_text = str(last_msg.content).strip().lower()
+        if any(
+            keyword in last_text
+            for keyword in [
+                "pdf",
+                "document",
+                "documento",
+                "formulario",
+                "form",
+                "solicitud",
+            ]
+        ):
+            return "cap_document_inspector"
+        # Any other reply moves on to text-based clarification rather than
+        # looping on the document request.
+        return "cap_application"
+
+    last_msg = messages[-1]
     text_content = str(last_msg.content).strip()
 
     # Fast-Path 1: Empty input check
@@ -40,7 +79,6 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_IN
 
     # Fallback: LLM Intent Classifier
     try:
-        # Load system instruction as transient SystemMessage
         system_instruction = load_prompt_asset("INTENT.md")
 
         classifier_chat = LocalChat(
@@ -48,7 +86,7 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_IN
             model_name=model_name,
             system_instruction=system_instruction,
             history_init=get_recent_history(messages[:-1], max_turns=4),
-            max_context_tokens=8000,
+            max_context_tokens=25000,
         )
 
         user_prompt = (
@@ -77,6 +115,9 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_IN
             "ecoschemes_rates",
             "fallback_rejection",
             "report_generator",
+            "cap_document_inspector",
+            "cap_application",
+            "cap_slot_guard",
         }
 
         if detected_intent in valid_intents:
@@ -88,3 +129,25 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> VALID_IN
         )
 
     return "basic_chat"
+
+
+def clear_cap_workflow(state: AgrIAState) -> dict:
+    """LangGraph Node: drop a CAP workflow when the farmer changes topic.
+
+    Replaces the previous in-place `state["pending_action"] = None`, which never
+    reached the checkpointer and so could not actually resume or clear anything.
+    """
+    logger.info("cap_workflow_cleared", pending_action=state.get("pending_action"))
+    return {"pending_action": None, "cap_workflow": None, "cap_alignment": None}
+
+
+def cap_guard_edge(state: AgrIAState) -> str:
+    """Separate interruption intents from normal CAP field extraction."""
+
+    alignment = state.get("cap_alignment") or {}
+    classification = alignment.get("classification")
+
+    if classification in {"topic_change", "pause", "cancel", "resume"}:
+        return "cap_interruption"
+
+    return "cap_application"

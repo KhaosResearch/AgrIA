@@ -45,9 +45,15 @@ def cap_query_node(state: AgrIAState, client, model_name: str) -> dict:
         model_name=model_name,
         system_instruction=system_instruction,
         history_init=get_recent_history(state["messages"][:-1]),
-        max_context_tokens=20000,
+        max_context_tokens=25000,
     )
 
     response_wrapper = chat.send_message(user_payload)
 
-    return {"messages": [AIMessage(content=response_wrapper.text)]}
+    # The application is complete and the farmer is back in advisory mode: drop
+    # the pending slot so the next free-text message is routed normally instead
+    # of resuming the clarification loop.
+    return {
+        "messages": [AIMessage(content=response_wrapper.text)],
+        "pending_action": None,
+    }

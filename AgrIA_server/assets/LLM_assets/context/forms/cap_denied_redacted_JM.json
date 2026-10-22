@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ResolucionAyudaSolicitante",
+  "description": "JSON Schema extracted from Resolución de Ayuda al Solicitante document (Junta de Andalucía)",
+  "type": "object",
+  "properties": {
+    "encabezado_documento": {
+      "type": "object",
+      "properties": {
+        "organismos_emisores": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [
+            "Unión Europea - Fondo Europeo Agrícola de Desarrollo Rural",
+            "Junta de Andalucía",
+            "Gobierno de España - Ministerio de Agricultura, Pesca y Alimentación",
+            "Consejería de Agricultura, Pesca, Agua y Desarrollo Rural - D.G. de Ayudas Directas y de Mercados - Servicio de Ayudas"
+          ]
+        },
+        "registro_salida": {
+          "type": "object",
+          "properties": {
+            "numero": { "type": "string", "default": "" },
+            "fecha": { "type": "string", "format": "date", "default": "2026-06-05" }
+          }
+        },
+        "datos_identificativos": {
+          "type": "object",
+          "properties": {
+            "titulo": { "type": "string", "default": "RESOLUCIÓN DE AYUDA AL SOLICITANTE / CAMPAÑA 2024" },
+            "numero_expediente": { "type": "string", "default": "01202409001218300211755" },
+            "nif": { "type": "string", "default": "" },
+            "numero_comunicacion": { "type": "string", "default": "654 / 2026" },
+            "fecha_presentacion_su": { "type": "string", "format": "date", "default": "2024-03-11" },
+            "fecha_resolucion": { "type": "string", "format": "date", "default": "2026-06-05" }
+          }
+        }
+      }
+    },
+    "cuerpo_resolucion": {
+      "type": "object",
+      "properties": {
+        "tenor_literal": {
+          "type": "object",
+          "properties": {
+            "referencia": { "type": "string", "default": "DGADM/SAD/C2024/Nº 654/2026" },
+            "campana_referenciada": { "type": "string", "default": "2024/2025" },
+            "antecedentes_de_hecho": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": [
+                "PRIMERO.- Que por la persona interesada fue presentada una Solicitud Única de Ayudas correspondiente a la campaña 2024/2025.",
+                "SEGUNDO.- Realizados los correspondientes controles administrativos y sobre el terreno a la solicitud de ayuda anteriormente referenciada.",
+                "TERCERO.- Realizadas las comunicaciones de las incidencias administrativas.",
+                "CUARTO.- Realizadas las comunicaciones relativas al resultado de los controles sobre el terreno realizados."
+              ]
+            },
+            "normativa_aplicable": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Relación de Reglamentos UE, Leyes, Reales Decretos y Órdenes de aplicación"
+            },
+            "fundamentos_de_derecho": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "resuelve": {
+              "type": "object",
+              "properties": {
+                "notificacion_recursos": { "type": "string", "default": "Recurso de reposición en el plazo de un mes desde el día siguiente a la notificación o recurso contencioso-administrativo." },
+                "firmante_director_general": { "type": "string", "default": "Raquel María Espín Crespo" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "caracter_de_la_resolucion": {
+      "type": "array",
+      "description": "Tabla de líneas de ayuda y carácter de la resolución (Denegación u Otorgamiento)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "linea_de_ayuda": { "type": "string" },
+          "caracter_de_la_resolucion": { "type": "string" },
+          "es_denegada": { "type": "boolean", "default": true }
+        }
+      },
+      "default": [
+        {
+          "linea_de_ayuda": "18- Ayuda básica a la renta para la sostenibilidad (ABRS)",
+          "caracter_de_la_resolucion": "DENEGACIÓN",
+          "es_denegada": true
+        },
+        {
+          "linea_de_ayuda": "19-Ayuda complementaria redistributiva",
+          "caracter_de_la_resolucion": "DENEGACIÓN",
+          "es_denegada": true
+        },
+        {
+          "linea_de_ayuda": "510-Cubierta vegetal espontánea o sembrada",
+          "caracter_de_la_resolucion": "DENEGACIÓN",
+          "es_denegada": true
+        }
+      ]
+    },
+    "informacion_grupo_pago_unidades_produccion": {
+      "type": "array",
+      "description": "Información por grupo de pago de las unidades de producción (AD)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "linea_de_ayuda": { "type": "string" },
+          "grupo_de_pago": { "type": "string" },
+          "unidades_declaradas": { "type": "number" },
+          "unidades_determinadas": { "type": "number" },
+          "unidades_penalizables": { "type": "number" },
+          "unidades_de_pago": { "type": "number" }
+        }
+      }
+    },
+    "informacion_grupo_pago_importes": {
+      "type": "array",
+      "description": "Información por grupo de pago de importes (AD)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "linea_de_ayuda": { "type": "string" },
+          "grupo_de_pago": { "type": "string" },
+          "importe_ayuda": { "type": "number", "default": 0.00 },
+          "importe_penalizacion_por_campo": { "type": "string", "default": "" },
+          "importe_penalizacion_por_fecha": { "type": "number", "default": 0.00 },
+          "importe_penalizacion_omision_parcelas": { "type": "string", "default": "" },
+          "importe_reduccion_por_capping": { "type": "number", "default": 0.00 },
+          "importe_detraer_rebasamiento": { "type": "number", "default": 0.00 },
+          "importe_detraer_disciplina_financiera": { "type": "number", "default": 0.00 },
+          "importe_pago": { "type": "number", "default": 0.00 },
+          "importe_detraer_condicionalidad": { "type": "string", "default": "" }
+        }
+      }
+    },
+    "motivos_de_reduccion": {
+      "type": "array",
+      "description": "Motivos de reducción y preceptos legales aplicados",
+      "items": {
+        "type": "object",
+        "properties": {
+          "linea_de_ayuda": { "type": "string" },
+          "tipo_de_reduccion": { "type": "integer" },
+          "motivo_de_reduccion": { "type": "integer" },
+          "descripcion_motivo_de_reduccion": { "type": "string" },
+          "precepto_legal": { "type": "string", "default": "" },
+          "es_incumplimiento_agricultor_activo": { "type": "boolean", "default": false }
+        }
+      },
+      "default": [
+        {
+          "linea_de_ayuda": "18-Ayuda básica a la renta para la sostenibilidad (ABRS)",
+          "tipo_de_reduccion": 4,
+          "motivo_de_reduccion": 428,
+          "descripcion_motivo_de_reduccion": "Agricultor con incumplimiento de la figura de agricultor activo.",
+          "precepto_legal": "R.D. 1048/2022 - Art. 4.",
+          "es_incumplimiento_agricultor_activo": true
+        },
+        {
+          "linea_de_ayuda": "18- Ayuda básica a la renta para la sostenibilidad (ABRS)",
+          "tipo_de_reduccion": 9,
+          "motivo_de_reduccion": 5,
+          "descripcion_motivo_de_reduccion": "Por controles administrativos",
+          "precepto_legal": "",
+          "es_incumplimiento_agricultor_activo": false
+        },
+        {
+          "linea_de_ayuda": "19-Ayuda complementaria redistributiva",
+          "tipo_de_reduccion": 4,
+          "motivo_de_reduccion": 428,
+          "descripcion_motivo_de_reduccion": "Agricultor con incumplimiento de la figura de agricultor activo.",
+          "precepto_legal": "R.D. 1048/2022 - Art. 4.",
+          "es_incumplimiento_agricultor_activo": true
+        },
+        {
+          "linea_de_ayuda": "19-Ayuda complementaria redistributiva",
+          "tipo_de_reduccion": 9,
+          "motivo_de_reduccion": 5,
+          "descripcion_motivo_de_reduccion": "Por controles administrativos",
+          "precepto_legal": "",
+          "es_incumplimiento_agricultor_activo": false
+        },
+        {
+          "linea_de_ayuda": "510-Cubierta vegetal espontánea o sembrada",
+          "tipo_de_reduccion": 4,
+          "motivo_de_reduccion": 428,
+          "descripcion_motivo_de_reduccion": "Agricultor con incumplimiento de la figura de agricultor activo.",
+          "precepto_legal": "R.D. 1048/2022 - Art. 4.",
+          "es_incumplimiento_agricultor_activo": true
+        },
+        {
+          "linea_de_ayuda": "510-Cubierta vegetal espontánea o sembrada",
+          "tipo_de_reduccion": 9,
+          "motivo_de_reduccion": 5,
+          "descripcion_motivo_de_reduccion": "Por controles administrativos",
+          "precepto_legal": "",
+          "es_incumplimiento_agricultor_activo": false
+        }
+      ]
+    },
+    "metadatos_firma_electronica": {
+      "type": "object",
+      "properties": {
+        "referencia_documento": { "type": "string", "default": "K4C//4jFxQwMX0QT28lb" },
+        "aplicacion_informaticas": { "type": "string", "default": "SGA" },
+        "url_verificacion": { "type": "string", "default": "https://ws142.juntadeandalucia.es/agriculturaypesca/verificaSGA" },
+        "firmado_por": { "type": "string", "default": "80132914V-José Álvaro Carrillo Crespo" },
+        "fecha_firma": { "type": "string", "format": "date", "default": "2026-06-06" }
+      }
+    }
+  }
+}
