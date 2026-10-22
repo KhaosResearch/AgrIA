@@ -161,7 +161,6 @@ The two main components are comprised of both smaller components and services th
     - **Ecoschemes Classif. Algorithm:** A mechanical algorithm to enhance user input so that the LLM will have little trouble with ecosheme classification assessments for the parcel.
 
 ## Technologies
-Podrías listar las tecnologías principales que se usan en el proyecto.
 
 ### Frontend (main packages)
 - ``Angular 20`` & ``Angular Material``: Frontend framework and styling library.
@@ -198,7 +197,7 @@ By default, AgrIA retrieves the images from **[CUBO](https://github.com/ESDS-Lei
 
 ## Design Choices
 The main project requirements are:
-- Implement an LLM to help users with CAP regulations.
+- Implement an LLM to help users with CAP regulations and aplications.
     - Context documents, parcel image and land use must be available to improve experience.
 - Retrieve cropped parcel images using already created SIGPAC API.
     - Images can be super-resolved to increase visual data quality and enhance LLM assessment.
@@ -209,9 +208,13 @@ For these reasons, the following design decision were made:
 
 Python has libraries that support heavy ML/AI operations and connect most of the main LLM APIs, so implementing the Chat Assistant was very accesible using it for the backend. Given the functionalities required for it, lightweight UI frameworks were discarded in favour of a solid React-based approach such as Angular for a more modular component-focused alternative.
 
-### Use of Google's Gemini for LLM
+### Use of Google's Gemini for Visual Analysis fallback
 
-Given both image and text needed to be handled by the LLM, a native multimodal available LLM was used, in this case, Google's Gemini. Python has the ``Google GenAI`` library (similar to OpenAI's)  that already implements the client initialziation and chat operations needed.
+Given both image and text needed to be handled by the LLM, a native multimodal available LLM was used, in this case, Google's Gemini. Python has the ``Google GenAI`` library (similar to OpenAI's)  that already implements the client initialziation and chat operations needed. Current implementations also supports OpenAI standard local models. Users must indicate its multimodal capabilities in the corresponding `.env` variables (`IS_VLM_TEXT_ONLY`) or use a fallback model (in our case, Gemini).
+
+### LangGraph node state management
+
+Tipically used for agentic approaches, a state node-based graph was implemented to help the LLM focus on the specific task. Requirements were narrowed down in order to specify these nodes and `langgraph` was used to implement it. This solution frames the scope for the LLM's context and improves response quality for on each pre-defined use case. It also severly reduces the risk of hallucation at the cost of limiting potentially expasive and useful responses.
 
 ### SR4S vs SEN2SR
 

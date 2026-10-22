@@ -3,6 +3,7 @@
 
 # Backend
 data/
+out/
 *db/ 
 .env
 *temp*
