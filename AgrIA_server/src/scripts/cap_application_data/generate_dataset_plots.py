@@ -37,9 +37,9 @@ def plot_land_area_distribution(
     percentages = categories.value_counts(sort=False, normalize=True) * 100
 
     fig, ax = plt.subplots(figsize=FIGURE_SIZE)
-    bars = ax.bar(
-        percentages.index.astype(str), percentages.values, color=BAR_COLOR, width=0.45
-    )
+    # bars = ax.bar(
+    #     percentages.index.astype(str), percentages.values, color=BAR_COLOR, width=0.45
+    # )
 
     ax.set_title("Land Area Distribution by Percentage", fontsize=14, pad=12)
     ax.set_xlabel("Area Category (Hectares)", fontsize=11, labelpad=10)
