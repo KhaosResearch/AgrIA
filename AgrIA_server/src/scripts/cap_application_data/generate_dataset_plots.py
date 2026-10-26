@@ -13,6 +13,8 @@ logger = get_logger(__file__)
 BAR_COLOR = "#316926"  # Dark purple theme matching provided plots
 FIGURE_SIZE = (16, 9)
 
+PLOTS_DIR.mkdir(exist_ok=True)
+
 
 def plot_land_area_distribution(
     df,
@@ -174,6 +176,56 @@ def plot_crop_payment_distribution(
     logger.info("Saved plot", path=output_path)
 
 
+def generate_dataset_plots(
+    df: pd.DataFrame,
+    land_area: bool = True,
+    land_practices: bool = True,
+    land_practices_target_col: str = "DESC_LNA",
+    crop_types: bool = True,
+    crop_types_target_col: str = "PRD_DESC",
+    crop_payment: bool = True,
+    crop_payment_target_col: str = "PRD_DESC",
+) -> None:
+    """Generate selected dataset distribution plots."""
+    plots = {
+        "land area": (land_area, plot_land_area_distribution, {}),
+        "land practices": (
+            land_practices,
+            plot_land_practices_distribution,
+            {"target_col": land_practices_target_col},
+        ),
+        "crop types": (
+            crop_types,
+            plot_crop_types_distribution,
+            {"target_col": crop_types_target_col},
+        ),
+        "crop payment": (
+            crop_payment,
+            plot_crop_payment_distribution,
+            {"target_col": crop_payment_target_col},
+        ),
+    }
+
+    selected_plots = [
+        (name, plot_func, kwargs)
+        for name, (enabled, plot_func, kwargs) in plots.items()
+        if enabled
+    ]
+
+    if not selected_plots:
+        logger.info("No plots selected for generation.")
+        return
+
+    logger.info("Generating %d plot(s)...", len(selected_plots))
+
+    for name, plot_func, kwargs in selected_plots:
+        logger.debug("Generating %s plot...", name)
+        plot_func(df, **kwargs)
+        logger.info("Generated %s plot successfully.", name)
+
+    logger.info("All %d plot(s) generated successfully.", len(selected_plots))
+
+
 if __name__ == "__main__":
     OUT_DIR.mkdir(exist_ok=True)
     PLOTS_DIR.mkdir(exist_ok=True)
@@ -187,12 +239,6 @@ if __name__ == "__main__":
             logger.info("Loading dataset...", file_path=file_path)
             df = pd.read_csv(file_path, encoding="latin1", low_memory=False)
 
-            # Generate graphics
-            plot_land_area_distribution(df)
-            plot_land_practices_distribution(df, target_col="DESC_LNA")
-            plot_crop_types_distribution(df, target_col="PRD_DESC")
-            plot_crop_payment_distribution(df, target_col="PRD_DESC")
-
-            logger.info("All graphics generated successfully!")
+            generate_dataset_plots(df)
 
             break  # just do one year

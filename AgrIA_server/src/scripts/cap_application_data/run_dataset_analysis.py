@@ -262,7 +262,7 @@ def _generate_report(
 # --- Pipeline / Processing Steps ---
 
 
-def run_comprehensive_analysis(file_path, report_output_path):
+def run_dataset_analysis(file_path, report_output_path):
     logger.info("Starting Comprehensive PAC 2023 Agricultural Data Analysis...")
 
     if not os.path.exists(file_path):
@@ -357,4 +357,4 @@ if __name__ == "__main__":
         file_path = str(OUT_DIR / f"PAC_{year}_PROCESSED.csv")
         report_output_path = str(OUT_DIR / f"PAC_{year}_structure_analysis.txt")
 
-        run_comprehensive_analysis(file_path, report_output_path)
+        run_dataset_analysis(file_path, report_output_path)

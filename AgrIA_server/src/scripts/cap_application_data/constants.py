@@ -4,3 +4,6 @@ HOME_DIR = Path(__file__).resolve().parent
 DATA_DIR = HOME_DIR / "data"
 OUT_DIR = HOME_DIR / "out"
 PLOTS_DIR = HOME_DIR / "plots"
+
+DATA_DIR / "classification_2023.json"
+DATA_DIR / "classification_2024.json"

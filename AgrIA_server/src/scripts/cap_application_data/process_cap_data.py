@@ -1,13 +1,8 @@
+import structlog
+
 from decimal import Decimal, InvalidOperation
-import logging
 
 from .constants import DATA_DIR, OUT_DIR
-
-from ...services.ecoscheme_payments.classification import get_exclusivity_land_uses
-from ...services.ecoscheme_payments.main import (
-    calculate_ecoscheme_payments,
-    get_eligible_ecoschemes_data,
-)
 from .utils import (
     classify_crop_code,
     iter_merged_data,
@@ -16,18 +11,29 @@ from .utils import (
     get_unique_crop_codes,
 )
 
-logger = logging.getLogger(__name__)
+from ...services.ecoscheme_payments.classification import get_exclusivity_land_uses
+from ...services.ecoscheme_payments.main import (
+    calculate_ecoscheme_payments,
+    get_eligible_ecoschemes_data,
+)
+from ...services.sigpac_tools_v2.find import find_from_cadastral_registry
+from ...utils.parcel_finder_utils import check_cadastral_data
+
+logger = structlog.getLogger(__name__)
 
 # Set chunk size for production streaming. Set max_rows=10 for fast testing if needed
 CHUNK_SIZE = 10_000
 MAX_ROWS_TEST = None  # Change to 10 or 100 for testing, None for full file
 
 
-def main(processed_output_file: str, merged_output_file: str):
+def process_cap_data(
+    processed_output_file: str, merged_output_file: str, classification_file: str
+):
     out_files = []
-    eligible_schemes_by_land_use, non_eligible_uses = get_eligible_ecoschemes_data()
+    eligible_schemes_by_land_use, non_eligible_uses = get_eligible_ecoschemes_data(
+        rules_json_filepath=classification_file
+    )
 
-    merged_output_file = get_merge_cap_data(year, output_file=merged_output_file)
     out_files.append(merged_output_file)
 
     # 1. Quick search to inspect unique crop codes & descriptions
@@ -40,7 +46,7 @@ def main(processed_output_file: str, merged_output_file: str):
         merged_output_file, batch_size=CHUNK_SIZE, max_rows=MAX_ROWS_TEST
     ):
         processed_entries = []
-
+        unprocessed_entries = []
         for entry in chunk:
             # Validate LNA_CODIGO range
             lna_code = entry.get("LNA_CODIGO")
@@ -49,25 +55,54 @@ def main(processed_output_file: str, merged_output_file: str):
                 processed_entries.append(entry)
                 continue  # skip non-ecoscheme entries
 
-            crop_merged_id = entry.get("PRD_CODIGO")
-            crop_merged_desc = entry.get("PRD_DESC")
-            crop_sigpac_id = classify_crop_code(crop_merged_id, crop_merged_desc)
-            logger.debug(f"crop_sigpac_id: {crop_sigpac_id}")
+            # Build cadastral reference
+            province = str(entry.get("PRO_CODIGO", "0"))
+            municipality = str(entry.get("MSP_CODIGO", "0"))
+            polygon = str(entry.get("REC_POLIGONO", "0"))
+            parcel_id = str(entry.get("REC_PARCELA", "0"))
+
+            logger.debug(f"ENTRY: {entry}")
+
+            try:
+                actual_cad_ref = check_cadastral_data(
+                    None,
+                    province=province,
+                    municipality=municipality,
+                    polygon=polygon,
+                    parcel_id=parcel_id,
+                )
+                __, metadata = find_from_cadastral_registry(actual_cad_ref)
+                crop_data = metadata.get("query").pop()
+            except Exception as e:
+                if "No geometries found in the provided JSON data" in str(e):
+                    logger.warning(str(e))
+                else:
+                    logger.error(e)
+                logger.info("Saving entry to unprocessed entry list")
+                unprocessed_entries.append(entry)
+
+            # if not saved_file:
+            #     with open(f"{actual_cad_ref}_metadata.json", "w") as f:
+            #         import json
+            #         json.dump(metadata, f, indent=4)
+            #         logger.debug("SAVED FILE!")
+            #     saved_file = True
 
             # Format entry
-            sup_riego = entry.get("SUP_RIEGO_HA", 0)
             sup_total = entry.get("SUP_TOTAL_HA", 0)
-
-            is_irrigated = Decimal(
-                str(sup_riego if sup_riego is not None else 0)
-            ) > Decimal("0.0")
             total_parcel_area = Decimal(str(sup_total if sup_total is not None else 0))
 
+            crop_merged_id = entry.get("PRD_CODIGO")
+            crop_merged_desc = entry.get("PRD_DESC")
+
             parsed_data = {
-                crop_sigpac_id: {
+                crop_data.get(
+                    "uso_sigpac", classify_crop_code(crop_merged_id, crop_merged_desc)
+                ): {
                     "area": total_parcel_area,
-                    "irrigation_coef": "100.0%" if is_irrigated else "0.0%",
-                    "slope_coef": "0.0%",  # Default placeholder for slope
+                    "irrigation_coef": str(crop_data.get("coef_regadio") or "0.0")
+                    + "%",
+                    "slope_coef": str(crop_data.get("pendiente_media") or "0.0") + "%",
                 }
             }
 
@@ -83,6 +118,9 @@ def main(processed_output_file: str, merged_output_file: str):
             ) = calculate_ecoscheme_payments(parsed_data, land_use_assignments)
 
             updated_entry = dict(entry)
+            updated_entry["%_PENDIENTE_MEDIA"] = str(
+                crop_data.get("pendiente_media", "0.0")
+            )
 
             if estimated_payments:
                 scheme_data = estimated_payments[0]
@@ -129,6 +167,7 @@ def main(processed_output_file: str, merged_output_file: str):
             processed_entries, processed_output_file, is_first_chunk=is_first_chunk
         )
         is_first_chunk = False
+    return unprocessed_entries if len(unprocessed_entries) > 0 else None
 
 
 if __name__ == "__main__":
@@ -138,8 +177,11 @@ if __name__ == "__main__":
     for year in years:
         merged_output_file = str(OUT_DIR / f"PAC_{year}_MERGED.csv")
         processed_output_file = str(OUT_DIR / f"PAC_{year}_PROCESSED.csv")
+        classification_file = str(DATA_DIR / f"classification_{year}.json")
 
-        main(
+        merged_output_file = get_merge_cap_data(year, output_file=merged_output_file)
+        process_cap_data(
             processed_output_file=processed_output_file,
             merged_output_file=merged_output_file,
+            classification_file=classification_file,
         )
