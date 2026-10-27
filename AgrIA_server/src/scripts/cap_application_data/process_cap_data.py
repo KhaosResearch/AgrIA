@@ -1,6 +1,6 @@
 import structlog
-
 from decimal import Decimal, InvalidOperation
+from concurrent.futures import ThreadPoolExecutor
 
 from .constants import DATA_DIR, OUT_DIR
 from .utils import (
@@ -21,13 +21,23 @@ from ...utils.parcel_finder_utils import check_cadastral_data
 
 logger = structlog.getLogger(__name__)
 
-# Set chunk size for production streaming. Set max_rows=10 for fast testing if needed
 CHUNK_SIZE = 10_000
 MAX_ROWS_TEST = None  # Change to 10 or 100 for testing, None for full file
+MAX_WORKERS = 32  # Concurrent network threads for API calls
+
+
+def fetch_parcel_crop_data(cad_ref: str):
+    """Worker helper to execute API lookup for a single cadastral reference."""
+    __, metadata = find_from_cadastral_registry(cad_ref)
+    return metadata.get("query").pop()
 
 
 def process_cap_data(
-    processed_output_file: str, merged_output_file: str, classification_file: str
+    processed_output_file: str,
+    merged_output_file: str,
+    classification_file: str,
+    use_parallel: bool = False,
+    max_workers: int = MAX_WORKERS,
 ):
     out_files = []
     eligible_schemes_by_land_use, non_eligible_uses = get_eligible_ecoschemes_data(
@@ -47,48 +57,72 @@ def process_cap_data(
     ):
         processed_entries = []
         unprocessed_entries = []
+        valid_entries = []
+
+        # Step A: Filter non-ecoscheme entries and prepare cadastral keys
         for entry in chunk:
-            # Validate LNA_CODIGO range
             lna_code = entry.get("LNA_CODIGO")
             if lna_code is None or not (500 <= int(lna_code) <= 520):
                 logger.debug(f"Skipping non-ecoscheme entry: {entry}")
                 processed_entries.append(entry)
-                continue  # skip non-ecoscheme entries
+                continue
 
-            # Build cadastral reference
             province = str(entry.get("PRO_CODIGO", "0"))
             municipality = str(entry.get("MSP_CODIGO", "0"))
             polygon = str(entry.get("REC_POLIGONO", "0"))
             parcel_id = str(entry.get("REC_PARCELA", "0"))
 
-            logger.debug(f"ENTRY: {entry}")
-
             try:
-                actual_cad_ref = check_cadastral_data(
+                cad_ref = check_cadastral_data(
                     None,
                     province=province,
                     municipality=municipality,
                     polygon=polygon,
                     parcel_id=parcel_id,
                 )
-                __, metadata = find_from_cadastral_registry(actual_cad_ref)
-                crop_data = metadata.get("query").pop()
+                valid_entries.append((entry, cad_ref))
             except Exception as e:
-                if "No geometries found in the provided JSON data" in str(e):
-                    logger.warning(str(e))
-                else:
-                    logger.error(e)
-                logger.info("Saving entry to unprocessed entry list")
+                logger.error(f"Error checking cadastral data: {e}")
                 unprocessed_entries.append(entry)
 
-            # if not saved_file:
-            #     with open(f"{actual_cad_ref}_metadata.json", "w") as f:
-            #         import json
-            #         json.dump(metadata, f, indent=4)
-            #         logger.debug("SAVED FILE!")
-            #     saved_file = True
+        # Step B: Batch fetch crop data with deduplication & concurrency
+        crop_cache = {}
+        unique_cad_refs = list({cad_ref for _, cad_ref in valid_entries})
 
-            # Format entry
+        if use_parallel:
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                future_to_ref = {
+                    executor.submit(fetch_parcel_crop_data, cad_ref): cad_ref
+                    for cad_ref in unique_cad_refs
+                }
+                for future in future_to_ref:
+                    cad_ref = future_to_ref[future]
+                    try:
+                        crop_cache[cad_ref] = future.result()
+                    except Exception as e:
+                        if "No geometries found in the provided JSON data" in str(e):
+                            logger.warning(str(e))
+                        else:
+                            logger.error(e)
+                        crop_cache[cad_ref] = None
+        else:
+            # Fallback synchronous path
+            for cad_ref in unique_cad_refs:
+                try:
+                    crop_cache[cad_ref] = fetch_parcel_crop_data(cad_ref)
+                except Exception as e:
+                    logger.error(e)
+                    crop_cache[cad_ref] = None
+
+        # Step C: Process calculations with fetched metadata
+        for entry, cad_ref in valid_entries:
+            crop_data = crop_cache.get(cad_ref)
+
+            if not crop_data:
+                logger.info("Saving entry to unprocessed entry list")
+                unprocessed_entries.append(entry)
+                continue
+
             sup_total = entry.get("SUP_TOTAL_HA", 0)
             total_parcel_area = Decimal(str(sup_total if sup_total is not None else 0))
 
@@ -110,12 +144,7 @@ def process_cap_data(
                 eligible_schemes_by_land_use, non_eligible_uses, parsed_data
             )
 
-            (
-                estimated_payments,
-                __,
-                __,
-                __,
-            ) = calculate_ecoscheme_payments(parsed_data, land_use_assignments)
+            estimated_payments = calculate_ecoscheme_payments(parsed_data, land_use_assignments)[0]
 
             updated_entry = dict(entry)
             updated_entry["%_PENDIENTE_MEDIA"] = str(
@@ -133,18 +162,15 @@ def process_cap_data(
                 for rate_type in ["Peninsular", "Insular"]:
                     rate_info = scheme_data.get(rate_type, 0.0)
 
-                    # Extract numerical value safely
                     if isinstance(rate_info, dict):
                         raw_val = rate_info.get("Total_Base_Payment_EUR", 0.0)
                     else:
                         raw_val = rate_info
 
-                    # Convert to Decimal safely
                     try:
-                        if raw_val is None:
-                            base_payment = Decimal("0.0")
-                        else:
-                            base_payment = Decimal(str(raw_val))
+                        base_payment = (
+                            Decimal("0.0") if raw_val is None else Decimal(str(raw_val))
+                        )
                     except (InvalidOperation, TypeError, ValueError):
                         base_payment = Decimal("0.0")
 
@@ -160,6 +186,7 @@ def process_cap_data(
                 updated_entry["PENINSULAR_PAGO_PLURI"] = 0.0
                 updated_entry["INSULAR_PAGO_BASE"] = 0.0
                 updated_entry["INSULAR_PAGO_PLURI"] = 0.0
+
             processed_entries.append(updated_entry)
 
         # 3. Append chunk results incrementally to output file
@@ -167,6 +194,7 @@ def process_cap_data(
             processed_entries, processed_output_file, is_first_chunk=is_first_chunk
         )
         is_first_chunk = False
+
     return unprocessed_entries if len(unprocessed_entries) > 0 else None
 
 
