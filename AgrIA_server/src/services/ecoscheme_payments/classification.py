@@ -9,7 +9,7 @@ logger = structlog.get_logger()
 
 
 def get_exclusivity_land_uses(
-    eligible_schemes_by_land_use, non_eligible_uses, parsed_data, lang="EN"
+    eligible_schemes_by_land_use, non_eligible_uses, parsed_data
 ) -> dict:
     land_use_assignments = {}
 
