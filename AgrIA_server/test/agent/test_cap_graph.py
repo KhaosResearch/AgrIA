@@ -129,11 +129,14 @@ class TestRouterDrivesCapChain:
 
     def test_clear_cap_workflow_resets_every_cap_field(self):
         state = _state(pending_action="AWAITING_CAP_DOC", cap_workflow="collect")
-        assert clear_cap_workflow(state) == {
-            "pending_action": None,
-            "cap_workflow": None,
-            "cap_alignment": None,
-        }
+        result = clear_cap_workflow(state)
+        assert result["pending_action"] is None
+        assert result["cap_workflow"] is None
+        assert result["cap_alignment"] is None
+        assert result["cap_form_data"] is None
+        assert result["cap_rates"] is None
+        assert len(result["messages"]) == 1
+        assert "cancelada" in result["messages"][0].content or "cancelled" in result["messages"][0].content
 
 
 class TestCapTurnBoundaries:
