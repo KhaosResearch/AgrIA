@@ -55,6 +55,14 @@
       "interactiveSupport": {
         "title": "Soporte Interactivo",
         "description": "Interactúa con AgrIA a través del chat y recibe respuestas actualizadas sobre tus cultivos."
+      },
+      "ecoSchemeGuidance": {
+        "title": "Guía de Ecorregímenes",
+        "description": "Obtén información detallada sobre los requisitos, umbrales y pagos de cada ecorregímen de la PAC para tu tipo de cultivo."
+      },
+      "subsidyAssistance": {
+        "title": "Asistente de Solicitud",
+        "description": "Rellena tu solicitud de ayuda de ecorregímenes paso a paso con AgrIA: guarda tu progreso, pausa cuando quieras y consulta tu estado en cualquier momento."
       }
     },
       "quickstart" : {
@@ -239,7 +247,9 @@
       "pauseFormButton": "Pausar",
       "pauseFormButtonTitle": "Pausar el relleno de tu solicitud.",
       "cancelFormButton": "Cancelar",
-      "cancelFormButtonTitle": "Cancelar y borrar tu solicitud."
+      "cancelFormButtonTitle": "Cancelar y borrar tu solicitud.",
+      "capToggle": "Ayuda con la solicitud de ecorregímenes",
+      "capActionsTitle": "Usa estos botones para pedir ayuda con una solicitud de ayudas de Ecorregímenes"
     },
     "navigationButton": {
       "title": "Volver a la vista del buscador de parcelas.",

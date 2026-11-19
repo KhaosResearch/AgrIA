@@ -55,6 +55,14 @@
       "interactiveSupport": {
         "title": "Interactive Support",
         "description": "Interact with AgrIA through chat and receive updated answers about your crops."
+      },
+      "ecoSchemeGuidance": {
+        "title": "Eco-scheme Guidance",
+        "description": "Get detailed information on the requirements, thresholds and payments of each CAP eco-scheme for your crop type."
+      },
+      "subsidyAssistance": {
+        "title": "Application Assistant",
+        "description": "Fill in your eco-scheme aid application step by step with AgrIA: save your progress, pause whenever you like and check your status at any time."
       }
     },
     "quickstart" : {
@@ -237,7 +245,9 @@
       "pauseFormButton": "Pause",
       "pauseFormButtonTitle": "Pause filling in your application.",
       "cancelFormButton": "Cancel",
-      "cancelFormButtonTitle": "Cancel and clear your application."
+      "cancelFormButtonTitle": "Cancel and clear your application.",
+      "capToggle": "Eco-scheme application help",
+      "capActionsTitle": "Use these buttons to get help with an Eco-scheme aid application"
     },
     "navigationButton": {
       "title": "Navigate to parcel finder view.",
