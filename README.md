@@ -146,21 +146,23 @@ AgrIA utilizes a stateful **LangGraph** orchestration architecture to route user
 graph LR
     %% Node Definitions
     START(["🚀 User Input / State Initialization"])
-    ROUTER{{"🧠 State-Aware Router<br/>(Reads Msg + AgrIAState Flags)"}}
+    ROUTER{{"🧠 State-Aware Router<br/>(Fast-paths + LLM Intent Classifier)"}}
 
     CONV["💬 Conversation Node<br/>(basic_chat)"]
     APP_USAGE["📖 App Usage Node<br/>(app_usage)"]
     FALLBACK["🚫 Fallback Node<br/>(fallback_rejection)"]
+    CLARIFY["❓ Clarify Node<br/>(clarify)<br/>Low-confidence disambiguation"]
 
     CAP_INSPECT["🔍 CAP Document Inspector<br/>(cap_document_inspector_node)"]
     CAP_GUARD["🛡️ CAP Slot Guard<br/>(cap_slot_guard_node)<br/>Classifies intent + extracts slots"]
     CAP_INTERRUPT["🔀 CAP Interruption Handler<br/>(cap_interruption_node)<br/>Topic change / Pause / Cancel / Resume"]
     CAP_APP["📋 CAP Application Node<br/>(cap_application_node)<br/>Merge slots + Validate + Collect"]
+    CAP_STATUS["📝 CAP Form Status<br/>(cap_form_status_node)<br/>Read-only progress summary"]
     CAP["📜 CAP Regulatory Query<br/>(cap_query_node)"]
 
     RATES["💶 Ecoscheme Rates Node<br/>(ecoschemes_rates_node)"]
-    REPORT["📊 Report Generator<br/>(generate_report_node)"]
-    VALIDATION["✅ Report Validation Node<br/>(validate_report_node)"]
+    REPORT["📊 Report Generator<br/>(report_node)"]
+    VALIDATION["✅ Report Validation Node<br/>(validation_node)"]
 
     CLEAR_CAP["🧹 Clear CAP Workflow<br/>(clear_cap_workflow)"]
 
@@ -179,6 +181,8 @@ graph LR
     ROUTER -- "cap_document_inspector" --> CAP_INSPECT
     ROUTER -- "cap_slot_guard" --> CAP_GUARD
     ROUTER -- "cap_application" --> CAP_APP
+    ROUTER -- "cap_form_status" --> CAP_STATUS
+    ROUTER -- "confidence < 0.55" --> CLARIFY
 
     %% CAP Document Inspection
     CAP_INSPECT -- "Extracted alignment / slots available" --> CAP_APP
@@ -186,7 +190,8 @@ graph LR
 
     %% CAP Slot Guard and Intent Routing
     CAP_GUARD -- "answer / correction / missing_information" --> CAP_APP
-    CAP_GUARD -- "topic_change / pause / cancel / resume" --> CAP_INTERRUPT
+    CAP_GUARD -- "topic_change / pause / resume" --> CAP_INTERRUPT
+    CAP_GUARD -- "cancel" --> CLEAR_CAP
 
     %% CAP Application Workflow
     CAP_APP -- "Missing or invalid required fields" --> END
@@ -195,20 +200,22 @@ graph LR
     %% CAP Interruption Handling
     CAP_INTERRUPT -- "Unrelated question answered" --> END
     CAP_INTERRUPT -- "Pause: preserve form + pending_action" --> END
-    CAP_INTERRUPT -- "Cancel: clear active form + pending_action" --> END
     CAP_INTERRUPT -- "Resume: re-enter application validation" --> CAP_APP
 
     %% Other Node Outputs
     CONV --> END
     APP_USAGE --> END
     FALLBACK --> END
+    CLARIFY --> END
     CAP --> END
     RATES --> END
+    CAP_STATUS --> END
 
-    %% Report Validation Loop
+    %% Report Validation Loop (max 2 retries)
     REPORT --> VALIDATION
     VALIDATION -- "Approved" --> END
-    VALIDATION -- "Correction required" --> REPORT
+    VALIDATION -- "Correction required (retry < 2)" --> REPORT
+    VALIDATION -- "Max retries reached" --> END
 
     %% Workflow Clearing
     CLEAR_CAP --> END
@@ -228,14 +235,18 @@ graph LR
     style CONV fill:#805ad5,stroke:#d6bcfa,color:#fff
     style APP_USAGE fill:#805ad5,stroke:#d6bcfa,color:#fff
     style FALLBACK fill:#e53e3e,stroke:#feb2b2,color:#fff
+    style CLARIFY fill:#d69e2e,stroke:#f6e05e,color:#fff
+    style CAP_STATUS fill:#38a169,stroke:#9ae6b4,color:#fff
     style CLEAR_CAP fill:#718096,stroke:#cbd5e0,color:#fff
 ```
 
 ### ⚡ Highlights
-* **Hybrid Intent Router**: Features a zero-latency fast-path regex check for report triggers alongside an LLM JSON classifier for natural user queries.
+* **Hybrid Intent Router**: Zero-latency fast-paths for report triggers and slot continuation, plus an LLM JSON classifier (10 intents + secondary intent + confidence scoring) for natural language routing. Low-confidence predictions route to a deterministic clarify node instead of guessing.
+* **Multi-Intent Support**: The router detects a secondary intent alongside the primary one, allowing advisory nodes to address both concerns in a single response without topology changes.
 * **Context Isolation & Local RAG**: Powered by an embedded ChromaDB store to retrieve latest CAP regulatory context dynamically without bloating context windows.
-* **Deterministic Rates Injection**: Direct file-injection fallback for high-frequency financial and ecorregímenes rate tables to guarantee 100% numerical accuracy.
-* **Automated Self-Reflection**: Report outputs undergo automated validation before final response emitting.
+* **Deterministic Rates Injection**: Language-filtered file-injection of eco-scheme rate tables to guarantee 100% numerical accuracy.
+* **Bounded Self-Reflection**: Report outputs undergo automated validation with a max-2-retry loop before final response emitting.
+* **Routing Telemetry**: Every routing decision is logged with source, intent, confidence, and secondary intent for observability.
 
 > For full technical documentation, node contracts, and schema definitions, see the agent's specific [`README`](AgrIA_server/src/agent/README.md) file.
 > 
