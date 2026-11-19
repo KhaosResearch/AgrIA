@@ -218,7 +218,7 @@
     },
     "chatWithAgria": {
       "title": "AgrIA",
-      "agriaMessage1": "¡Hola! Soy tu Asistente de Imágenes Agrícolas, ¡pero puedes llamarme AgrIA! Mi propósito aquí es analizar imágenes satelitales de campos de cultivo para asistirte...",
+      "agriaMessage1": "¡Hola! Soy tu Asistente de Imágenes Agrícolas, ¡pero puedes llamarme AgrIA! Mi propósito aquí es analizar imágenes satelitales de campos de cultivo para asistirte en el análisis de tu uso del espacio y los recursos, así como las prácticas agrícolas, con el fin de asesorarte a reunir los requisitos para las subvenciones de la Política Agrícola Común (PAC). Puedo ayudarte a analizar tu parcela, consultar normas y ecorregímenes, o rellenar tu solicitud de ayuda paso a paso.",
       "userMessage1": "Hola AgrIA, he subido una imagen de mi campo en la parcela 34. ¿Podrías analizar el uso del agua?",
       "agriaMessage2": "Claro, he analizado la imagen de la parcela 34. Parece que hay áreas con bajo índice de vegetación que podrían indicar un uso ineficiente del agua. Te sugiero...",
       "inputPlaceholder": "Escribe tu pregunta o comentario aquí...",
@@ -232,7 +232,14 @@
       "sendButtonTitle": "Enviar mensaje.",
       "getSuggestionButton": "Obtener Sugerencia",
       "getSuggestionButtonTitle": "Obtener una sugerencia de la respuesta.",
-      "detailedImageDescription": "Descripción detallada de imagen."
+      "detailedImageDescription": "Descripción detallada de imagen.",
+      "capHint": "Puedes preguntarme sobre ecorregímenes, normas de la PAC, o pedirme que te ayude a rellenar tu solicitud de ayuda.",
+      "showFormButton": "Mi solicitud",
+      "showFormButtonTitle": "Ver el estado de tu solicitud de ayuda.",
+      "pauseFormButton": "Pausar",
+      "pauseFormButtonTitle": "Pausar el relleno de tu solicitud.",
+      "cancelFormButton": "Cancelar",
+      "cancelFormButtonTitle": "Cancelar y borrar tu solicitud."
     },
     "navigationButton": {
       "title": "Volver a la vista del buscador de parcelas.",
