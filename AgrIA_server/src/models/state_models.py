@@ -18,6 +18,26 @@ class AgrIAState(TypedDict):
     cap_rates: Optional[dict]  # Explicit EUR/ha rate table used to reproduce amounts
     visual_description: Optional[str]
     correction_feedback: Optional[str]
+    secondary_intent: Optional[str]  # A second intent the router detected; the primary
+    # node is asked to also address it in its reply (multi-intent, no topology change)
+
+
+# Single source of truth for the intents the router may emit. The graph's edge map,
+# the classifier's validity check and the few-shot prompt all derive from this set,
+# so adding or renaming an intent is one edit instead of three.
+INTENT_REGISTRY: frozenset[str] = frozenset(
+    {
+        "report_generator",
+        "basic_chat",
+        "app_usage",
+        "cap_query",
+        "ecoschemes_rates",
+        "fallback_rejection",
+        "cap_document_inspector",
+        "cap_slot_guard",
+        "cap_application",
+    }
+)
 
 
 class CapSlotGuardOutput(BaseModel):
