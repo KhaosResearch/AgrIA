@@ -4,7 +4,7 @@ from ...benchmark.vlm.constants import OG_CLASSIFICATION_FILEPATH
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
 from ...utils.chat_utils import get_recent_history
-from ...utils.nodes_utils import load_prompt_asset
+from ...utils.nodes_utils import load_prompt_asset, secondary_intent_block
 
 
 def ecoschemes_rates_node(state: AgrIAState, client, model_name: str) -> dict:
@@ -25,6 +25,7 @@ def ecoschemes_rates_node(state: AgrIAState, client, model_name: str) -> dict:
     system_instruction = raw_instruction.replace(
         "{lang}", "Spanish" if lang == "es" else "English"
     )
+    system_instruction += secondary_intent_block(state)
 
     # Construct compact user payload
     user_payload = f"""

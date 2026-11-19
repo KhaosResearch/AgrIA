@@ -4,7 +4,7 @@ from ...utils.rag_utils import get_or_create_knowledge_base, query_knowledge_bas
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
 from ...utils.chat_utils import get_recent_history
-from ...utils.nodes_utils import load_prompt_asset
+from ...utils.nodes_utils import load_prompt_asset, secondary_intent_block
 
 
 def cap_query_node(state: AgrIAState, client, model_name: str) -> dict:
@@ -27,6 +27,7 @@ def cap_query_node(state: AgrIAState, client, model_name: str) -> dict:
     system_instruction = raw_instruction.replace(
         "{lang}", "Spanish" if lang == "es" else "English"
     )
+    system_instruction += secondary_intent_block(state)
 
     # 4. Construct compact user payload
     user_payload = f"""
