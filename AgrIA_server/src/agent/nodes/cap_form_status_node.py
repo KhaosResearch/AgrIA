@@ -7,7 +7,6 @@ inspect their own progress mid-application.
 """
 
 import structlog
-
 from langchain_core.messages import AIMessage
 
 from ...models.state_models import AgrIAState
@@ -98,7 +97,9 @@ def cap_form_status_node(state: AgrIAState) -> dict:
     status_map = {
         "collect": "in progress" if lang == "en" else "en curso",
         "paused": "paused" if lang == "en" else "en pausa",
-        "ready": "complete — ready to submit" if lang == "en" else "completa — lista para enviar",
+        "ready": "complete — ready to submit"
+        if lang == "en"
+        else "completa — lista para enviar",
         "cancelled": "cancelled" if lang == "en" else "cancelada",
     }
     status_text = status_map.get(cap_workflow, cap_workflow)
@@ -108,11 +109,15 @@ def cap_form_status_node(state: AgrIAState) -> dict:
         lines.append(f"\n**Estado:** {status_text}")
 
     if lang == "en":
-        lines.append("\nYou can continue by answering the outstanding field, "
-                     "or say 'pause' / 'cancel' if you need to.")
+        lines.append(
+            "\nYou can continue by answering the outstanding field, "
+            "or say 'pause' / 'cancel' if you need to."
+        )
     else:
-        lines.append("\nPuedes continuar respondiendo al campo pendiente, "
-                     "o decir «pausa» / «cancelar» si lo necesitas.")
+        lines.append(
+            "\nPuedes continuar respondiendo al campo pendiente, "
+            "o decir «pausa» / «cancelar» si lo necesitas."
+        )
 
     content = "\n".join(lines)
     logger.info("cap_form_status", fields=len(form_data), status=cap_workflow)

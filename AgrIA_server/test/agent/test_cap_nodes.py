@@ -12,8 +12,8 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 from src.agent.nodes.cap_application_node import cap_application_node
 from src.agent.nodes.cap_document_inspector_node import (
-    _pdf_path_from,
     _parse_slots,
+    _pdf_path_from,
     cap_document_inspector_node,
 )
 from src.agent.nodes.cap_slot_guard_node import (
@@ -523,7 +523,10 @@ class TestCapFormStatus:
 
         state = _state(
             "¿qué llevo?",
-            cap_form_data={"beneficiary.nif_cif": "12345678Z", "beneficiary.full_name": "Ana"},
+            cap_form_data={
+                "beneficiary.nif_cif": "12345678Z",
+                "beneficiary.full_name": "Ana",
+            },
             pending_action="AWAITING_SLOT:beneficiary.iban",
             cap_workflow="collect",
         )
