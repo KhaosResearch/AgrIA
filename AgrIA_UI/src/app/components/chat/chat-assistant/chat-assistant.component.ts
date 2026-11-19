@@ -39,7 +39,7 @@ export class ChatAssistantComponent {
 
   ngOnInit() {
     if (this.chatHistory.length <= 1) {
-      this.chatAssistantService.loadActiveChatHistory().subscribe({
+      this.chatAssistantService.loadActiveChatHistory(this.threadId).subscribe({
         next: (response: IChatMessage[]) => {
           this.chatHistory = this.sanitizeChatHistory(response);
           this.scrollToBottom(); // scroll to bottom after loading history
@@ -127,12 +127,15 @@ export class ChatAssistantComponent {
 
   /**
    * Adds user message to chat and gets assistant output
-   * @param content - User message content
+   * @param content - User message content (sent to the backend as-is)
+   * @param imageFile - Optional image file
+   * @param isDetailedDescription - Whether to use the short or detailed description
+   * @param displayContent - When set, shown in the bubble instead of `content`
    */
-  public addUserMessage(content: string, imageFile: File | null, isDetailedDescription: boolean) {
+  public addUserMessage(content: string, imageFile: File | null, isDetailedDescription: boolean, displayContent?: string) {
     if (content.length > 0) {
       const safeContent = this.sanitizeMarkdown(content);
-      this.chatHistory.push({ role: 'user', content: safeContent });
+      this.chatHistory.push({ role: 'user', content: safeContent, displayContent });
       this.sendUserInput(safeContent, imageFile, isDetailedDescription);
       this.scrollToBottom();
     }
