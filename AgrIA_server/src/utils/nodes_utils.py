@@ -21,6 +21,30 @@ def load_prompt_asset(filename: str, lang: str = "") -> str:
     return file_path.read_text(encoding="utf-8")
 
 
+def secondary_intent_block(state: "AgrIAState") -> str:
+    """Build the `<secondary_intent>` system block for the primary node.
+
+    When the router detected a second intent in the farmer's message, the node
+    that is running (the primary) is asked to also address that second point in
+    the same reply. This is how multi-intent works without any graph topology
+    change: the second intent is folded into the primary node's prompt.
+
+    Returns an empty string when there is no secondary intent, so nodes that do
+    not support it can ignore the helper entirely.
+    """
+    secondary = state.get("secondary_intent")
+    if not secondary:
+        return ""
+    return (
+        "\n\n<secondary_intent>\n"
+        f"The farmer's message also asked for a second thing, classified as "
+        f"'{secondary}'. After fully addressing your main task, briefly address "
+        f"that second point in the same reply so the farmer does not have to ask "
+        f"again. Keep it concise and clearly separated from the main answer.\n"
+        f"</secondary_intent>\n"
+    )
+
+
 def execute_scoped_chat(
     state: AgrIAState,
     client,
@@ -36,6 +60,7 @@ def execute_scoped_chat(
         user_input = last_chat_msg.content
 
         system_instruction = load_prompt_asset(prompt_filename, lang)
+        system_instruction += secondary_intent_block(state)
 
         chat = LocalChat(
             client=client,
