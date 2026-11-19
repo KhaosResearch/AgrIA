@@ -46,6 +46,7 @@ def cap_interruption_node(
             "cap_workflow": "cancelled",
             "cap_form_data": None,
             "pending_action": None,
+            "cap_rates": None,
             "messages": [
                 AIMessage(
                     content=(

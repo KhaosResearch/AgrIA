@@ -153,6 +153,7 @@ def build_graph() -> StateGraph[AgrIAState]:
         {
             "cap_interruption": "cap_interruption",
             "cap_application": "cap_application",
+            "clear_cap_workflow": "clear_cap_workflow",
         },
     )
 
