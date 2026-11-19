@@ -37,6 +37,7 @@ async def send_user_input(
     image: UploadFile | str | None = File(None),
     isDetailedDescription: str = Form("false"),
     lang: str = Form("en"),
+    thread_id: str = Form("default_session"),
 ):
     try:
         is_detailed_description = "true" in isDetailedDescription.lower()
@@ -48,7 +49,8 @@ async def send_user_input(
         if userMessage is not None and len(userMessage) > 0:
             response_text = await _await_if_needed(
                 generate_user_response(
-                    userMessage, is_detailed_description, lang, file, filename
+                    userMessage, is_detailed_description, lang, file, filename,
+                    thread_id=thread_id,
                 )
             )
             return {"response": response_text}

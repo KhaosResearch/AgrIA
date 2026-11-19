@@ -341,6 +341,9 @@ def _get_parcel_description_sync(
             "lang": lang,
             "messages": [HumanMessage(content=model_payload)],
             "visual_description": extracted_visual_description,
+            # A new parcel invalidates the previous assessment: clear it so
+            # cap_application does not inject a stale report from another parcel.
+            "assessment_report": None,
         }
         config = {"configurable": {"thread_id": thread_id}}
         output_state = agent_graph.invoke(inputs, config=config)

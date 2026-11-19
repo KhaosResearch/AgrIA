@@ -102,7 +102,9 @@ def test_send_user_input_scenarios(
 ):
     # --- ARRANGE --- #
     # Prepare mockups
-    monkeypatch.setattr(chat, "generate_user_response", lambda *args: expected_response)
+    monkeypatch.setattr(
+        chat, "generate_user_response", lambda *args, **kwargs: expected_response
+    )
 
     # Prepare inputs
     data = {
