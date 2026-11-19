@@ -54,19 +54,12 @@ def _mock_router(case: dict, state: AgrIAState) -> dict:
     if pending and pending.startswith("AWAITING_SLOT:"):
         return {"next_node": "cap_slot_guard", "intents": ["cap_slot_guard"],
                 "confidence": 1.0, "reason": "fast-path: pending slot"}
-    if pending == "AWAITING_CAP_DOC":
-        text = last.lower()
-        if any(k in text for k in ("pdf", "document", "documento", "formulario",
-                                   "form", "solicitud")):
-            return {"next_node": "cap_document_inspector",
-                    "intents": ["cap_document_inspector"], "confidence": 1.0,
-                    "reason": "fast-path: doc keyword"}
-        return {"next_node": "cap_application", "intents": ["cap_application"],
-                "confidence": 1.0, "reason": "fast-path: AWAITING_CAP_DOC"}
+    # AWAITING_CAP_DOC is no longer a deterministic fast-path (B5): it falls
+    # through to the LLM classifier like any other message.
     if not last.strip():
         return {"next_node": "basic_chat", "intents": ["basic_chat"],
                 "confidence": 1.0, "reason": "fast-path: empty"}
-    if "###DESCRIBE_SHORT_IMAGE###" in last:
+    if "###DESCRIBE_SHORT_IMAGE###" in last or "###DESCRIBE_LONG_IMAGE###" in last:
         return {"next_node": "report_generator",
                 "intents": ["report_generator"], "confidence": 1.0,
                 "reason": "fast-path: image trigger"}
@@ -110,7 +103,8 @@ def _emulate_classifier(case: dict, text: str) -> dict:
                 "confidence": 0.95, "reason": "emulated: application"}
     # 5. Document extraction
     if any(k in t for k in ("extrae los datos", "lee este documento",
-                            "extraer del pdf")):
+                            "extraer del pdf", "adjunto el pdf", "documento",
+                            "formulario", "pdf")):
         return {"next_node": "cap_document_inspector",
                 "intents": ["cap_document_inspector"],
                 "confidence": 0.9, "reason": "emulated: document"}

@@ -107,12 +107,25 @@ class TestRouterDrivesCapChain:
         assert deterministic_router(state, MagicMock(), "m") == "cap_slot_guard"
 
     def test_pending_document_with_pdf_goes_to_inspector(self):
+        # AWAITING_CAP_DOC is no longer a deterministic fast-path; the LLM
+        # classifier handles document-related messages.
         state = _state("/tmp/solicitud.pdf", pending_action="AWAITING_CAP_DOC")
-        assert deterministic_router(state, MagicMock(), "m") == "cap_document_inspector"
+        assert deterministic_router(state, MagicMock(), "m") == "basic_chat"
 
     def test_pending_document_without_pdf_goes_to_application(self):
+        # Same: falls through to the LLM router.
         state = _state("no lo tengo", pending_action="AWAITING_CAP_DOC")
-        assert deterministic_router(state, MagicMock(), "m") == "cap_application"
+        assert deterministic_router(state, MagicMock(), "m") == "basic_chat"
+
+    def test_long_image_trigger_fast_path(self):
+        """###DESCRIBE_LONG_IMAGE### must also route to report_generator."""
+        state = _state("###DESCRIBE_LONG_IMAGE###\n```FECHA: 2024-01-01```")
+        assert deterministic_router(state, MagicMock(), "m") == "report_generator"
+
+    def test_short_image_trigger_fast_path(self):
+        """###DESCRIBE_SHORT_IMAGE### still routes to report_generator."""
+        state = _state("###DESCRIBE_SHORT_IMAGE###\n```FECHA: 2024-01-01```")
+        assert deterministic_router(state, MagicMock(), "m") == "report_generator"
 
     def test_clear_cap_workflow_resets_every_cap_field(self):
         state = _state(pending_action="AWAITING_CAP_DOC", cap_workflow="collect")

@@ -2,7 +2,6 @@ import json
 import structlog
 
 from typing import Literal
-from langchain_core.messages import BaseMessage
 
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState, INTENT_REGISTRY
@@ -113,27 +112,6 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> str:
         _log_routing("fast_path", "cap_slot_guard", 1.0, slot=pending_action)
         return "cap_slot_guard"
 
-    if pending_action == "AWAITING_CAP_DOC":
-        last_msg: BaseMessage = messages[-1]
-        last_text = str(last_msg.content).strip().lower()
-        if any(
-            keyword in last_text
-            for keyword in [
-                "pdf",
-                "document",
-                "documento",
-                "formulario",
-                "form",
-                "solicitud",
-            ]
-        ):
-            _log_routing("fast_path", "cap_document_inspector", 1.0)
-            return "cap_document_inspector"
-        # Any other reply moves on to text-based clarification rather than
-        # looping on the document request.
-        _log_routing("fast_path", "cap_application", 1.0)
-        return "cap_application"
-
     last_msg = messages[-1]
     text_content = str(last_msg.content).strip()
 
@@ -142,8 +120,8 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> str:
         _log_routing("fast_path", "basic_chat", 1.0)
         return "basic_chat"
 
-    # Fast-Path 2: System tag check for report generation
-    if "###DESCRIBE_SHORT_IMAGE###" in text_content:
+    # Fast-Path 2: System tag check for report generation (both variants)
+    if "###DESCRIBE_SHORT_IMAGE###" in text_content or "###DESCRIBE_LONG_IMAGE###" in text_content:
         _log_routing("fast_path", "report_generator", 1.0)
         return "report_generator"
 
@@ -155,7 +133,7 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> str:
             client=client,
             model_name=model_name,
             system_instruction=system_instruction,
-            history_init=get_recent_history(messages[:-1], max_turns=4),
+            history_init=get_recent_history(messages[:-1], max_turns=6),
             max_context_tokens=25000,
         )
 
@@ -216,12 +194,20 @@ def clear_cap_workflow(state: AgrIAState) -> dict:
 
 
 def cap_guard_edge(state: AgrIAState) -> str:
-    """Separate interruption intents from normal CAP field extraction."""
+    """Separate interruption intents from normal CAP field extraction.
+
+    Returns one of: "cap_interruption", "cap_application", "clear_cap_workflow".
+    The cancel classification routes to `clear_cap_workflow` so the node is
+    actually reachable in the graph (it was previously dead code).
+    """
 
     alignment = state.get("cap_alignment") or {}
     classification = alignment.get("classification")
 
-    if classification in {"topic_change", "pause", "cancel", "resume"}:
+    if classification == "cancel":
+        return "clear_cap_workflow"
+
+    if classification in {"topic_change", "pause", "resume"}:
         return "cap_interruption"
 
     return "cap_application"
