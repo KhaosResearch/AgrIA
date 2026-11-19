@@ -23,6 +23,9 @@ llm_formatted_out/
 !AgrIA_server/assets/LLM_assets/prompts/CAP_RATES.json
 !AgrIA_server/assets/LLM_assets/prompts/CAP_SLOTS.json
 
+# Test fixtures are JSON but must be tracked
+!AgrIA_server/test/agent/router_eval_set.json
+
 # Custom
 misc/
 

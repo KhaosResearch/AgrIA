@@ -4,7 +4,7 @@ from ...utils.rag_utils import get_or_create_knowledge_base, query_knowledge_bas
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
 from ...utils.chat_utils import get_recent_history
-from ...utils.nodes_utils import load_prompt_asset
+from ...utils.nodes_utils import load_prompt_asset, secondary_intent_block
 
 
 def cap_query_node(state: AgrIAState, client, model_name: str) -> dict:
@@ -27,6 +27,7 @@ def cap_query_node(state: AgrIAState, client, model_name: str) -> dict:
     system_instruction = raw_instruction.replace(
         "{lang}", "Spanish" if lang == "es" else "English"
     )
+    system_instruction += secondary_intent_block(state)
 
     # 4. Construct compact user payload
     user_payload = f"""
@@ -50,10 +51,9 @@ def cap_query_node(state: AgrIAState, client, model_name: str) -> dict:
 
     response_wrapper = chat.send_message(user_payload)
 
-    # The application is complete and the farmer is back in advisory mode: drop
-    # the pending slot so the next free-text message is routed normally instead
-    # of resuming the clarification loop.
+    # Advisory queries preserve the CAP workflow: the farmer can still be
+    # mid-form and come back to it. This matches `topic_change` semantics in
+    # the interruption node (both keep pending_action intact).
     return {
         "messages": [AIMessage(content=response_wrapper.text)],
-        "pending_action": None,
     }

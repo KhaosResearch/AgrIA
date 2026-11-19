@@ -1,10 +1,11 @@
 import structlog
 
+from langchain_core.messages import AIMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph, START, END
 
 from ..config.llm_client import client, LLM_MODEL_NAME
-from ..models.state_models import AgrIAState
+from ..models.state_models import AgrIAState, INTENT_REGISTRY
 from .nodes.cap_query_node import cap_query_node
 from .nodes.cap_interruption_node import cap_interruption_node
 from .nodes.basic_chat_node import basic_chat_node
@@ -12,11 +13,17 @@ from .nodes.app_usage_node import app_usage_node
 from .nodes.fallback_node import fallback_rejection_node
 from .nodes.ecoscheme_rates_node import ecoschemes_rates_node
 from .nodes.report_node import generate_report_node
-from .nodes.router_node import cap_guard_edge, deterministic_router, clear_cap_workflow
+from .nodes.router_node import (
+    cap_guard_edge,
+    deterministic_router,
+    clear_cap_workflow,
+    _clarification_message,
+)
 from .nodes.validation_node import validate_report_node, evaluation_router_edge
 from .nodes.cap_document_inspector_node import cap_document_inspector_node
 from .nodes.cap_slot_guard_node import cap_slot_guard_node
 from .nodes.cap_application_node import cap_application_node
+from .nodes.cap_form_status_node import cap_form_status_node
 
 logger = structlog.get_logger(__file__)
 
@@ -35,6 +42,27 @@ def inspector_edge(state: AgrIAState) -> str:
 def route_adapter(state: AgrIAState, model_name: str = LLM_MODEL_NAME) -> str:
     """Adapter function to pass model execution runtime args to the router."""
     return deterministic_router(state, client=client, model_name=model_name)
+
+
+def clarify_node(state: AgrIAState) -> dict:
+    """Terminal node reached when the router is unsure of the intent.
+
+    The classifier returned a label it did not trust (below the confidence
+    threshold), so instead of guessing we ask one short clarifying question.
+    This is deterministic (no LLM call) and keeps the CAP workflow untouched.
+    """
+    lang = state.get("lang", "es")
+    return {
+        "messages": [AIMessage(content=_clarification_message(lang))],
+        "secondary_intent": None,
+    }
+
+
+# The router may send the graph to any registered intent plus the clarify node.
+# Deriving the map from INTENT_REGISTRY keeps it in sync with the classifier by
+# construction: a new intent added to the registry is routable immediately.
+ROUTER_TARGETS = {intent: intent for intent in INTENT_REGISTRY}
+ROUTER_TARGETS["clarify"] = "clarify"
 
 
 def build_graph() -> StateGraph[AgrIAState]:
@@ -84,23 +112,12 @@ def build_graph() -> StateGraph[AgrIAState]:
         lambda state: cap_interruption_node(state, client, model_name),
     )
     builder.add_node("clear_cap_workflow", clear_cap_workflow)
+    builder.add_node("clarify", clarify_node)
+    builder.add_node("cap_form_status", cap_form_status_node)
 
-    # Wire up the graph flow topology
-    builder.add_conditional_edges(
-        START,
-        route_adapter,
-        {
-            "basic_chat": "basic_chat",
-            "app_usage": "app_usage",
-            "cap_query": "cap_query",
-            "ecoschemes_rates": "ecoschemes_rates",
-            "fallback_rejection": "fallback_rejection",
-            "report_generator": "report_generator",
-            "cap_document_inspector": "cap_document_inspector",
-            "cap_slot_guard": "cap_slot_guard",
-            "cap_application": "cap_application",
-        },
-    )
+    # Wire up the graph flow topology. The target map is derived from the intent
+    # registry (plus the clarify node), so it cannot drift from the classifier.
+    builder.add_conditional_edges(START, route_adapter, ROUTER_TARGETS)
 
     # Add terminal nodes
     builder.add_edge("basic_chat", END)
@@ -108,6 +125,7 @@ def build_graph() -> StateGraph[AgrIAState]:
     builder.add_edge("cap_query", END)
     builder.add_edge("ecoschemes_rates", END)
     builder.add_edge("fallback_rejection", END)
+    builder.add_edge("clarify", END)
 
     # Add non-terminal and conditional nodes
     builder.add_edge("report_generator", "validate_report")
@@ -137,11 +155,13 @@ def build_graph() -> StateGraph[AgrIAState]:
         {
             "cap_interruption": "cap_interruption",
             "cap_application": "cap_application",
+            "clear_cap_workflow": "clear_cap_workflow",
         },
     )
 
     builder.add_edge("cap_interruption", END)
     builder.add_edge("cap_application", END)
+    builder.add_edge("cap_form_status", END)
     builder.add_edge("clear_cap_workflow", END)
 
     return builder

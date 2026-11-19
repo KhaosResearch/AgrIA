@@ -1,10 +1,26 @@
+import json
+
 from langchain_core.messages import AIMessage
 
 from ...benchmark.vlm.constants import OG_CLASSIFICATION_FILEPATH
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
 from ...utils.chat_utils import get_recent_history
-from ...utils.nodes_utils import load_prompt_asset
+from ...utils.nodes_utils import load_prompt_asset, secondary_intent_block
+
+
+def _load_rates_context(lang: str) -> str:
+    """Load the eco-scheme rate table for the requested language only.
+
+    The full asset contains both EN and ES blocks (~11 KB). Injecting only the
+    relevant language halves the token cost and avoids the model mixing
+    languages in the output.
+    """
+    with open(OG_CLASSIFICATION_FILEPATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    lang_key = "ES" if lang == "es" else "EN"
+    entries = data.get(lang_key, [])
+    return json.dumps(entries, ensure_ascii=False, indent=2)
 
 
 def ecoschemes_rates_node(state: AgrIAState, client, model_name: str) -> dict:
@@ -16,15 +32,15 @@ def ecoschemes_rates_node(state: AgrIAState, client, model_name: str) -> dict:
     messages = state.get("messages", [])
     user_query = str(messages[-1].content) if messages else ""
 
-    # Retrieve ecoschemes classification information
-    with open(OG_CLASSIFICATION_FILEPATH, "r") as f:
-        retrieved_context = f.read()
+    # Retrieve ecoschemes classification information (language-filtered)
+    retrieved_context = _load_rates_context(lang)
 
     # Load System Instructions
     raw_instruction = load_prompt_asset("RATES.md")
     system_instruction = raw_instruction.replace(
         "{lang}", "Spanish" if lang == "es" else "English"
     )
+    system_instruction += secondary_intent_block(state)
 
     # Construct compact user payload
     user_payload = f"""

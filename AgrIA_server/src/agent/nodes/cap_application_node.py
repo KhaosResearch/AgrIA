@@ -19,7 +19,7 @@ from ...utils.cap_form_utils import (
     validate_application,
 )
 from ...utils.chat_utils import get_recent_history
-from ...utils.nodes_utils import load_prompt_asset
+from ...utils.nodes_utils import load_prompt_asset, secondary_intent_block
 
 logger = structlog.get_logger(__name__)
 
@@ -160,6 +160,7 @@ def cap_application_node(state: AgrIAState, client, model_name: str) -> Dict[str
     cap_form_instructions = f"Use the following example of cap form for plant cover ecoscheme application to guide the user. Use the corresponding headers and options on the form to help the user apply for all calculated ecoschemes on their parcel:\n\n<cap_form_example>\n{cap_form_example}\n<cap_form_example>"
 
     system_instruction = f"{raw_instruction}\n\n<classification>\n{_load_ecoscheme_classification()}\n</classification>\n\n{cap_form_instructions}"
+    system_instruction += secondary_intent_block(state)
 
     # The mapping and amounts are precomputed here: the LLM may only narrate
     # them, never recompute or adjust a figure.

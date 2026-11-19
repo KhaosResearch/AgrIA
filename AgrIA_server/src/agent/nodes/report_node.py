@@ -99,6 +99,7 @@ Please compile the agricultural report matching the template constraints using t
     update = {
         "messages": messages_update + [AIMessage(content=response_wrapper.text)],
         "correction_feedback": None,  # Reset feedback after every attempt
+        "report_retry_count": (state.get("report_retry_count") or 0) + 1,
     }
 
     if feedback is None or feedback == "PASSED":
