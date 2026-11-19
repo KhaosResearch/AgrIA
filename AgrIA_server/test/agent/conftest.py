@@ -92,10 +92,7 @@ La parcela identificada con referencia 26002A001000010000EQ cuenta con un área 
                     '{"intent": "ecoschemes_rates", "secondary_intent": '
                     '"cap_application", "confidence": 0.9}'
                 )
-            elif (
-                "ecorregímenes" in lowered
-                and "importes" in lowered
-            ):
+            elif "ecorregímenes" in lowered and "importes" in lowered:
                 mock_response.text = (
                     '{"intent": "ecoschemes_rates", "confidence": 0.98}'
                 )

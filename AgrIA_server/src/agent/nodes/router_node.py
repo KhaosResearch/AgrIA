@@ -121,7 +121,10 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> str:
         return "basic_chat"
 
     # Fast-Path 2: System tag check for report generation (both variants)
-    if "###DESCRIBE_SHORT_IMAGE###" in text_content or "###DESCRIBE_LONG_IMAGE###" in text_content:
+    if (
+        "###DESCRIBE_SHORT_IMAGE###" in text_content
+        or "###DESCRIBE_LONG_IMAGE###" in text_content
+    ):
         _log_routing("fast_path", "report_generator", 1.0)
         return "report_generator"
 
@@ -148,9 +151,7 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> str:
         primary = _valid_intent(data.get("intent"))
         if primary is None:
             # Unknown label: treat as a low-signal turn rather than a valid route.
-            _log_routing(
-                "llm_invalid", "basic_chat", None, raw=str(data.get("intent"))
-            )
+            _log_routing("llm_invalid", "basic_chat", None, raw=str(data.get("intent")))
             state["secondary_intent"] = None
             return "basic_chat"
 

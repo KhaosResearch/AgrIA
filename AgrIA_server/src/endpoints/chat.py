@@ -49,7 +49,11 @@ async def send_user_input(
         if userMessage is not None and len(userMessage) > 0:
             response_text = await _await_if_needed(
                 generate_user_response(
-                    userMessage, is_detailed_description, lang, file, filename,
+                    userMessage,
+                    is_detailed_description,
+                    lang,
+                    file,
+                    filename,
                     thread_id=thread_id,
                 )
             )
