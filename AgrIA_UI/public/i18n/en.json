@@ -55,6 +55,14 @@
       "interactiveSupport": {
         "title": "Interactive Support",
         "description": "Interact with AgrIA through chat and receive updated answers about your crops."
+      },
+      "ecoSchemeGuidance": {
+        "title": "Eco-scheme Guidance",
+        "description": "Get detailed information on the requirements, thresholds and payments of each CAP eco-scheme for your crop type."
+      },
+      "subsidyAssistance": {
+        "title": "Application Assistant",
+        "description": "Fill in your eco-scheme aid application step by step with AgrIA: save your progress, pause whenever you like and check your status at any time."
       }
     },
     "quickstart" : {
@@ -217,7 +225,7 @@
     },
     "chatWithAgria": {
       "title": "AgrIA",
-      "agriaMessage1": "Hello! I'm your Agricultural Image Assistant, but you can call me AgrIA! My purpose here is to analyze satellite images of cultivated fields to assist you...",
+      "agriaMessage1": "Hello! I'm your Agricultural Image Assistant, but you can call me AgrIA! My purpose here is to analyze satellite images of cultivated fields to assist you in analyzing your land use and resources, as well as agricultural practices, with the aim of advising you on meeting the requirements for Common Agricultural Policy (CAP) subsidies. I can help you analyze your parcel, look up CAP rules and eco-schemes, or fill in your aid application step by step.",
       "userMessage1": "Hello AgrIA, I have uploaded an image of my field in parcel 34. Could you analyze water usage?",
       "agriaMessage2": "Of course, I have analyzed the image of parcel 34. It seems there are areas with a low vegetation index that could indicate inefficient water use. I suggest...",
       "inputPlaceholder": "Write your question or comment here...",
@@ -230,7 +238,16 @@
       "sendButtonTitle": "Send prompt.",
       "getSuggestionButton": "Get Suggestion",
       "getSuggestionButtonTitle": "Get a suggested prompt from the reply.",
-      "detailedImageDescription": "Detailed image description."
+      "detailedImageDescription": "Detailed image description.",
+      "capHint": "You can ask me about eco-schemes, CAP rules, or ask me to help you fill in your aid application.",
+      "showFormButton": "My application",
+      "showFormButtonTitle": "View the status of your aid application.",
+      "pauseFormButton": "Pause",
+      "pauseFormButtonTitle": "Pause filling in your application.",
+      "cancelFormButton": "Cancel",
+      "cancelFormButtonTitle": "Cancel and clear your application.",
+      "capToggle": "Eco-scheme application help",
+      "capActionsTitle": "Use these buttons to get help with an Eco-scheme aid application"
     },
     "navigationButton": {
       "title": "Navigate to parcel finder view.",

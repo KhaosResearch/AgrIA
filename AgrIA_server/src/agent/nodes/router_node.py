@@ -3,6 +3,8 @@ import structlog
 
 from typing import Literal
 
+from langchain_core.messages import AIMessage
+
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState, INTENT_REGISTRY
 from ...utils.chat_utils import get_recent_history
@@ -128,6 +130,18 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> str:
         _log_routing("fast_path", "report_generator", 1.0)
         return "report_generator"
 
+    # Fast-Path 3: CAP workflow command tags (injected by UI action buttons)
+    # These bypass the LLM classifier entirely for deterministic routing.
+    if "###CAP_STATUS###" in text_content:
+        _log_routing("fast_path", "cap_form_status", 1.0)
+        return "cap_form_status"
+    if "###CAP_PAUSE###" in text_content:
+        _log_routing("fast_path", "cap_slot_guard", 1.0)
+        return "cap_slot_guard"
+    if "###CAP_CANCEL###" in text_content:
+        _log_routing("fast_path", "clear_cap_workflow", 1.0)
+        return "clear_cap_workflow"
+
     # Fallback: LLM Intent Classifier
     try:
         system_instruction = load_prompt_asset("INTENT.md")
@@ -185,13 +199,29 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> str:
 
 
 def clear_cap_workflow(state: AgrIAState) -> dict:
-    """LangGraph Node: drop a CAP workflow when the farmer changes topic.
+    """LangGraph Node: drop a CAP workflow when the farmer cancels or changes topic.
 
-    Replaces the previous in-place `state["pending_action"] = None`, which never
-    reached the checkpointer and so could not actually resume or clear anything.
+    Clears all CAP workflow state (form data, pending action, alignment, rates)
+    and generates a confirmation message so the user knows the application was
+    cancelled. The farmer can start a new application at any time.
     """
+    lang = state.get("lang", "es")
     logger.info("cap_workflow_cleared", pending_action=state.get("pending_action"))
-    return {"pending_action": None, "cap_workflow": None, "cap_alignment": None}
+    confirmation = (
+        "Tu solicitud de ecorregímenes ha sido cancelada. "
+        "Puedes comenzar una nueva solicitud cuando quieras."
+        if lang == "es"
+        else "Your eco-scheme application has been cancelled. "
+        "You can start a new application whenever you like."
+    )
+    return {
+        "pending_action": None,
+        "cap_workflow": None,
+        "cap_alignment": None,
+        "cap_form_data": None,
+        "cap_rates": None,
+        "messages": [AIMessage(content=confirmation)],
+    }
 
 
 def cap_guard_edge(state: AgrIAState) -> str:
