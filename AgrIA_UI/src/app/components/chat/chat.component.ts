@@ -261,7 +261,9 @@ export class ChatComponent {
 
   /**
    * Sends a CAP workflow command (status, pause, cancel) to the assistant.
-   * Uses a localized prompt so the backend intent classifier routes correctly.
+   * Injects a routing tag (###CAP_*###) so the backend fast-path routes
+   * deterministically without an LLM classifier call. The tag is sent to
+   * the backend; the user sees a human-readable label in the bubble.
    *
    * @param command - One of 'status', 'pause', 'cancel'
    */
@@ -271,22 +273,37 @@ export class ChatComponent {
       return;
     }
     const lang = this.translateService.currentLang;
-    const prompts: Record<string, Record<string, string>> = {
+    const commands: Record<string, { tag: string; display: Record<string, string> }> = {
       status: {
-        es: 'Muéstrame el estado de mi solicitud',
-        en: 'Show me the status of my application',
+        tag: '###CAP_STATUS###',
+        display: {
+          es: 'Muéstrame el estado de mi solicitud',
+          en: 'Show me the status of my application',
+        },
       },
       pause: {
-        es: 'Pausa',
-        en: 'Pause',
+        tag: '###CAP_PAUSE###',
+        display: {
+          es: 'Pausa mi solicitud',
+          en: 'Pause my application',
+        },
       },
       cancel: {
-        es: 'Cancela mi solicitud',
-        en: 'Cancel my application',
+        tag: '###CAP_CANCEL###',
+        display: {
+          es: 'Cancela mi solicitud',
+          en: 'Cancel my application',
+        },
       },
     };
-    const prompt = prompts[command]?.[lang] ?? prompts[command]?.['en'] ?? command;
-    this.chatAssistant.addUserMessage(prompt, null, false);
+    const cmd = commands[command];
+    if (!cmd) {
+      console.warn(`Unknown CAP command: ${command}`);
+      return;
+    }
+    const display = cmd.display[lang] ?? cmd.display['en'];
+    // Tag goes to the backend (fast-path routing); display goes to the bubble.
+    this.chatAssistant.addUserMessage(cmd.tag, null, false, display);
   }
 
   /**
