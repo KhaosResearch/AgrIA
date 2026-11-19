@@ -260,6 +260,36 @@ export class ChatComponent {
   }
 
   /**
+   * Sends a CAP workflow command (status, pause, cancel) to the assistant.
+   * Uses a localized prompt so the backend intent classifier routes correctly.
+   *
+   * @param command - One of 'status', 'pause', 'cancel'
+   */
+  public sendCapCommand(command: string): void {
+    if (this.isAssistantLoading()) {
+      console.warn('Cannot send CAP command: Assistant is loading a response.');
+      return;
+    }
+    const lang = this.translateService.currentLang;
+    const prompts: Record<string, Record<string, string>> = {
+      status: {
+        es: 'Muéstrame el estado de mi solicitud',
+        en: 'Show me the status of my application',
+      },
+      pause: {
+        es: 'Pausa',
+        en: 'Pause',
+      },
+      cancel: {
+        es: 'Cancela mi solicitud',
+        en: 'Cancel my application',
+      },
+    };
+    const prompt = prompts[command]?.[lang] ?? prompts[command]?.['en'] ?? command;
+    this.chatAssistant.addUserMessage(prompt, null, false);
+  }
+
+  /**
    * Reroute to parcel finder form view
    *
    */
