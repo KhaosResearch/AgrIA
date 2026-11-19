@@ -274,12 +274,15 @@ class TestRouterPrecedence:
         assert deterministic_router(state, MagicMock(), "m") == "cap_slot_guard"
 
     def test_pending_cap_doc_pdf_goes_to_inspector(self):
+        # AWAITING_CAP_DOC is no longer a fast-path: the LLM classifier handles
+        # document-related messages. The mock returns basic_chat for this input.
         state = _state("aqui va mi documento pdf", pending_action="AWAITING_CAP_DOC")
-        assert deterministic_router(state, MagicMock(), "m") == "cap_document_inspector"
+        assert deterministic_router(state, MagicMock(), "m") == "basic_chat"
 
     def test_pending_cap_doc_other_reply_goes_to_application(self):
+        # Same: no longer a deterministic fast-path, falls through to LLM router.
         state = _state("no lo tengo", pending_action="AWAITING_CAP_DOC")
-        assert deterministic_router(state, MagicMock(), "m") == "cap_application"
+        assert deterministic_router(state, MagicMock(), "m") == "basic_chat"
 
     def test_clear_cap_workflow_resets_state(self):
         state = _state(
@@ -290,6 +293,85 @@ class TestRouterPrecedence:
             "cap_workflow": None,
             "cap_alignment": None,
         }
+
+
+class TestCapGuardEdge:
+    """cap_guard_edge routes cancel to clear_cap_workflow (B4 fix)."""
+
+    def test_cancel_routes_to_clear_cap_workflow(self):
+        from src.agent.nodes.router_node import cap_guard_edge
+
+        state = _state(
+            "cancela",
+            cap_alignment={"classification": "cancel"},
+            pending_action="AWAITING_SLOT:beneficiary.iban",
+        )
+        assert cap_guard_edge(state) == "clear_cap_workflow"
+
+    def test_pause_routes_to_interruption(self):
+        from src.agent.nodes.router_node import cap_guard_edge
+
+        state = _state(
+            "pausa",
+            cap_alignment={"classification": "pause"},
+            pending_action="AWAITING_SLOT:beneficiary.iban",
+        )
+        assert cap_guard_edge(state) == "cap_interruption"
+
+    def test_topic_change_routes_to_interruption(self):
+        from src.agent.nodes.router_node import cap_guard_edge
+
+        state = _state(
+            "hola, ¿qué tal el tiempo?",
+            cap_alignment={"classification": "topic_change"},
+            pending_action="AWAITING_SLOT:beneficiary.iban",
+        )
+        assert cap_guard_edge(state) == "cap_interruption"
+
+    def test_answer_routes_to_application(self):
+        from src.agent.nodes.router_node import cap_guard_edge
+
+        state = _state(
+            "ES91 2100 0418 4502 0005 1332",
+            cap_alignment={"classification": "answer"},
+            pending_action="AWAITING_SLOT:beneficiary.iban",
+        )
+        assert cap_guard_edge(state) == "cap_application"
+
+
+class TestReportRetryBound:
+    """B1: the report validation loop must terminate after MAX_REPORT_RETRIES."""
+
+    def test_first_failure_loops_back(self):
+        from src.agent.nodes.validation_node import evaluation_router_edge
+
+        state = _state(
+            "###DESCRIBE_SHORT_IMAGE###",
+            correction_feedback="CRITICAL CORRECTION REQUIRED:\n- Missing table",
+            report_retry_count=1,
+        )
+        assert evaluation_router_edge(state) == "report_generator"
+
+    def test_second_failure_loops_back(self):
+        from src.agent.nodes.validation_node import evaluation_router_edge
+
+        state = _state(
+            "###DESCRIBE_SHORT_IMAGE###",
+            correction_feedback="CRITICAL CORRECTION REQUIRED:\n- Missing table",
+            report_retry_count=2,
+        )
+        # retry_count becomes 3, which is > MAX_REPORT_RETRIES (2)
+        assert evaluation_router_edge(state) == "__end__"
+
+    def test_passed_exits_immediately(self):
+        from src.agent.nodes.validation_node import evaluation_router_edge
+
+        state = _state(
+            "###DESCRIBE_SHORT_IMAGE###",
+            correction_feedback="PASSED",
+            report_retry_count=0,
+        )
+        assert evaluation_router_edge(state) == "__end__"
 
 
 class TestApplicationNode:
