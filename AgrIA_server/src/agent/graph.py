@@ -23,6 +23,7 @@ from .nodes.validation_node import validate_report_node, evaluation_router_edge
 from .nodes.cap_document_inspector_node import cap_document_inspector_node
 from .nodes.cap_slot_guard_node import cap_slot_guard_node
 from .nodes.cap_application_node import cap_application_node
+from .nodes.cap_form_status_node import cap_form_status_node
 
 logger = structlog.get_logger(__file__)
 
@@ -112,6 +113,7 @@ def build_graph() -> StateGraph[AgrIAState]:
     )
     builder.add_node("clear_cap_workflow", clear_cap_workflow)
     builder.add_node("clarify", clarify_node)
+    builder.add_node("cap_form_status", cap_form_status_node)
 
     # Wire up the graph flow topology. The target map is derived from the intent
     # registry (plus the clarify node), so it cannot drift from the classifier.
@@ -159,6 +161,7 @@ def build_graph() -> StateGraph[AgrIAState]:
 
     builder.add_edge("cap_interruption", END)
     builder.add_edge("cap_application", END)
+    builder.add_edge("cap_form_status", END)
     builder.add_edge("clear_cap_workflow", END)
 
     return builder

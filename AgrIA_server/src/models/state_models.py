@@ -39,6 +39,7 @@ INTENT_REGISTRY: frozenset[str] = frozenset(
         "cap_document_inspector",
         "cap_slot_guard",
         "cap_application",
+        "cap_form_status",
     }
 )
 

@@ -161,6 +161,27 @@ def _emulate_classifier(case: dict, text: str) -> dict:
             "confidence": 0.95,
             "reason": "emulated: application",
         }
+    # 4b. Form status: reviewing progress without new data
+    if any(
+        k in t
+        for k in (
+            "qué llevo",
+            "que llevo",
+            "muéstrame mi solicitud",
+            "muestra mi solicitud",
+            "estado de mi",
+            "en qué punto",
+            "en que punto",
+            "show me my form",
+            "what have i filled",
+        )
+    ):
+        return {
+            "next_node": "cap_form_status",
+            "intents": ["cap_form_status"],
+            "confidence": 0.95,
+            "reason": "emulated: form status",
+        }
     # 5. Document extraction
     if any(
         k in t

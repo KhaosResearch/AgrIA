@@ -505,3 +505,59 @@ class TestApplicationNode:
         )
         assert result["cap_alignment"] is None
         assert result["cap_form_data"]["beneficiary.nif_cif"] == "12345678Z"
+
+
+class TestCapFormStatus:
+    """C5: the farmer can inspect their own form progress (no LLM)."""
+
+    def test_empty_form_shows_start_message(self):
+        from src.agent.nodes.cap_form_status_node import cap_form_status_node
+
+        state = _state("¿qué llevo?", cap_form_data=None, cap_workflow="none")
+        result = cap_form_status_node(state)
+        assert "no has iniciado" in result["messages"][0].content
+        assert result["secondary_intent"] is None
+
+    def test_partial_form_lists_collected_fields(self):
+        from src.agent.nodes.cap_form_status_node import cap_form_status_node
+
+        state = _state(
+            "¿qué llevo?",
+            cap_form_data={"beneficiary.nif_cif": "12345678Z", "beneficiary.full_name": "Ana"},
+            pending_action="AWAITING_SLOT:beneficiary.iban",
+            cap_workflow="collect",
+        )
+        result = cap_form_status_node(state)
+        content = result["messages"][0].content
+        assert "12345678Z" in content
+        assert "Ana" in content
+        assert "Pendiente" in content or "Outstanding" in content
+        assert "IBAN" in content
+
+    def test_ready_form_shows_complete_status(self):
+        from src.agent.nodes.cap_form_status_node import cap_form_status_node
+
+        state = _state(
+            "estado",
+            cap_form_data={"beneficiary.nif_cif": "12345678Z"},
+            pending_action=None,
+            cap_workflow="ready",
+        )
+        result = cap_form_status_node(state)
+        content = result["messages"][0].content
+        assert "lista para enviar" in content or "ready to submit" in content
+
+    def test_no_state_mutation(self):
+        from src.agent.nodes.cap_form_status_node import cap_form_status_node
+
+        state = _state(
+            "¿qué llevo?",
+            cap_form_data={"beneficiary.nif_cif": "12345678Z"},
+            pending_action="AWAITING_SLOT:beneficiary.full_name",
+            cap_workflow="collect",
+        )
+        result = cap_form_status_node(state)
+        # The node must not clear pending_action or mutate form data.
+        assert "pending_action" not in result
+        assert "cap_form_data" not in result
+        assert "cap_workflow" not in result
