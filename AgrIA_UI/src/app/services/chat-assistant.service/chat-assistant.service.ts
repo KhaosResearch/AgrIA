@@ -12,7 +12,8 @@ export class ChatAssistantService {
 
   constructor(private http: HttpClient) {}
 
-  public sendUserInput(request: FormData): Observable<string> {
+  public sendUserInput(request: FormData, threadId: string): Observable<string> {
+    request.append('thread_id', threadId);
     return this.http.post<{ response: string }>(`${this.apiUrl}/send-user-input`, request).pipe(map(res => res.response));
   }
 
