@@ -1,7 +1,8 @@
 import os
-import structlog
 
+import structlog
 from dotenv import load_dotenv
+
 from .constants import SEN2SR_SR_DIR
 
 os.environ["SEN2SR_OUTPUT_DIR"] = str(
@@ -21,6 +22,7 @@ LLM_MODEL_NAME = os.environ.get("LLM_MODEL_NAME", None)
 VLM_BASE_URL = os.environ.get("VLM_BASE_URL", None)
 VLM_API_KEY = os.environ.get("VLM_API_KEY", None)
 VLM_MODEL_NAME = os.environ.get("VLM_MODEL_NAME", None)
+IS_VLM_TEXT_ONLY = os.environ.get("IS_VLM_TEXT_ONLY", None)
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", None)
 

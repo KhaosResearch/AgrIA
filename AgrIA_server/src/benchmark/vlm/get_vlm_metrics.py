@@ -1,23 +1,25 @@
 # Setup VLM
 import base64
-from collections import defaultdict
 import json
 import os
-import pandas as pd
-import structlog
 import time
-
+from collections import defaultdict
 from datetime import datetime, timedelta
-from langchain_core.messages import HumanMessage, SystemMessage
 from pathlib import Path
 
-from ..sr.utils import copy_file_to_dir
+import pandas as pd
+import structlog
+from langchain_core.messages import HumanMessage, SystemMessage
+from sen2sr_tools.constants import GEOJSON_FILEPATH
+from sigpac_tools.find import find_from_cadastral_registry
+
 from ...config.constants import SEN2SR_SR_DIR, TEMP_DIR
 from ...config.llm_client import client
+from ...services.ecoscheme_payments.main import get_ecoscheme_payments_data
 from ...services.parcel_finder_service import download_sen2sr_parcel_image
 from ...utils.chat_utils import generate_image_context_data
 from ...utils.parcel_finder_utils import reset_dir
-
+from ..sr.utils import copy_file_to_dir
 from .constants import (
     BM_JSON_DIR,
     BM_LLM_DIR,
@@ -26,15 +28,11 @@ from .constants import (
     DATES_PAPER,
     FULL_DESC_SYS_INSTR_EN,
     FULL_DESC_SYS_INSTR_ES,
-    USE_PAPER_DATA,
     LANG,
+    USE_PAPER_DATA,
 )
-from ...services.ecoscheme_payments.main import calculate_ecoscheme_payment
 from .llm_setup import generate_system_instructions
 from .utils import n_random_dates_between
-
-from sen2sr_tools.constants import GEOJSON_FILEPATH
-from sigpac_tools.find import find_from_cadastral_registry
 
 SLEEP_SECONDS = 60
 
@@ -83,8 +81,10 @@ def init():
 
 
 def setup_ndates(
-    n_dates: int, to_date: datetime = datetime.today(), delta_days: int = 4 * 365
+    n_dates: int, to_date: datetime | None = None, delta_days: int = 4 * 365
 ):
+    if to_date is None:
+        to_date = datetime.now()
     # Get all parcel descriptions
     from_date = to_date - timedelta(days=delta_days)
     dates = n_random_dates_between(
@@ -155,7 +155,7 @@ def get_llm_full_desc(
     if not lang:
         lang = LANG
 
-    json_data = calculate_ecoscheme_payment(parcel_desc, lang)
+    json_data = get_ecoscheme_payments_data(parcel_desc, lang)
 
     prompt_en = f"Produce a full English parcel description with the following information. Combine it with the image for a 700-character max description:\n\n{json_data}"
     desc_en = "The satellite image displays a **31.18-hectare** agricultural parcel dominated by **dry, reddish-brown tones**, indicative of **low vegetation cover** or recently worked soil, typical of Mediterranean woody crops or extensive grazing lands. This visual assessment directly correlates with the digital land use analysis. The largest area, **Olive Groves (OV)**, accounts for **30.72 ha** and has been assigned to the Eco-scheme **P6/P7 (Plant Cover)**, based on the highest payment/ha. A smaller portion of **Shrub Pastures (PR)**, **0.36 ha**, is assigned to **P1 (Extensive Grazing)**.The overall low vegetation signal in the image is consistent with the extensive farming practices suggested by the two applicable Eco-schemes, particularly the large area of OV allocated to the P6/P7 scheme using the Tier 2 rate."
@@ -164,7 +164,7 @@ def get_llm_full_desc(
     )
     prompt_es = f"Genera una descripción completa de la parcela en Español con la siguiente información. Combínala con la imagen para la descripción de 700 caracteres máximo:\n\n{json_data}"
     desc_es = "La imagen satélite muestra una parcela agrícola de **31.18 ha**, dominada por **tonos rojizos, marrones y secos**, indicativo de **poca cobertura vegetal** o terreno trabajado recientemente, típico de cultivos leñosos mediterráneos o de tierras de pastoreo extensivo. La evaluación visual se correlaciona direcatmente con el análisi digital del uso de la tierra. El área más grande, **Olivares (OV)**, abarca **30.72 ha** y ha sido asignaco al Ecorrégimen **P6/P7 (Cobertura Vegetal)**, debido a tener el importe pago/ha más alto. Un pequeña porción de **Pasto Arbustivo (PA)**, **0.36 ha**, ha sido asignada a **P1 (Pastoreo Extensivo)**. La baja señal de vegetación en general en la imagen is consistente con las prácticas agrícolas extensivas sugeridas en estos dos Ecorregímenes aplicables, particularmente, el área más grande de OV que se ha asignado a P6/P7 usando importes del Tramo 2."
-    prompt_es += f'\n\Este es un ejemplo de la la descripción de 700 caracteres máximo:\n"{desc_es}"'
+    prompt_es += f'\n\\Este es un ejemplo de la la descripción de 700 caracteres máximo:\n"{desc_es}"'
     prompt = f"Describe the parcels based on the following information and image:\n\n{parcel_desc}"
 
     prompt = prompt_en if lang == "en" else prompt_es if lang == "es" else prompt
@@ -457,8 +457,8 @@ def demo():
 
         run_vlm_benchmark(use_paper_data=True)
 
-    except Exception as e:
-        logger.exception(f"Error during VLM metrics collection:\nEXCEPTION:\t{e}")
+    except Exception:
+        logger.exception("Error during VLM metrics collection:\nEXCEPTION:\t")
     finally:
         logger.info(f"TIMES:\n{dict(times)}")
         times_filepath = BM_JSON_DIR / "times.json"

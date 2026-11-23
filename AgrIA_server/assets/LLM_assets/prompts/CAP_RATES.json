@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0.0",
+  "updated": "2026-10-05",
+  "campaign": "CAP 2026 eco-schemes, Spain",
+  "note": "Explicit EUR/ha rates. Amounts are only ever computed from this table; a missing key means the corresponding amount is not reported rather than guessed.",
+  "source_documents": [
+    "assets/LLM_assets/context/files/230306_pmf4-ecorregimenes_v4.md"
+  ],
+  "rates": {
+    "unit_rate_eur_ha": null,
+    "practice_rate_eur_ha": null,
+    "multiannual_bonus_eur_ha": 25.0
+  },
+  "rate_notes_es": {
+    "unit_rate_eur_ha": "Tarifa basica por hectarea de la ayuda base. Sin valor publicado en los documentos de referencia: debe cargarse por el administrador.",
+    "practice_rate_eur_ha": "Tarifa por hectarea de la practica de eco regimen (Siembra Directa P4 / Cubiertas Vegetales P6). Sin valor publicado: debe cargarse por el administrador.",
+    "multiannual_bonus_eur_ha": "Complemento de plurianualidad por mantener la misma practica durante dos anos consecutivos."
+  },
+  "rate_notes_en": {
+    "unit_rate_eur_ha": "Base aid rate per hectare. No published figure in the reference documents: must be supplied by an administrator.",
+    "practice_rate_eur_ha": "Eco-scheme practice rate per hectare. No published figure: must be supplied by an administrator.",
+    "multiannual_bonus_eur_ha": "Multi-year bonus for keeping the same practice on the same parcel for two consecutive years."
+  }
+}

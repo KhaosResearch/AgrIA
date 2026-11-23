@@ -1,0 +1,407 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SolicitudUnicaPAC",
+  "description": "JSON Schema extracted from Solicitud Única document (Junta de Andalucía)",
+  "type": "object",
+  "properties": {
+    "cabecera": {
+      "type": "object",
+      "properties": {
+        "organismo": { "type": "string", "default": "JUNTA DE ANDALUCIA - Consejería de Agricultura, Pesca, Agua y Desarrollo Rural" },
+        "codigos_procedimiento": { "type": "array", "items": { "type": "string" }, "default": ["8318", "7058", "25231", "25232"] },
+        "campana": { "type": "string", "default": "2024" },
+        "numero_inscripcion": { "type": "string", "default": "005236/1" }
+      }
+    },
+    "datos_generales": {
+      "type": "object",
+      "properties": {
+        "datos_identificativos": {
+          "type": "object",
+          "properties": {
+            "numero_solicitud": { "type": "string" },
+            "numero_expediente": { "type": "string" },
+            "comunidad_autonoma": { "type": "string", "default": "Andalucía" },
+            "provincia": { "type": "string" },
+            "fecha_registro": { "type": "string", "format": "date" },
+            "num_exp_campana_anterior": { "type": "string" },
+            "cod_explotacion": { "type": "string" }
+          }
+        },
+        "datos_personales_solicitante": {
+          "type": "object",
+          "properties": {
+            "cif_nif": { "type": "string" },
+            "nombre_razon_social": { "type": "string" },
+            "primer_apellido": { "type": "string" },
+            "segundo_apellido": { "type": "string" },
+            "f_nacimiento": { "type": "string", "format": "date" },
+            "genero": { "type": "string" },
+            "estado_civil": { "type": "string" },
+            "regimen_matrimonial": { "type": "string" },
+            "telefono": { "type": "string" },
+            "movil": { "type": "string" },
+            "email": { "type": "string", "format": "email" }
+          }
+        },
+        "comunicacion_correo_electronico_sms": {
+          "type": "object",
+          "properties": {
+            "autorizacion_sms": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string", "default": "Autorización a la Administración para enviar información mediante SMS." },
+                "selected": { "type": "boolean", "default": true }
+              }
+            },
+            "autorizacion_email": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string", "default": "Autorización a la Administración para enviar información mediante correo electrónico." },
+                "selected": { "type": "boolean", "default": true }
+              }
+            }
+          }
+        },
+        "titularidad_compartida": {
+          "type": "object",
+          "properties": {
+            "titularidad_compartida": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string", "default": "Titularidad compartida" },
+                "selected": { "type": "boolean", "default": false }
+              }
+            }
+          }
+        },
+        "conyuge": {
+          "type": "object",
+          "properties": {
+            "cif_nif": { "type": "string" },
+            "nombre": { "type": "string" },
+            "primer_apellido": { "type": "string" },
+            "segundo_apellido": { "type": "string" },
+            "genero": { "type": "string" },
+            "regimen_matrimonial": { "type": "string" },
+            "f_nacimiento": { "type": "string", "format": "date" }
+          }
+        },
+        "representante": {
+          "type": "object",
+          "properties": {
+            "cif_nif": { "type": "string" },
+            "nombre": { "type": "string" },
+            "primer_apellido": { "type": "string" },
+            "segundo_apellido": { "type": "string" },
+            "genero": { "type": "string" },
+            "f_nacimiento": { "type": "string", "format": "date" },
+            "movil": { "type": "string" },
+            "email": { "type": "string" }
+          }
+        },
+        "direccion_notificacion": {
+          "type": "object",
+          "properties": {
+            "tipo_via": { "type": "string" },
+            "nombre_via": { "type": "string" },
+            "numero": { "type": "string", "default": "9" },
+            "bloque": { "type": "string" },
+            "portal": { "type": "string" },
+            "escalera": { "type": "string" },
+            "planta": { "type": "string", "default": "5º" },
+            "puerta": { "type": "string", "default": "C" },
+            "km": { "type": "string" },
+            "provincia": { "type": "string" },
+            "municipio": { "type": "string" },
+            "codigo_postal": { "type": "string" },
+            "localidad": { "type": "string" },
+            "apartado_correos": { "type": "string" },
+            "oficina_correos": { "type": "string" }
+          }
+        },
+        "direccion_residencia_igual_notificacion": {
+          "type": "object",
+          "properties": {
+            "domicilio_igual": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string", "default": "Domicilio de residencia igual al de notificación." },
+                "selected": { "type": "boolean", "default": true }
+              }
+            }
+          }
+        }
+      }
+    },
+    "datos_bancarios": {
+      "type": "object",
+      "properties": {
+        "iban": { "type": "string" },
+        "entidad": { "type": "string" },
+        "sucursal": { "type": "string" },
+        "dc": { "type": "string" }
+      }
+    },
+    "datos_fiscales_solicitante": {
+      "type": "object",
+      "properties": {
+        "incorporacion_actividad_agraria": {
+          "type": "object",
+          "properties": {
+            "label": { "type": "string", "default": "Solicitante que se incorpora a la actividad agraria" },
+            "selected": { "type": "boolean", "default": false }
+          }
+        },
+        "forma_juridica": { "type": "string", "default": "Persona física" },
+        "ingresos_agrarios_2023": { "type": "string" },
+        "ingresos_agrarios_2022": { "type": "string" },
+        "ingresos_agrarios_2021": { "type": "string" },
+        "ingresos_totales_2023": { "type": "string" },
+        "ingresos_totales_2022": { "type": "string" },
+        "ingresos_totales_2021": { "type": "string" },
+        "cif_nif_integradora_ganado": { "type": "string" },
+        "costes_laborales_pagados": { "type": "string" }
+      }
+    },
+    "solicita": {
+      "type": "object",
+      "properties": {
+        "solicitud_unica": {
+          "type": "object",
+          "properties": {
+            "ayuda_basica_renta_sostenibilidad": { "type": "boolean", "default": true },
+            "ayuda_complementaria_redistributiva": { "type": "boolean", "default": true },
+            "ayuda_complementaria_jovenes_agricultores": { "type": "boolean", "default": false },
+            "pagos_directos_asociados_agricultores": {
+              "type": "object",
+              "properties": {
+                "proteinas_origen_vegetal": { "type": "boolean", "default": false },
+                "arroz": { "type": "boolean", "default": false },
+                "remolacha_azucarera": { "type": "boolean", "default": false },
+                "tomate_transformacion": { "type": "boolean", "default": false },
+                "frutos_secos_riesgo_desertificacion": { "type": "boolean", "default": false },
+                "uva_pasa": { "type": "boolean", "default": false },
+                "olivar_dificultades_especificas": { "type": "boolean", "default": false },
+                "pago_especifico_algodon": { "type": "boolean", "default": false }
+              }
+            },
+            "pagos_directos_asociados_ganaderos": {
+              "type": "object",
+              "properties": {
+                "vacuno_carne_extensivo": { "type": "boolean", "default": false },
+                "engorde_terneros_explotacion_nacimiento": { "type": "boolean", "default": false },
+                "engorde_sostenible_terneros": { "type": "boolean", "default": false },
+                "produccion_sostenible_leche_vaca": { "type": "boolean", "default": false },
+                "ovino_caprino_carne": { "type": "boolean", "default": false },
+                "produccion_sostenible_leche_oveja_cabra": { "type": "boolean", "default": false },
+                "ovino_caprino_sin_pastos": { "type": "boolean", "default": false }
+              }
+            },
+            "eco_regimenes": {
+              "type": "object",
+              "properties": {
+                "agricultura_carbono_pastos": {
+                  "type": "object",
+                  "properties": {
+                    "selected": { "type": "boolean", "default": false },
+                    "pastoreo_extensivo": { "type": "boolean", "default": false },
+                    "siega_sostenible": { "type": "boolean", "default": false },
+                    "islas_biodiversidad_pastos": { "type": "boolean", "default": false }
+                  }
+                },
+                "agricultura_carbono_tierras_cultivo": {
+                  "type": "object",
+                  "properties": {
+                    "selected": { "type": "boolean", "default": false },
+                    "rotacion_cultivos_especies_mejorantes": { "type": "boolean", "default": false },
+                    "siembra_directa": { "type": "boolean", "default": false }
+                  }
+                },
+                "agricultura_carbono_cultivos_lenosos": {
+                  "type": "object",
+                  "properties": {
+                    "selected": { "type": "boolean", "default": true },
+                    "cubierta_vegetal_espontanea_sembrada": { "type": "boolean", "default": true },
+                    "cubierta_inerte_restos_poda": { "type": "boolean", "default": false }
+                  }
+                },
+                "agroecologia_espacios_biodiversidad": {
+                  "type": "object",
+                  "properties": {
+                    "selected": { "type": "boolean", "default": false },
+                    "espacios_biodiversidad": { "type": "boolean", "default": false },
+                    "nivelacion_anual_terreno": { "type": "boolean", "default": false },
+                    "siembra_en_seco_inundacion": { "type": "boolean", "default": false },
+                    "secas_intermitentes": { "type": "boolean", "default": false },
+                    "construccion_caballones": { "type": "boolean", "default": false }
+                  }
+                }
+              }
+            },
+            "solicitudes_desarrollo_rural_feader": {
+              "type": "object",
+              "properties": {
+                "comunidades_autonomas": {
+                  "type": "object",
+                  "properties": {
+                    "andalucia": { "type": "boolean", "default": false },
+                    "aragon": { "type": "boolean", "default": false },
+                    "asturias": { "type": "boolean", "default": false },
+                    "islas_baleares": { "type": "boolean", "default": false },
+                    "canarias": { "type": "boolean", "default": false },
+                    "cantabria": { "type": "boolean", "default": false },
+                    "castilla_la_mancha": { "type": "boolean", "default": false },
+                    "castilla_y_leon": { "type": "boolean", "default": false },
+                    "cataluna": { "type": "boolean", "default": false },
+                    "extremadura": { "type": "boolean", "default": false },
+                    "galicia": { "type": "boolean", "default": false },
+                    "madrid": { "type": "boolean", "default": false },
+                    "murcia": { "type": "boolean", "default": false },
+                    "navarra": { "type": "boolean", "default": false },
+                    "pais_vasco": { "type": "boolean", "default": false },
+                    "la_rioja": { "type": "boolean", "default": false },
+                    "c_valenciana": { "type": "boolean", "default": false }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "datos_de_derechos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "origen": { "type": "string" },
+          "porcentaje_derecho": { "type": "string" },
+          "zona_reg": { "type": "string" },
+          "valor_nominal": { "type": "string" },
+          "solicita": { "type": "string", "default": "" },
+          "tipo_de_derecho": { "type": "string", "default": "" },
+          "valor_real": { "type": "string", "default": "" }
+        }
+      }
+    },
+    "declaraciones_especificas_y_compromisos": {
+      "type": "object",
+      "properties": {
+        "socios_jovenes_encuesta": { "type": "boolean", "default": false },
+        "bcam_8_1_prohibicion_fitosanitarios": { "type": "boolean", "default": false },
+        "variedades_modificadas_geneticamente": {
+          "type": "object",
+          "properties": {
+            "afirma_conocer_normativa": { "type": "boolean", "default": false }
+          }
+        },
+        "venta_producciones_agricolas": {
+          "type": "object",
+          "properties": {
+            "venta_directa_o_canal_corto": { "type": "boolean", "default": false },
+            "no_venta_directa_o_canal_corto": { "type": "boolean", "default": false },
+            "destino_consumo_domestico_o_ganado_sin_venta": { "type": "boolean", "default": true }
+          }
+        },
+        "declaraciones_especificas_ayudas_sectoriales": {
+          "type": "object",
+          "properties": {
+            "ayuda_tomate_industria": { "type": "boolean", "default": false },
+            "ayuda_cultivos_proteicos": { "type": "boolean", "default": false },
+            "existencias_arroz": {
+              "type": "object",
+              "properties": {
+                "si_posee": { "type": "boolean", "default": false },
+                "no_posee": { "type": "boolean", "default": false }
+              }
+            },
+            "concesion_agua_regadio": { "type": "boolean", "default": false },
+            "fitosanitarios_islas_biodiversidad": { "type": "boolean", "default": false },
+            "fitosanitarios_fertilizantes_espacios_biodiversidad": { "type": "boolean", "default": false },
+            "fitosanitarios_cubiertas_vegetales_inertes": { "type": "boolean", "default": true }
+          }
+        },
+        "cuaderno_digital_explotacion": { "type": "boolean", "default": false }
+      }
+    },
+    "autorizaciones": {
+      "type": "object",
+      "properties": {
+        "datos_aeat_agricultor_activo": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "costes_laborales_inss": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "vida_laboral_tgss": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "verificacion_identidad_dgp": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "entrada_controladores_explotacion": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "datos_catastrales_ovc": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "sistema_giro_hacienda": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "contratos_empresa_azucarera": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "contratos_industria_tomate": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "contratos_desmotadora_algodon": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "ventas_leche_bovino": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "entregas_leche_ovino_caprino": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "ventas_directas_compradores": { "type": "object", "properties": { "autoriza": { "type": "boolean", "default": true }, "se_opone": { "type": "boolean", "default": false } } },
+        "notificacion_electronica_notifica": { "type": "boolean", "default": false }
+      }
+    },
+    "declaracion_responsable_agricultor_activo": {
+      "type": "object",
+      "properties": {
+        "realiza_actividad_excluida": { "type": "boolean", "default": false },
+        "quiere_ser_considerado_agricultor_activo": { "type": "boolean", "default": false },
+        "proporcion_25_porciento_ingresos_agrarios": { "type": "boolean", "default": false },
+        "aporta_otra_documentacion": { "type": "boolean", "default": false },
+        "revision_de_oficio": { "type": "boolean", "default": false },
+        "tiene_entidades_asociadas": { "type": "boolean", "default": false }
+      }
+    },
+    "datos_responsabilidad_juridica_explotacion": {
+      "type": "object",
+      "properties": {
+        "responsabilidad_juridica_economica": { "type": "string", "default": "Una persona física" },
+        "titular_es_gerente": { "type": "string", "default": "Si" },
+        "gerente_comparte_responsabilidad": { "type": "string", "default": "No" },
+        "porcentaje_jornadas_trabajo": { "type": "string", "default": "0% - <25%" },
+        "ano_inicio_gerente": { "type": "string", "default": "2010" },
+        "formacion_agraria_gerente": { "type": "string", "default": "Sólo experiencia práctica agraria" },
+        "cursos_perfeccionamiento_12_meses": { "type": "string", "default": "No" }
+      }
+    },
+    "datos_de_recintos": {
+      "type": "array",
+      "description": "Table of land parcels and enclosures extracted from document pages 11-13",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cod_provincia": { "type": "string" },
+          "cod_municipio": { "type": "string" },
+          "cod_poligono": { "type": "string" },
+          "cod_parcela": { "type": "string" },
+          "cod_recinto": { "type": "string" },
+          "uso_sigpac": { "type": "string" },
+          "producto": { "type": "string" },
+          "variedad_especie": { "type": "string" },
+          "superficie_declarada": { "type": "number" },
+          "secano_regadio": { "type": "string" },
+          "actividad_agraria": { "type": "string", "default": "" }
+        }
+      }
+    },
+    "documentos_que_acompanan_a_la_solicitud": {
+      "type": "object",
+      "description": "Attached documents checklist (Page 17 and 18)",
+      "properties": {
+        "nif_solicitante_persona_fisica": { "type": "boolean", "default": false },
+        "nif_solicitante_persona_juridica": { "type": "boolean", "default": false },
+        "nif_representante_legal": { "type": "boolean", "default": false },
+        "acreditacion_representante_legal": { "type": "boolean", "default": false },
+        "certificado_bancario": { "type": "boolean", "default": false },
+        "declaracion_irpf": { "type": "boolean", "default": false },
+        "alta_reta_agricultor_activo": { "type": "boolean", "default": false },
+        "fotografias_georreferenciadas": { "type": "boolean", "default": false },
+        "otra_documentacion": { "type": "boolean", "default": false }
+      }
+    }
+  }
+}

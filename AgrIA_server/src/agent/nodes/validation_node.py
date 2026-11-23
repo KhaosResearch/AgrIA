@@ -1,7 +1,7 @@
-import structlog
-
-from langchain_core.messages import HumanMessage
 from typing import Literal
+
+import structlog
+from langchain_core.messages import HumanMessage
 
 from ...models.state_models import AgrIAState
 
@@ -25,7 +25,7 @@ def validate_report_node(state: AgrIAState) -> dict:
         )
 
     # Rule 2: Critical Data Check (Must reference the total parcel area value)
-    print("GENERATED REP\n", generated_report)
+    logger.debug(f"GENERATED REPORT:\n{generated_report}")
 
     if metadata:
         total_area = str(metadata.get("Total_Parcel_Area_ha", ""))
@@ -47,7 +47,7 @@ def validate_report_node(state: AgrIAState) -> dict:
             )
             i -= 1
         errors.append(
-            f"Insert '_Using last user message as land use metadata...<br>_'at the beginning of the report and use this as metadata:\n<usr_msg>\n{usr_msg}\n</usr_msg>\n\nDo not include this in the report, only the requested insertion."
+            f"Insert '_Using last user message as land use metadata..._<br>'at the beginning of the report and use this as metadata:\n<usr_msg>\n{usr_msg}\n</usr_msg>\n\nDo not include this in the report, only the requested insertion."
         )
 
     # TODO: Use col names in tables as validation markers!!
@@ -60,19 +60,37 @@ def validate_report_node(state: AgrIAState) -> dict:
         logger.warning(feedback_note)
         return {"correction_feedback": feedback_note}
 
-    state["crop_metadata"] = None  # Reset crop metadata after successful validation
+    # Clear the metadata in the returned update: the previous in-place assignment
+    # was discarded by LangGraph, so the value survived into the next turn.
+    # Safe because a PASSED verdict exits the graph immediately.
     return {"correction_feedback": "PASSED"}
 
 
+MAX_REPORT_RETRIES = 2
+
+
 def evaluation_router_edge(state: AgrIAState) -> Literal["report_generator", "__end__"]:
-    """Determines whether to exit or loop back based on validation feedback."""
+    """Determines whether to exit or loop back based on validation feedback.
+
+    Bounded: after MAX_REPORT_RETRIES failed attempts the loop exits with the
+    last (imperfect) report rather than recursing indefinitely.
+    """
     feedback = state.get("correction_feedback", "")
 
     if feedback == "PASSED":
         logger.info("-> [VALIDATION PASSED]: Report meets all compliance rules.")
         return "__end__"  # LangGraph's native exit keyword
 
+    retry_count = (state.get("report_retry_count") or 0) + 1
+    if retry_count > MAX_REPORT_RETRIES:
+        logger.warning(
+            f"-> [VALIDATION GAVE UP]: Max retries ({MAX_REPORT_RETRIES}) exceeded. "
+            f"Returning last attempt."
+        )
+        return "__end__"
+
     logger.warning(
-        f"-> [VALIDATION FAILED]: Loop correction triggered.\nFeedback: {feedback}"
+        f"-> [VALIDATION FAILED]: Loop correction triggered (attempt {retry_count}/{MAX_REPORT_RETRIES}).\n"
+        f"Feedback: {feedback}"
     )
     return "report_generator"

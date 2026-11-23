@@ -1,13 +1,12 @@
 import json
-import structlog
-
 from inspect import isawaitable
-from langchain_core.messages import AIMessage
-from typing import Optional
-from fastapi import APIRouter, Form, UploadFile, File, HTTPException
 
-from src.config.constants import WELCOME_MESSAGE
+import structlog
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from langchain_core.messages import AIMessage
+
 from src.agent.graph import AGRIA_GRAPH as agent_graph
+from src.config.constants import WELCOME_MESSAGE
 from src.services.chat_service import (
     generate_user_response,
     get_parcel_description,
@@ -34,9 +33,10 @@ async def hello_world():
 @router.post("/send-user-input")
 async def send_user_input(
     userMessage: str = Form(...),
-    image: UploadFile | str | None = File(None),
+    image: UploadFile | str | None = File(None),  # noqa: B008
     isDetailedDescription: str = Form("false"),
     lang: str = Form("en"),
+    thread_id: str = Form("default_session"),
 ):
     try:
         is_detailed_description = "true" in isDetailedDescription.lower()
@@ -48,7 +48,12 @@ async def send_user_input(
         if userMessage is not None and len(userMessage) > 0:
             response_text = await _await_if_needed(
                 generate_user_response(
-                    userMessage, is_detailed_description, lang, file, filename
+                    userMessage,
+                    is_detailed_description,
+                    lang,
+                    file,
+                    filename,
+                    thread_id=thread_id,
                 )
             )
             return {"response": response_text}
@@ -57,7 +62,7 @@ async def send_user_input(
             ve = ValueError(msg)
             logger.error(str(ve))
             raise HTTPException(status_code=400, detail=msg)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -66,7 +71,7 @@ async def send_parcel_info_to_chat(
     imageDate: str = Form(...),
     landUses: str = Form(...),
     query: str = Form(...),
-    imageFilename: Optional[str] = Form(None),
+    imageFilename: str | None = Form(None),
     isDetailedDescription: str = Form("false"),
     lang: str = Form("es"),
 ):
@@ -89,8 +94,20 @@ async def send_parcel_info_to_chat(
         return {"response": response}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        logger.exception("Error loading parcel to chat:\n")
+    except Exception as e:  # noqa: BLE001
+        import traceback
+
+        tb = traceback.extract_tb(e.__traceback__)
+        frame = tb[-1]
+
+        logger.error(
+            "Error loading parcel to chat:",
+            error=str(e),
+            file=frame.filename,
+            line=frame.lineno,
+            function=frame.name,
+        )
+
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -134,10 +151,7 @@ async def load_active_chat_history(thread_id: str = "default_session"):
                 agent_graph.update_state(config, {"messages": [welcome_msg]})
             chat_history = [welcome_msg]
         response = get_role_and_content(chat_history)
-        with open("history.json", "w") as f:
-            import json
 
-            json.dump(response, f, indent=4)
         return {"response": response}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

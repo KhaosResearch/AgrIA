@@ -5,7 +5,7 @@
         @if (msg.loading) {
           <img src="img/message-icon.png" class="typing-icon" alt="Assistant is thinking..." />
         } @else {
-          <markdown [data]="msg.revealProgress ?? msg.content"></markdown>
+          <markdown [data]="msg.revealProgress ?? msg.displayContent ?? msg.content"></markdown>
         }
       </div>
     </div>

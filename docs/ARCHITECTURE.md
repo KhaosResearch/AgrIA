@@ -23,63 +23,120 @@ The following diagram displays the core processes involved:
 
 ## Components Diagram
 ```mermaid
-graph TD
-    subgraph Frontend[AgrIA_UI]
-        App[App Component] --> Nav[Navbar Component]
+graph LR
+    %% ============================================================
+    %% FRONTEND
+    %% ============================================================
+    subgraph Frontend["AgrIA UI"]
 
-        subgraph Homepage[Homepage View]
-            Home[Home Page Component]
+        App["App"]
+        Nav["Navbar"]
+
+        subgraph Views["Views"]
+            Home["Homepage"]
+            Chat["Chat"]
+            Parcel["Parcel Finder"]
         end
 
+        subgraph ChatSystem["Chat"]
+            ChatAsst["Chat Assistant"]
+            ChatService["Chat Service"]
+        end
+
+        subgraph ParcelSystem["Parcel Finder"]
+            ParcelCad["Cadastral"]
+            ParcelLoc["Locator"]
+            ParcelDraw["Drawer"]
+            ParcelDisp["Display"]
+            ParcelService["Parcel Service"]
+        end
+
+        Notification["Notification Service"]
+        API["HTTP Client"]
+
+        App --> Nav
         Nav --> Home
-        Nav --> Chat[Chat Component]
-        Nav --> Parcel[Parcel Finder Component]
-        
-        subgraph Parcel_System[Parcel Finder View]
-            Parcel --> ParcelCad[Parcel Cadastral]
-            Parcel --> ParcelLoc[Parcel Locator]
-            Parcel --> ParcelDraw[Parcel Drawer]
-            Parcel --> ParcelDisp[Parcel Display]
-            ParcelLoc & ParcelCad & ParcelDraw --> ParcelService[Parcel Finder Service]
-        end
-        
-        subgraph Chat_System[Chat View]
-            Chat --> ChatAsst[Chat Assistant Component]
-            ChatAsst --> ChatService[Chat Assistant Services]
-        end
+        Nav --> Chat
+        Nav --> Parcel
 
-        ChatService & ParcelService --> Notification[Notification Service]
-        ChatService & ParcelService --> API_Client[HTTP Client]
+        Chat --> ChatAsst
+        ChatAsst --> ChatService
+
+        Parcel --> ParcelCad
+        Parcel --> ParcelLoc
+        Parcel --> ParcelDraw
+        Parcel --> ParcelDisp
+
+        ParcelCad --> ParcelService
+        ParcelLoc --> ParcelService
+        ParcelDraw --> ParcelService
+
+        ChatService --> Notification
+        ParcelService --> Notification
+
+        ChatService --> API
+        ParcelService --> API
+
     end
 
-    API_Client -- "REST API" --> Server
 
-    subgraph Backend[AgrIA_server]
-        Server[Server Entry Point] --> Router[API Router/Controllers/Endpoints]
-        
-        subgraph Assets[Assets & Docs]
-            LLM_Assets[LLM Assets / Context Docs]
-            Geo_Assets[GeoJSON Assets]
-            CAP_Docs[CAP Reference Docs]
+    %% ============================================================
+    %% FRONTEND → BACKEND
+    %% ============================================================
+    API -->|"REST API"| Server
+
+
+    %% ============================================================
+    %% BACKEND
+    %% ============================================================
+    subgraph Backend["AgrIA Server"]
+
+        Server["Server Entry Point"]
+        Router["API Router / Controllers / Endpoints"]
+        Agent["AgrIA Agent Graph"]
+        subgraph Logic["Core Logic"]
+
+            GeoLogic["GeoJSON / Spatial Logic"]
+            ChatLogic["Chat Logic / LLM Processing"]
+            ClassifLogic["Ecoschemes Classification"]
+
         end
 
-        subgraph Core_Logic[Core Logic]
-            ChatLogic[Chat Logic / LLM Processing]
-            GeoLogic[GeoJSON / Spatial Logic]
-            ClassifLogic[Ecoschemes Classif. Algorithm]
+        subgraph Assets["Assets & Docs"]
+
+            GeoAssets["GeoJSON Assets"]
+            LLMAssets["LLM Context Docs"]
+            CAPDocs["CAP Reference Docs"]
+
         end
 
-        Router --> Core_Logic
-        Assets --> Core_Logic
+        SR["Image Super-Resolution"]
+        LLMEval["LLM Ecoscheme Evaluation"]
+        Response["Full LLM Response"]
 
-        GeoLogic --> SR_Module[Image Super-Resolution Module]
-        ChatLogic & ClassifLogic--> LLM_Eval[LLM Ecoscheme Evaluation]
-        
-        SR_Module & LLM_Eval --> Response[Full LLM Response]
+        Server --> Router
+        Router -- Sends input and Chat State to --> Agent
+
+        Agent --> GeoLogic
+        Agent --> ChatLogic
+        Agent --> ClassifLogic
+
+        GeoAssets --> GeoLogic
+        LLMAssets --> ChatLogic
+        CAPDocs --> ClassifLogic
+
+        GeoLogic --> SR
+
+        ChatLogic --> LLMEval
+        ClassifLogic --> LLMEval
+
+        SR --> Response
+        LLMEval --> Response
+
     end
 ```
-The two main components are comprised of both smaller components and services that allow comunication between frontend and backend:
 
+The two main components are comprised of both smaller components and services that allow comunication between frontend and backend:
 ### Frontend
 
 - **Chat:** A basic chat interface that communicates with the AI model. It displays the different buttons for the chat as well as the parcel image and chat views.
@@ -104,7 +161,6 @@ The two main components are comprised of both smaller components and services th
     - **Ecoschemes Classif. Algorithm:** A mechanical algorithm to enhance user input so that the LLM will have little trouble with ecosheme classification assessments for the parcel.
 
 ## Technologies
-Podrías listar las tecnologías principales que se usan en el proyecto.
 
 ### Frontend (main packages)
 - ``Angular 20`` & ``Angular Material``: Frontend framework and styling library.
@@ -141,7 +197,7 @@ By default, AgrIA retrieves the images from **[CUBO](https://github.com/ESDS-Lei
 
 ## Design Choices
 The main project requirements are:
-- Implement an LLM to help users with CAP regulations.
+- Implement an LLM to help users with CAP regulations and aplications.
     - Context documents, parcel image and land use must be available to improve experience.
 - Retrieve cropped parcel images using already created SIGPAC API.
     - Images can be super-resolved to increase visual data quality and enhance LLM assessment.
@@ -152,9 +208,13 @@ For these reasons, the following design decision were made:
 
 Python has libraries that support heavy ML/AI operations and connect most of the main LLM APIs, so implementing the Chat Assistant was very accesible using it for the backend. Given the functionalities required for it, lightweight UI frameworks were discarded in favour of a solid React-based approach such as Angular for a more modular component-focused alternative.
 
-### Use of Google's Gemini for LLM
+### Use of Google's Gemini for Visual Analysis fallback
 
-Given both image and text needed to be handled by the LLM, a native multimodal available LLM was used, in this case, Google's Gemini. Python has the ``Google GenAI`` library (similar to OpenAI's)  that already implements the client initialziation and chat operations needed.
+Given both image and text needed to be handled by the LLM, a native multimodal available LLM was used, in this case, Google's Gemini. Python has the ``Google GenAI`` library (similar to OpenAI's)  that already implements the client initialziation and chat operations needed. Current implementations also supports OpenAI standard local models. Users must indicate its multimodal capabilities in the corresponding `.env` variables (`IS_VLM_TEXT_ONLY`) or use a fallback model (in our case, Gemini).
+
+### LangGraph node state management
+
+Tipically used for agentic approaches, a state node-based graph was implemented to help the LLM focus on the specific task. Requirements were narrowed down in order to specify these nodes and `langgraph` was used to implement it. This solution frames the scope for the LLM's context and improves response quality for on each pre-defined use case. It also severly reduces the risk of hallucation at the cost of limiting potentially expasive and useful responses.
 
 ### SR4S vs SEN2SR
 

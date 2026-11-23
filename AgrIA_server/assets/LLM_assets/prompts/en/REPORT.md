@@ -6,6 +6,60 @@ Your task is to generate a formal, technical, and precise Visual Analysis Report
 CRITICAL: The target language is {lang}. You MUST generate the entire markdown output, headers, tables, explanations, and descriptions exclusively in this language (e.g., if 'es', output in Spanish; if 'en', output in English).
 </localization>
 
+<land_use_vocabulary>
+Here is the information about each land use type: their ID and full name both in English and Spanish.
+
+| Land Use ID | Name (Eng) |
+| :---: | :--- 
+| AG | Water currents and surfaces |
+| CA | Roads |
+| CF | Citrus-Fruit trees |
+| CI | Citrus |
+| CS | Citrus-Nut trees |
+| CV | Citrus-Vineyard |
+| ED | Buildings |
+| EP | Landscape element |
+| FF | Nut trees-Fruit trees |
+| FL | Nut trees-Olive grove |
+| FO | Forestry |
+| FS | Nut trees |
+| FV | Nut trees-Vineyard |
+| FY | Fruit trees |
+| IM | Unproductive |
+| IV | Greenhouses and crops under plastic |
+| MT | Bushes |
+| OC | Olive grove-Citrus |
+| OF | Olive grove-Fruit trees |
+| OV | Olive grove |
+| PA | Wooded pasture |
+| PR | Shrub pasture |
+| PS | Grassland |
+| TA | Arable land |
+| TH | Vegetable garden |
+| VF | Fruit trees-Vineyard |
+| VI | Vineyard |
+| VO | Olive grove-Vineyard |
+| ZC | Concentrated area |
+| ZU | Urban area |
+| ZV | Censored area |
+</land_use_vocabulary>
+
+<ecoschemes_vocabulary>
+| Name (Eng) |
+| :--- |
+| P1 - Extensive Grazing (Humid Pastures) |
+| P1 - Extensive Grazing (Mediterranean Pastures) |
+| P3/P4 - Rotation/No-Till (Rainfed) |
+| P3/P4 - Rotation/No-Till (Rainfed Humid) |
+| P3/P4 - Rotation/No-Till (Irrigated) |
+| P5 (A) - Biodiversity Spaces (Cultivated/Permanent) |
+| P5 (B) - Biodiversity Spaces (Under Water) |
+| P6/P7 - Plant Cover (Flat Woody Crops) |
+| P6/P7 - Plant Cover (Medium Slope) |
+| P6/P7 - Plant Cover (Steep Slope/Terraces) |
+| Non-Eligible |
+</ecoschemes_vocabulary>
+
 ## Strict Processing Rules
 1. **Description**: Generate a highly descriptive paragraph (max 700 characters) correlating the visual items found in <visual_description> with the dominant land use class from <parcel_metadata_json>[cite: 1, 2]. You MUST state the exact value of `Total_Parcel_Area_ha`.
 2. **Tables**: Construct the 'POSSIBLE ECO-SCHEMES' and 'ESTIMATED TOTAL PAYMENT' markdown tables matching the formatting blueprints[cite: 1, 2]. Use the 'Peninsular' nested data attributes for base calculations.

@@ -1,3 +1,38 @@
+# 📝 Changelog – Version 1.4 (November 2025 – July 2026)
+
+This release introduces a fully autonomous LangGraph-based agent, end-to-end CAP subsidy application assistance, and significant improvements to the chat experience and developer tooling.
+
+---
+
+### 🚀 New Features & User Experience
+
+* **Autonomous Agent Graph (LangGraph):** Replaced the initial Hermes Agent integration with a fully autonomous LangGraph-based agent. The new architecture features a deterministic intent router with confidence-gated classification, a clarify node for ambiguous inputs, secondary intent detection, and a modular node registry (`INTENT_REGISTRY`) for extensible routing.
+* **CAP Application Workflow:** End-to-end CAP subsidy application assistance with slot tracking, form progress inspection (`cap_form_status` node), document inspection with PDF text extraction, interruption handling, and fast-path command routing for common CAP actions.
+* **CAP Dataset Processing & Analysis:** Pipeline for processing 2023–2024 CAP datasets with parallel execution, PDF schema extraction, and eco-scheme classification data integration.
+* **Enhanced Chat Capabilities:** Persistent `thread_id` per chat session, document and image upload support in the chat input, system command labels displayed in chat history, and improved input suggestion context handling.
+
+---
+
+### 🛠 Fixes & Stability Improvements
+
+* **Input Suggestion Context:** Fixed the `/get-input-suggestion` endpoint to correctly pass `thread_id` from the frontend, ensuring suggestions are generated from the actual conversation history rather than an empty default session.
+* **CAP Workflow State:** Unified CAP workflow state semantics, cleaned up dead code, and fixed `clear_cap_workflow` to perform a full state reset with confirmation.
+* **Report Validation:** Bounded the report validation retry loop to a maximum of 2 attempts to prevent infinite loops.
+* **Image Classification:** Fixed the `DESCRIBE_LONG_IMAGE` fast-path and widened the classifier context window for improved accuracy on large satellite images.
+* **Rates Context:** Filtered rates context by language and deduplicated `RATES.md` logic to avoid redundant prompt content.
+* **Metadata Lifecycle:** Fixed `thread_id` propagation in `/send-user-input` and resolved metadata lifecycle issues in the agent graph.
+
+---
+
+### ⚙️ Developer & Backend Enhancements
+
+* **Agent Documentation:** Updated agent README and main README with the current graph topology, node registry, and routing logic.
+* **Router Evaluation:** Added an offline router evaluation harness with a 25-case eval set for regression testing intent classification.
+* **LLM Module Plan:** Added implementation plan documentation for the LLM module architecture.
+* **Linting & Code Quality:** Resolved all Ruff linting and formatting issues across the codebase (89 check errors, 6 formatting files). Standardized on explicit `Optional` types, f-strings, and proper exception handling patterns.
+
+---
+
 # 📝 Changelog – Version 1.3 (September - November 2025)
 
 This release unifies our codebase into a single repository and introduces major enhancements to our data processing, image super-resolution capabilities, and the core Eco-scheme classification engine.

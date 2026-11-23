@@ -1,12 +1,12 @@
 import asyncio
 import base64
 import io
+from pathlib import Path
+
 import openai
 import structlog
-
 from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
-from pathlib import Path
 from PIL import Image
 
 logger = structlog.get_logger(__file__)
@@ -89,7 +89,7 @@ class LocalChat:
             else:
                 summary_response = self.client.invoke(msg)
             return summary_response.content
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error(f"Failed to auto-summarize history: {e}")
             return "System Note: Earlier history truncated due to context limit constraints."
 
@@ -239,4 +239,4 @@ class LocalChat:
                 self.summarize_history()
                 return self.send_message(content_input, False)
 
-            raise e
+            raise

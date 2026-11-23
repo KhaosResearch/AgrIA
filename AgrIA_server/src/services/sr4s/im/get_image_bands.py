@@ -1,23 +1,21 @@
 import time
-import structlog
-
-import numpy as np
-
+from contextvars import ContextVar
 from datetime import datetime, timedelta
 
+import numpy as np
+import structlog
 from sentinelhub import (
-    SHConfig,
     DataCollection,
     MimeType,
     SentinelHubRequest,
+    SHConfig,
     bbox_to_dimensions,
 )
-from .sh_config import CONFIG_NAME
-from .utils import generate_evalscript, get_bbox_from_center, save_tiff
+
 from ....config.constants import BANDS_DIR
 from ..constants import DELTA_DAYS, RESOLUTION, SIZE
-
-from contextvars import ContextVar
+from .sh_config import CONFIG_NAME
+from .utils import generate_evalscript, get_bbox_from_center, save_tiff
 
 logger = structlog.get_logger(__file__)
 
@@ -70,7 +68,7 @@ def download_sentinel_image(lat, lon, size, filename, evalscript):
     """
     bbox = get_bbox_from_center(lat, lon, size[0], size[-1], RESOLUTION)
     width, height = bbox_to_dimensions(bbox, resolution=RESOLUTION)
-    date_info, band_ext = filename.split("-")
+    date_info, _ = filename.split("-")
     year, month = date_info.split("_")
     # Get a range of dates to ensure cloud-free scenes
     date = datetime(
@@ -167,7 +165,9 @@ def get_cloudless_image(
     raise RuntimeError("❌ No valid Sentinel-2 image found after all attempts.")
 
 
-def download_image_bands(lat, lon, size, filename=None, bands=["B02", "B03", "B04"]):
+def download_image_bands(lat, lon, size, filename=None, bands=None):
+    if bands is None:
+        bands = ["B02", "B03", "B04"]
     """
     Downloads separate Sentinel image bandsfor the given latitude and longitude.
 

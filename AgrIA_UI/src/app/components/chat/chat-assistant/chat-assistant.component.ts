@@ -19,9 +19,11 @@ export class ChatAssistantComponent {
     {
       role: 'model',
       content:
-        '¡Hola!\n\nSoy tu Asistente de Imágenes Agrícolas, ¡pero puedes llamarme **AgrIA**!\n\nMi propósito aquí es **analizar imágenes satelitales de campos de cultivo** para asistir a los agricultores en en análisis del su **uso del espacio y los recursos, así como las prácticas agrícolas**, con el fin de **asesorarles a reunir los requisitos para las subvenciones del Comité Europeo de Política Agrícola Común (CAP)**.\n\n¡Sólo tienes que subir una imagen satelital de tus campos de cultivo y nos pondremos manos a la obra!\n\nSi tiene alguna pregunta, también puede escribir en el cuadro de texto',
+        '¡Hola!\n\nSoy tu Asistente de Imágenes Agrícolas, ¡pero puedes llamarme **AgrIA**!\n\nMi propósito aquí es **analizar imágenes satelitales de campos de cultivo** para asistir a los agricultores en el análisis de su **uso del espacio y los recursos, así como las prácticas agrícolas**, con el fin de **asesorarles a reunir los requisitos para las subvenciones de la Política Agrícola Común (PAC)**.\n\nPuedo ayudarte a:\n- **Analizar tu parcela** desde una imagen satelital\n- **Consultar normas y ecorregímenes** de la PAC\n- **Rellenar tu solicitud de ayuda** paso a paso\n\n¡Sólo tienes que subir una imagen satelital de tus campos de cultivo y nos pondremos manos a la obra!\n\nSi tienes alguna pregunta, también puedes escribir en el cuadro de texto.',
     },
   ];
+  // Unique thread identifier for this chat session (persists across reloads)
+  public threadId: string = this.getOrCreateThreadId();
   // Index of the first message after chat sanitizaion
   private firstIndex: number = 0;
   // Miliscendos delay to display Chat Assistant's replies
@@ -37,7 +39,7 @@ export class ChatAssistantComponent {
 
   ngOnInit() {
     if (this.chatHistory.length <= 1) {
-      this.chatAssistantService.loadActiveChatHistory().subscribe({
+      this.chatAssistantService.loadActiveChatHistory(this.threadId).subscribe({
         next: (response: IChatMessage[]) => {
           this.chatHistory = this.sanitizeChatHistory(response);
           this.scrollToBottom(); // scroll to bottom after loading history
@@ -93,6 +95,18 @@ export class ChatAssistantComponent {
           };
         }
       }
+      if (msg.content.includes('```markdown\n')) {
+        let parts = msg.content.split('```markdown\n');
+        console.log("parts", parts)
+        if (parts.length > 1) {
+          // parts = parts.slice(0, -1);
+          return {
+            ...msg,
+            content: parts[0]
+          };
+        }
+        
+      }
       return msg;
     });
     
@@ -113,15 +127,32 @@ export class ChatAssistantComponent {
 
   /**
    * Adds user message to chat and gets assistant output
-   * @param content - User message content
+   * @param content - User message content (sent to the backend as-is)
+   * @param imageFile - Optional image file
+   * @param isDetailedDescription - Whether to use the short or detailed description
+   * @param displayContent - When set, shown in the bubble instead of `content`
    */
-  public addUserMessage(content: string, imageFile: File | null, isDetailedDescription: boolean) {
+  public addUserMessage(content: string, imageFile: File | null, isDetailedDescription: boolean, displayContent?: string) {
     if (content.length > 0) {
       const safeContent = this.sanitizeMarkdown(content);
-      this.chatHistory.push({ role: 'user', content: safeContent });
+      this.chatHistory.push({ role: 'user', content: safeContent, displayContent });
       this.sendUserInput(safeContent, imageFile, isDetailedDescription);
       this.scrollToBottom();
     }
+  }
+
+  /**
+   * Gets or creates a persistent thread ID for this chat session.
+   * Stored in localStorage so the conversation state survives page reloads.
+   */
+  private getOrCreateThreadId(): string {
+    const STORAGE_KEY = 'agria_chat_thread_id';
+    let id = localStorage.getItem(STORAGE_KEY);
+    if (!id) {
+      id = `session_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      localStorage.setItem(STORAGE_KEY, id);
+    }
+    return id;
   }
 
   /**
@@ -129,7 +160,7 @@ export class ChatAssistantComponent {
    *
    * @param userMessage - User input message
    * @param imageFile - image file content
-   * @param isDetailedDescription - Whether to use the shrot or detailed description
+   * @param isDetailedDescription - Whether to use the short or detailed description
    */
   public sendUserInput(userMessage: string, imageFile: File | null, isDetailedDescription: boolean = false) {
     const trimmedInput: string = userMessage
@@ -143,8 +174,8 @@ export class ChatAssistantComponent {
     formData.append('image', imageFileData);
     formData.append('isDetailedDescription', String(isDetailedDescription));
     formData.append('lang', String(this.translateService.currentLang));
-    
-    this.chatAssistantService.sendUserInput(formData).subscribe({
+
+    this.chatAssistantService.sendUserInput(formData, this.threadId).subscribe({
       next: (responseText: string) => {
         this.hideMessageIcon();
         this.displayResponse(responseText);

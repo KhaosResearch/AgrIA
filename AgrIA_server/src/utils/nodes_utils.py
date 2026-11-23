@@ -1,6 +1,5 @@
 import structlog
-
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ..config.constants import BASE_PROMPTS_PATH
 from ..models.chat_models import LocalChat
@@ -11,13 +10,38 @@ logger = structlog.get_logger(__file__)
 
 
 def load_prompt_asset(filename: str, lang: str = "") -> str:
-    """Reads modular markdown text prompts directly from filesystem."""
+    """Reads modular markdown text prompts directly from filesystem.
+
+    Raises `FileNotFoundError` when the asset is missing. A silent fallback to a
+    generic chatbot instruction would hide typos in prompt names and quietly
+    degrade node behaviour, so the failure must surface.
+    """
     file_path = BASE_PROMPTS_PATH / lang / filename
-    try:
-        return file_path.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        # Fallback block to prevent server crash
-        return "You are AgrIA, an agricultural AI chatbot assistant."
+    return file_path.read_text(encoding="utf-8")
+
+
+def secondary_intent_block(state: "AgrIAState") -> str:
+    """Build the `<secondary_intent>` system block for the primary node.
+
+    When the router detected a second intent in the farmer's message, the node
+    that is running (the primary) is asked to also address that second point in
+    the same reply. This is how multi-intent works without any graph topology
+    change: the second intent is folded into the primary node's prompt.
+
+    Returns an empty string when there is no secondary intent, so nodes that do
+    not support it can ignore the helper entirely.
+    """
+    secondary = state.get("secondary_intent")
+    if not secondary:
+        return ""
+    return (
+        "\n\n<secondary_intent>\n"
+        f"The farmer's message also asked for a second thing, classified as "
+        f"'{secondary}'. After fully addressing your main task, briefly address "
+        f"that second point in the same reply so the farmer does not have to ask "
+        f"again. Keep it concise and clearly separated from the main answer.\n"
+        f"</secondary_intent>\n"
+    )
 
 
 def execute_scoped_chat(
@@ -35,13 +59,14 @@ def execute_scoped_chat(
         user_input = last_chat_msg.content
 
         system_instruction = load_prompt_asset(prompt_filename, lang)
+        system_instruction += secondary_intent_block(state)
 
         chat = LocalChat(
             client=client,
             model_name=model_name,
             system_instruction=system_instruction,
             history_init=get_recent_history(state["messages"][:-1]),
-            max_context_tokens=20000,
+            max_context_tokens=25000,
         )
 
         response_wrapper = chat.send_message(user_input)

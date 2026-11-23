@@ -6,7 +6,7 @@
           <h2>{{ 'chat.uploadImage.title' | translate }}</h2>
         </div>
         <div class="image-preview">
-          @if (imagePreviewUrl) {
+          @if (imagePreviewUrl != null) {
             <img [src]="imagePreviewUrl" alt="{{ 'parcelFinder.previewAlt' | translate }}" />
           } @else {
             <img class="image-icon" src="img/image-icon.png" alt="{{ 'parcelFinder.uploadImageAlt' | translate }}" />
@@ -47,7 +47,7 @@
             src="img/upload-icon1.png"
             alt="{{ 'parcelFinder.uploadImageAlt' | translate }}"
             title="{{ 'parcelFinder.uploadImageAlt' | translate }}" />
-          <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+          <input type="file" accept="image/*, .pdf" (change)="onFileSelected($event)" />
         </label>
       </div>
       <textarea
@@ -70,15 +70,28 @@
             {{ !isLoading() ? ('chat.chatInput.getSuggestionButton' | translate) : ('parcelFinder.loading' | translate) }}
           </button>
         </div>
-
-        <label class="detailed-description-checkbox">
-          <input type="checkbox" class="description-length" [(ngModel)]="isDetailedDescription" />
-          {{ 'chat.chatInput.detailedImageDescription' | translate }}
-        </label>
       </div>
     </div>
-    <button class="navigation-button" (click)="goToParcelFinderView()" title="{{ 'chat.navigationButton.title' | translate }}">
-      {{ 'chat.navigationButton.text' | translate }}
-    </button>
+    <p class="cap-actions-title">{{ 'chat.chatInput.capActionsTitle' | translate }}</p>
+    <div class="cap-actions-row">
+      <button
+        class="cap-action-button"
+        (click)="sendCapCommand('status')"
+        title="{{ 'chat.chatInput.showFormButtonTitle' | translate }}">
+        {{ 'chat.chatInput.showFormButton' | translate }}
+      </button>
+      <button
+        class="cap-action-button"
+        (click)="sendCapCommand('pause')"
+        title="{{ 'chat.chatInput.pauseFormButtonTitle' | translate }}">
+        {{ 'chat.chatInput.pauseFormButton' | translate }}
+      </button>
+      <button
+        class="cap-action-button cap-cancel-button"
+        (click)="sendCapCommand('cancel')"
+        title="{{ 'chat.chatInput.cancelFormButtonTitle' | translate }}">
+        {{ 'chat.chatInput.cancelFormButton' | translate }}
+      </button>
+    </div>
   </div>
 </div>

@@ -1,23 +1,21 @@
-import cv2
 import glob
-import numpy as np
 import os
 import time
-import torch
-import rasterio
-import structlog
-
 from datetime import datetime
 from pathlib import Path
+
+import cv2
+import numpy as np
+import rasterio
+import structlog
+import torch
 from PIL import Image
 
 from ....benchmark.sr.constants import BM_DATA_DIR
-
-from ....config.constants import GET_SR_BENCHMARK, SR_BANDS, SR5M_DIR
 from ....benchmark.sr.utils import copy_file_to_dir
-
-from .utils import percentile_stretch, stack_bgrn, make_grid
+from ....config.constants import GET_SR_BENCHMARK, SR5M_DIR, SR_BANDS
 from .L1BSR_wrapper import L1BSR
+from .utils import make_grid, percentile_stretch, stack_bgrn
 
 logger = structlog.get_logger(__file__)
 

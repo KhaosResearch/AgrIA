@@ -1,20 +1,21 @@
 import base64
 import json
 import os
-import structlog
-
-from google.genai import Client as GeminiGenAIClient
 from io import BytesIO
+
+import structlog
+from google.genai import Client as GeminiGenAIClient
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
-from ..config.llm_client import vlm_client
 from ..config.constants import (
     BASE_CONTEXT_PATH,
     BASE_PROMPTS_PATH,
     CONTEXT_DOCUMENTS_FILE,
     PROMPT_LIST_FILE,
+    VLM_DESC_PROMPT,
     WELCOME_MESSAGE,
 )
+from ..config.llm_client import vlm_client
 from ..services.llm_services import upload_context_document
 
 logger = structlog.get_logger()
@@ -175,8 +176,8 @@ def set_initial_history(
 
     try:
         doc_paths_list = load_documents_from_json(documents_json_path)
-    except Exception as e:
-        logger.exception(f"Error loading documents from JSON: {e}")
+    except Exception:
+        logger.exception("Error loading documents from JSON: ")
 
     if doc_paths_list:
         # 1. Gather CAP Guideline Docs (Files 0 to 2)
@@ -234,8 +235,8 @@ def upload_context_files(doc_paths_list) -> str:
                 logger.warning(
                     f"Skipping unsupported non-text context file: {filename}"
                 )
-        except Exception as e:
-            logger.exception(f"Error packing file data {doc_path}: {e}")
+        except Exception:
+            logger.exception(f"Error packing file data {doc_path}: ")
 
     return compiled_text
 
@@ -250,18 +251,12 @@ def get_aux_image_description(image_obj, lang=None):
         if vlm_client is None:
             return "[No active vision language model client initialized]"
 
-        # Formulate the visual analysis directive
-        prompt_text = {
-            "en": "Describe this satellite crop image. Detail parcel boundaries, distinct zones, ground textures, and visible agricultural features in 60 words or less.",
-            "es": "Describe esta imagen satélite de cultivos. Detalla los límites de la parcela, zonas distintivas, texturas de suelo y característica agrícolas visibles en 60 palabras o menos.",
-        }
-
         # Fallback Routing to Cloud Gemini API Engine
         if isinstance(vlm_client, GeminiGenAIClient):
             logger.debug("Routing vision task via Google Cloud Gemini API Engine...")
             # The native Google SDK reads PIL Image objects directly out of the box!
             response = vlm_client.models.generate_content(
-                model="gemini-3.5-flash", contents=[image_obj, prompt_text[lang]]
+                model="gemini-3.5-flash", contents=[image_obj, VLM_DESC_PROMPT[lang]]
             )
             logger.debug(f"Cloud Response Received!\n{response.text}")
             return response.text
@@ -274,7 +269,7 @@ def get_aux_image_description(image_obj, lang=None):
         image_data_url = f"data:image/png;base64,{img_str}"
 
         message_content = [
-            {"type": "text", "text": prompt_text},
+            {"type": "text", "text": VLM_DESC_PROMPT[lang]},
             {"type": "image_url", "image_url": {"url": image_data_url}},
         ]
 
@@ -282,6 +277,17 @@ def get_aux_image_description(image_obj, lang=None):
         logger.debug(f"Local Response Received! {response}")
         return response.content
 
-    except Exception as e:
-        logger.error(f"Vision analysis fallback triggered: {e}")
+    except Exception as e:  # noqa: BLE001
+        import traceback
+
+        tb = traceback.extract_tb(e.__traceback__)
+        frame = tb[-1]
+
+        logger.error(
+            "Vision analysis fallback triggered:",
+            error=str(e),
+            file=frame.filename,
+            line=frame.lineno,
+            function=frame.name,
+        )
         return "[Visual representation provided but description extraction failed]"

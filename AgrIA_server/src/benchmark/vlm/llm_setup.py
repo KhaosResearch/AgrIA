@@ -1,5 +1,5 @@
+from ...config.constants import CALCULATIONS_RULE, EXCLUSIVITY_RULE, PROMPT_LIST_FILE
 from ...utils.llm_utils import load_prompt_from_json
-from ...config.constants import PROMPT_LIST_FILE, CALCULATIONS_RULE, EXCLUSIVITY_RULE
 from .constants import BM_DIR, BM_PROMPT_LIST_FILE
 
 

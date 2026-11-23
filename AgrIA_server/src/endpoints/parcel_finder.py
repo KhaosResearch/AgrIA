@@ -1,19 +1,18 @@
 import os
-import structlog
-
-from inspect import isawaitable
 from datetime import datetime
+from inspect import isawaitable
+
+import structlog
 from fastapi import APIRouter, Form, HTTPException
 from fastapi.responses import FileResponse
-from typing import Optional
 
 from ..config.constants import TEMP_DIR
+from ..services.parcel_finder_service import get_parcel_image
 from ..utils.parcel_finder_utils import (
     check_cadastral_data,
     is_coord_in_zones,
     reset_dir,
 )
-from ..services.parcel_finder_service import get_parcel_image
 
 logger = structlog.get_logger(__file__)
 
@@ -33,10 +32,10 @@ async def load_parcel_description(lang: str = Form("es")):
         content = "..."
 
         if os.path.exists(parcel_desc_file):
-            with open(parcel_desc_file, "r", encoding="utf-8") as file:
+            with open(parcel_desc_file, "r", encoding="utf-8") as file:  # noqa: ASYNC230
                 content = file.read()
         return {"response": content}
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -44,14 +43,14 @@ async def load_parcel_description(lang: str = Form("es")):
 async def find_parcel(
     selectedDate: str = Form(...),
     isFromCadastralReference: str = Form("False"),
-    cadastralReference: Optional[str] = Form(None),
-    parcelGeometry: Optional[str] = Form("None"),
-    parcelMetadata: Optional[str] = Form(None),
-    coordinates: Optional[str] = Form(None),
-    province: Optional[str] = Form(None),
-    municipality: Optional[str] = Form(None),
-    polygon: Optional[str] = Form(None),
-    parcelId: Optional[str] = Form(None),
+    cadastralReference: str | None = Form(None),
+    parcelGeometry: str | None = Form("None"),
+    parcelMetadata: str | None = Form(None),
+    coordinates: str | None = Form(None),
+    province: str | None = Form(None),
+    municipality: str | None = Form(None),
+    polygon: str | None = Form(None),
+    parcelId: str | None = Form(None),
 ):
     reset_dir(TEMP_DIR, [".png"])
     init = datetime.now()
@@ -89,7 +88,8 @@ async def find_parcel(
                 "metadata": metadata,
             }
         }
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
+        logger.error(str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -97,7 +97,7 @@ async def find_parcel(
 async def is_coord_in_zone(lat: float = Form(...), lng: float = Form(...)):
     try:
         return {"response": is_coord_in_zones(lng, lat)}
-    except Exception:
+    except Exception:  # noqa: BLE001
         raise HTTPException(status_code=400, detail="Invalid or missing coordinates")
 
 

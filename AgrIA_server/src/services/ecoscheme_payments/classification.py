@@ -1,6 +1,6 @@
-import structlog
-
 from decimal import Decimal
+
+import structlog
 
 from .constants import PLURIANNUALITY_BONUS_PER_HA
 from .utils import is_valid_rate_for_coefficients
@@ -9,7 +9,7 @@ logger = structlog.get_logger()
 
 
 def get_exclusivity_land_uses(
-    eligible_schemes_by_land_use, non_eligible_uses, parsed_data, lang="EN"
+    eligible_schemes_by_land_use, non_eligible_uses, parsed_data
 ) -> dict:
     land_use_assignments = {}
 
@@ -33,11 +33,11 @@ def get_exclusivity_land_uses(
                 "id": "N/A",
                 "name": "Non-Eligible",
                 "subtype": None,
-                "payment_per_ha": Decimal("0"),
+                "payment_per_ha": Decimal(0),
             }
             continue
 
-        best_payment_per_ha = Decimal("-1")
+        best_payment_per_ha = Decimal(-1)
         best_scheme_assignment = None
 
         for rate_type in ["Peninsular", "Insular"]:
@@ -61,7 +61,7 @@ def get_exclusivity_land_uses(
                     current_rate = (
                         Decimal(rate_details["Flat"])
                         if rate_details["Flat"] != "N/A"
-                        else Decimal("0")
+                        else Decimal(0)
                     )
                 else:
                     threshold = rate_details.get("Threshold_ha")
@@ -91,7 +91,7 @@ def get_exclusivity_land_uses(
                 "id": "N/A",
                 "name": "Non-Eligible",
                 "subtype": None,
-                "payment_per_ha": Decimal("0"),
+                "payment_per_ha": Decimal(0),
             }
 
     return land_use_assignments

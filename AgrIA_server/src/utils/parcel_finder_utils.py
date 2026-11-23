@@ -1,49 +1,46 @@
 import math
-from pathlib import Path
+import os
 import re
 import shutil
-from flask import jsonify
-from pyproj import Transformer, CRS
-
-
-from ..services.sr4s.im.get_image_bands import download_from_sentinel_hub
-from ..services.sr4s.sr.get_sr_image import process_directory
-from ..services.sr4s.sr.utils import percentile_stretch, set_reflectance_scale
-from ..config.constants import (
-    ANDALUSIA_TILES,
-    SPAIN_ZONES,
-    TEMP_DIR,
-    SR_BANDS,
-    RESOLUTION,
-    BANDS_DIR,
-    MERGED_BANDS_DIR,
-    MASKS_DIR,
-    SR5M_DIR,
-)
-
-from ..config.minio_client import minioClient, bucket_name
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from dateutil.relativedelta import relativedelta
 from datetime import datetime
-from dotenv import load_dotenv
-from minio.error import S3Error
-from PIL import Image
-from shapely import Point, box, ops, unary_union
-from shapely.geometry import GeometryCollection, MultiPolygon, Polygon, shape, mapping
-from rasterio.mask import mask
-from rasterio.merge import merge
-from shapely.ops import transform as shapely_transform
-from rasterio.warp import calculate_default_transform, reproject, Resampling
+from pathlib import Path
 
 import cv2
 import geopandas as gpd
 import numpy as np
-import os
 import rasterio
 import structlog
-
+from dateutil.relativedelta import relativedelta
+from dotenv import load_dotenv
+from flask import jsonify
+from minio.error import S3Error
+from PIL import Image
+from pyproj import CRS, Transformer
+from rasterio.mask import mask
+from rasterio.merge import merge
+from rasterio.warp import Resampling, calculate_default_transform, reproject
+from shapely import Point, box, ops, unary_union
+from shapely.geometry import GeometryCollection, MultiPolygon, Polygon, mapping, shape
+from shapely.ops import transform as shapely_transform
 from sigpac_tools.generate import build_cadastral_reference
+
+from ..config.constants import (
+    ANDALUSIA_TILES,
+    BANDS_DIR,
+    MASKS_DIR,
+    MERGED_BANDS_DIR,
+    RESOLUTION,
+    SPAIN_ZONES,
+    SR5M_DIR,
+    SR_BANDS,
+    TEMP_DIR,
+)
+from ..config.minio_client import bucket_name, minioClient
+from ..services.sr4s.im.get_image_bands import download_from_sentinel_hub
+from ..services.sr4s.sr.get_sr_image import process_directory
+from ..services.sr4s.sr.utils import percentile_stretch, set_reflectance_scale
 
 logger = structlog.get_logger()
 
@@ -80,7 +77,7 @@ def get_tiles_polygons(geojson):
 
     interseccion = gpd.overlay(base_geojson, geojson, how="intersection")
 
-    tiles_zones_list = set(list(interseccion["Name"]))
+    tiles_zones_list = set(interseccion["Name"])
 
     return tiles_zones_list
 
@@ -106,7 +103,7 @@ def download_tile_bands(utm_zones, year, month, bands, geometry):
             parcel_center.y, parcel_center.x, f"{year}_{month}"
         )
         for path in band_files_list:
-            for band in downloaded_files:
+            for band in list(downloaded_files):
                 if band in path:
                     downloaded_files[band].append(path)
 
@@ -280,7 +277,7 @@ def reproject_tiles(input_dir):
 
         reprojected_files = []
 
-        for crs, group_files in crs_groups.items():
+        for group_files in crs_groups.values():
             for f in group_files:
                 with rasterio.open(f) as src:
                     transform, width, height = calculate_default_transform(
@@ -507,7 +504,7 @@ def save_raster(image, temp_file, src, transform, format):
         with rasterio.open(temp_file, "w", **out_meta) as dest:
             dest.write(image)
     except Exception as e:
-        raise Exception(f"Failed to save raster: {str(e)}")
+        raise RuntimeError(f"Failed to save raster: {e!s}") from e
 
 
 def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
@@ -534,12 +531,11 @@ def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
             SR_BANDS[-1] in path for path in image_paths
         )
 
-        if get_sr_image:
-            if geometry:
-                geometry = bbox_from_polygon(geometry)
-            # TODO:
-            # else:
-            #     geometry = get_bbox_from_center(lat, lon, min_size, min_size, RESOLUTION).geojson
+        if get_sr_image and geometry:
+            geometry = bbox_from_polygon(geometry)
+        # TODO:
+        # else:
+        #     geometry = get_bbox_from_center(lat, lon, min_size, min_size, RESOLUTION).geojson
 
         # Sanity check
         if isinstance(geometry, dict):
@@ -568,10 +564,10 @@ def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
 
     except FileNotFoundError as e:
         logger.error(str(e))
-        raise e
+        raise
     except Exception as e:
-        logger.error(f"An error occurred: {str(e)}")
-        raise e
+        logger.error(f"An error occurred: {e!s}")
+        raise
 
 
 def crop_raster_to_geometry(
@@ -808,7 +804,7 @@ def merge_and_convert_to_geometry(feature_collection: dict) -> dict:
     return mapping(merged)
 
 
-def reset_dir(dir: str | Path, keep_extensions: list[str] = None):
+def reset_dir(dir: str | Path, keep_extensions: list[str] | None = None):
     """
     Removes ALL subdirectories and files inside `dir`, except files in the top-level
     directory with an allowed extension (e.g., ['png']).
@@ -828,9 +824,8 @@ def reset_dir(dir: str | Path, keep_extensions: list[str] = None):
             except FileNotFoundError:
                 pass
             continue
-        if item.is_file():
-            if item.suffix.lower().lstrip(".") not in keep_extensions:
-                item.unlink(missing_ok=True)
+        if item.is_file() and item.suffix.lower().lstrip(".") not in keep_extensions:
+            item.unlink(missing_ok=True)
 
 
 def check_cadastral_data(
@@ -1031,7 +1026,7 @@ def is_coord_in_zones(lon: float, lat: float, zones_json: dict = SPAIN_ZONES) ->
                 # Check if the point is within the polygon
                 if poly.contains(point):
                     is_in_zone = True
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 # Log the warning but continue checking other zones
                 logger.warning(
                     f"Warning: Zone '{zone_id}' has an invalid Polygon geometry. Skipping zone: {e}"

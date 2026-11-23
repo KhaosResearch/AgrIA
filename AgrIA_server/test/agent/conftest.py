@@ -1,7 +1,9 @@
-import pytest
 import uuid
 from unittest.mock import MagicMock
+
+import pytest
 from langchain_core.messages import HumanMessage
+
 from src.models.state_models import AgrIAState
 
 
@@ -83,18 +85,22 @@ La parcela identificada con referencia 26002A001000010000EQ cuenta con un área 
 
         # 2. If called from deterministic_router for intent classification
         if "Classify the intent" in content_str:
+            lowered = content_str.lower()
             if "###DESCRIBE_SHORT_IMAGE###" in content_str:
                 mock_response.text = '{"intent": "report_generator", "confidence": 1.0}'
-            elif (
-                "ecorregímenes" in content_str.lower()
-                and "importes" in content_str.lower()
-            ):
+            elif "relleno la solicitud" in lowered or "ayúdame a rellenar" in lowered:
+                # Multi-intent: rates question plus starting the application.
+                mock_response.text = (
+                    '{"intent": "ecoschemes_rates", "secondary_intent": '
+                    '"cap_application", "confidence": 0.9}'
+                )
+            elif "ecorregímenes" in lowered and "importes" in lowered:
                 mock_response.text = (
                     '{"intent": "ecoschemes_rates", "confidence": 0.98}'
                 )
-            elif "ecorregímenes" in content_str.lower() or "pac" in content_str.lower():
+            elif "ecorregímenes" in lowered or "pac" in lowered:
                 mock_response.text = '{"intent": "cap_query", "confidence": 0.95}'
-            elif "sentido de la vida" in content_str.lower():
+            elif "sentido de la vida" in lowered:
                 mock_response.text = (
                     '{"intent": "fallback_rejection", "confidence": 0.98}'
                 )

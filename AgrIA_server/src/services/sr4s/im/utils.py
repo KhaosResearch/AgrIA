@@ -1,15 +1,15 @@
 import io
 import math
-import numpy as np
 import random
+
+import numpy as np
 import rasterio
 import structlog
-
 from PIL import Image
 from rasterio.transform import from_bounds
-from sentinelhub import BBox, CRS
+from sentinelhub import CRS, BBox
 
-from ..constants import LAT_MIN, LAT_MAX, LON_MIN, LON_MAX
+from ..constants import LAT_MAX, LAT_MIN, LON_MAX, LON_MIN
 
 logger = structlog.get_logger(__file__)
 
@@ -112,9 +112,9 @@ def get_bbox_from_center(lat, lon, width_px, height_px, resolution_m):
     return BBox(bbox=[min_lon, min_lat, max_lon, max_lat], crs=CRS.WGS84)
 
 
-def get_n_random_coordinate_pairs(
-    amount: int, bounded_zone=[LAT_MIN, LAT_MAX, LON_MIN, LON_MAX]
-):
+def get_n_random_coordinate_pairs(amount: int, bounded_zone=None):
+    if bounded_zone is None:
+        bounded_zone = [LAT_MIN, LAT_MAX, LON_MIN, LON_MAX]
     """
     Generate random coordinates from a bounded zone.
 
@@ -133,7 +133,7 @@ def get_n_random_coordinate_pairs(
 
 
 def generate_evalscript(
-    bands=["B04", "B03", "B02"],
+    bands=None,
     units="REFLECTANCE",
     data_type=None,
     mosaicking_type="SIMPLE",

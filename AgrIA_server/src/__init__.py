@@ -1,10 +1,10 @@
 import io
 import os
-import structlog
-import requests
 import zipfile
-
 from contextlib import asynccontextmanager
+
+import requests
+import structlog
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,6 +15,7 @@ from .benchmark.sr.constants import BM_DATA_DIR, BM_RES_DIR
 from .config.constants import BASE_GEOJSON_PATH, KML_FILE_URL, KML_FILENAME, TEMP_DIR
 from .config.env_config import UI_URL
 from .endpoints.chat import router as chat_router
+from .endpoints.hermes_agent import router as hermes_router
 from .endpoints.parcel_finder import router as parcel_finder_router
 from .utils.parcel_finder_utils import reset_dir
 
@@ -27,7 +28,7 @@ async def lifespan(app: FastAPI):
     # Fetch Sentinel2 Grid KML file
     try:
         if not os.path.exists(str(BASE_GEOJSON_PATH / str(KML_FILENAME + ".kml"))):
-            response = requests.get(KML_FILE_URL, stream=True)
+            response = requests.get(KML_FILE_URL, stream=True)  # noqa: ASYNC210
             response.raise_for_status()
             z = zipfile.ZipFile(io.BytesIO(response.content))
             z.extractall(BASE_GEOJSON_PATH)
@@ -101,5 +102,5 @@ def create_app(ui_url: str = UI_URL, lifespan=lifespan) -> FastAPI:
     # Register Routers (Equivalent to Blueprints)
     app.include_router(chat_router)
     app.include_router(parcel_finder_router)
-
+    app.include_router(hermes_router)
     return app

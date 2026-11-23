@@ -48,9 +48,11 @@ def get_ecoscheme_rules_data(rules_data_list) -> dict:
 
 
 def get_base_rate_details(
-    rates: dict, threshold: Decimal, keys: list = ["Peninsular", "Insular"]
+    rates: dict, threshold: Decimal, keys: list | None = None
 ) -> dict:
     """Extracts and formats Tier/Flat rate details for both Peninsular and Insular areas."""
+    if keys is None:
+        keys = ["Peninsular", "Insular"]
     base_rate_details = {}
     for key in keys:
         key_rates = rates.get(key)

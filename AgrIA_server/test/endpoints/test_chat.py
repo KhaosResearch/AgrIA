@@ -1,7 +1,6 @@
-import pytest
-
 from unittest.mock import MagicMock
 
+import pytest
 from langchain_core.messages import AIMessage
 
 from src.endpoints import chat
@@ -102,7 +101,9 @@ def test_send_user_input_scenarios(
 ):
     # --- ARRANGE --- #
     # Prepare mockups
-    monkeypatch.setattr(chat, "generate_user_response", lambda *args: expected_response)
+    monkeypatch.setattr(
+        chat, "generate_user_response", lambda *args, **kwargs: expected_response
+    )
 
     # Prepare inputs
     data = {
@@ -216,7 +217,7 @@ def test_send_parcel_info_to_chat_scenarios(
         pytest.param(
             "Success: Got suggestion",
             "A list of past messages in the chat.",
-            {"lang": "en"},
+            {"lang": "en", "thread_id": "test_thread_123"},
             200,
             "A mock suggestion from the LLM.",
             id="Success_GotSuggestion",
@@ -224,7 +225,7 @@ def test_send_parcel_info_to_chat_scenarios(
         pytest.param(
             "Failure: No valid history provided",
             None,
-            {"lang": "en"},
+            {"lang": "en", "thread_id": "test_thread_123"},
             400,
             "No valid history provided.",
             id="Failure_NoHistory",

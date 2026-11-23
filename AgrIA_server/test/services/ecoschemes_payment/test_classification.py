@@ -1,7 +1,8 @@
 from decimal import Decimal
+
 from src.services.ecoscheme_payments.classification import (
-    get_exclusivity_land_uses,
     get_ecoschemes_rates_and_totals,
+    get_exclusivity_land_uses,
 )
 from src.services.ecoscheme_payments.rules import get_ecoscheme_rules_data
 

@@ -1,13 +1,13 @@
-from datetime import datetime, timedelta
 import json
 import os
-import structlog
+from datetime import datetime, timedelta
 from decimal import Decimal
 
-from ...benchmark.vlm.constants import CLASSIFICATION_OUT_DIR
-from ...services.ecoscheme_payments.main import calculate_ecoscheme_payment
-from ...utils.parcel_finder_utils import reset_dir
+import structlog
 
+from ...benchmark.vlm.constants import CLASSIFICATION_OUT_DIR
+from ...services.ecoscheme_payments.main import get_ecoscheme_payments_data
+from ...utils.parcel_finder_utils import reset_dir
 
 # Fixed constant for the pluriannuality bonus (€25.00/ha) as per instructions
 PLURIANNUALITY_BONUS_PER_HA = Decimal("25.00")
@@ -258,8 +258,8 @@ def demo():
     for lang in languages:
         # Get ecoschemes classification
         data_dict = cad_ref_dict[lang.lower()]
-        for key in data_dict.keys():
-            output_dict = calculate_ecoscheme_payment(data_dict[key], lang)
+        for key, value in data_dict.items():
+            output_dict = get_ecoscheme_payments_data(value, lang)
             out_path = CLASSIFICATION_OUT_DIR / f"{key}_example_{lang}.json"
             with open(out_path, "w") as file:
                 json.dump(output_dict, file, indent=4)

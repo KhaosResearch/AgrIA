@@ -1,19 +1,28 @@
 import asyncio
-import structlog
+import io
+import os
 
-from PIL import Image
+import pdfplumber
+import structlog
+from google.genai import Client as GeminiGenAIClient
 from google.genai.types import Content
 from langchain_core.messages import HumanMessage
+from PIL import Image
+from run_agent import AIAgent
 
-from ..utils.nodes_utils import load_prompt_asset
-
-from .ecoscheme_payments.main import calculate_ecoscheme_payment
 from ..agent.graph import AGRIA_GRAPH as agent_graph
-from ..config.llm_client import vlm_client
-from ..config.constants import FULL_DESC_TRIGGER, SHORT_DESC_TRIGGER, TEMP_DIR
-from ..config.llm_client import client
+from ..config.constants import (
+    FULL_DESC_TRIGGER,
+    PDF_CONTEXT_HEADER,
+    SHORT_DESC_TRIGGER,
+    TEMP_DIR,
+)
+from ..config.llm_client import client, vlm_client
+from ..models.satellite_analyzer import SatelliteImageAnalyzer
 from ..utils.chat_utils import generate_image_context_data, save_image_and_get_path
 from ..utils.llm_utils import get_aux_image_description
+from ..utils.nodes_utils import load_prompt_asset
+from .ecoscheme_payments.main import get_ecoscheme_payments_data
 
 logger = structlog.getLogger()
 
@@ -23,7 +32,7 @@ def _generate_user_response_sync(
     is_detailed_description: bool,
     lang: str,
     file=None,
-    filename: str = None,
+    filename: str | None = None,
     thread_id: str = "default_session",
 ) -> str:
     """
@@ -39,14 +48,20 @@ def _generate_user_response_sync(
     try:
         final_input = user_input
         if None not in [file, filename]:
-            input_for_llm, image_context_prompt = get_image_description(
-                file, filename, lang, is_detailed_description
-            )
-            final_input = str(
-                "\n\n".join(
-                    [image_context_prompt, "\n".join(input_for_llm), user_input]
+            ext = os.path.splitext(filename)[-1]
+            if ext in [".png", ".jpg", ".jpeg"]:
+                input_for_llm, image_context_prompt = get_image_description(
+                    file, filename, lang, is_detailed_description
                 )
-            )
+                final_input = str(
+                    "\n\n".join(
+                        [image_context_prompt, "\n".join(input_for_llm), user_input]
+                    )
+                )
+            elif ext == ".pdf":
+                pdf_payload = extract_structured_pdf_content(file, filename, lang)
+                final_input = f"{user_input}\n---\n{pdf_payload}"
+
         inputs = {
             "lang": lang,
             "messages": [HumanMessage(content=final_input)],
@@ -60,9 +75,20 @@ def _generate_user_response_sync(
         response = str(output_state["messages"][-1].content)
         return response
     except Exception as e:
-        logger.error(f"Error while generating response: {e}")
-        logger.exception(e)
-        raise e
+        import traceback
+
+        tb = traceback.extract_tb(e.__traceback__)
+        frame = tb[-1]
+
+        logger.error(
+            "Error while generating response",
+            error=str(e),
+            file=frame.filename,
+            line=frame.lineno,
+            function=frame.name,
+        )
+
+        raise
 
 
 async def generate_user_response(
@@ -70,7 +96,7 @@ async def generate_user_response(
     is_detailed_description: bool,
     lang: str,
     file=None,
-    filename: str = None,
+    filename: str | None = None,
     thread_id: str = "default_session",
 ) -> str:
     return await asyncio.to_thread(
@@ -130,6 +156,76 @@ def get_image_description(file, filename, lang, is_detailed_description):
     return input_for_llm, image_context_prompt[lang]
 
 
+def extract_structured_pdf_content(file, filename, lang) -> str:
+    """
+    Reads a SpooledTemporaryFile stream of an administrative form PDF,
+    extracting clean text, checkboxes, and tables as structured Markdown.
+    """
+    try:
+        # Seek to start and read into memory
+        file.seek(0)
+        pdf_bytes = io.BytesIO(file.read())
+        file.seek(0)  # Always reset stream cursor back to start
+
+        pages_output = []
+
+        with pdfplumber.open(pdf_bytes) as pdf:
+            for page_idx, page in enumerate(pdf.pages):
+                page_lines = []
+                page_lines.append(f"### PAGE {page_idx + 1}\n")
+
+                # 1. Extract tables formatted as Markdown Tables
+                tables = page.extract_tables()
+                if tables:
+                    for table in tables:
+                        if not table or len(table) < 1:
+                            continue
+
+                        # Process table header
+                        header = [
+                            str(cell).strip().replace("\n", " ") if cell else ""
+                            for cell in table[0]
+                        ]
+                        page_lines.append("| " + " | ".join(header) + " |")
+                        page_lines.append(
+                            "| " + " | ".join(["---"] * len(header)) + " |"
+                        )
+
+                        # Process table rows
+                        for row in table[1:]:
+                            cleaned_row = [
+                                str(cell).strip().replace("\n", " ") if cell else ""
+                                for cell in row
+                            ]
+                            page_lines.append("| " + " | ".join(cleaned_row) + " |")
+
+                        page_lines.append("")  # Blank line after table
+
+                # 2. Extract regular page text (preserves unicode checkboxes like ☑ and ☐)
+                text = page.extract_text(layout=False)
+                if text:
+                    # Clean double blank lines while keeping line integrity
+                    cleaned_text = "\n".join(
+                        [line.strip() for line in text.splitlines() if line.strip()]
+                    )
+                    page_lines.append(cleaned_text)
+
+                pages_output.append("\n".join(page_lines))
+
+        # Format PDF payload to LLM
+        pdf_text = "\n\n---\n\n".join(pages_output)
+        header = PDF_CONTEXT_HEADER.get(lang, PDF_CONTEXT_HEADER["en"]).format(
+            filename=filename
+        )
+        pdf_payload = f"{header}```markdown\n{pdf_text}\n```"
+
+        return pdf_payload
+
+    except Exception as e:  # noqa: BLE001
+        logger.error(f"Error parsing structured PDF with pdfplumber: {e}")
+        return f"[PDF Parsing Error: Unable to parse document due to {e!s}]"
+
+
 def _get_parcel_description_sync(
     image_date: str,
     land_uses: list[dict],
@@ -153,8 +249,14 @@ def _get_parcel_description_sync(
     """
     try:
         logger.info("Retrieveing parcel data...")
-        image_context_data = generate_image_context_data(image_date, land_uses, query)
-        json_data = calculate_ecoscheme_payment(image_context_data[lang], lang)
+        cleaned_land_uses = []
+        for lu in land_uses:
+            lu["uso_sigpac"] = lu.get("uso_sigpac", "").split("-")[0].strip()
+            cleaned_land_uses.append(lu)
+        image_context_data = generate_image_context_data(
+            image_date, cleaned_land_uses, query
+        )
+        json_data = get_ecoscheme_payments_data(image_context_data[lang], lang)
         with open(TEMP_DIR / "ecoscheme_data.json", "w") as f:
             import json
 
@@ -167,39 +269,79 @@ def _get_parcel_description_sync(
         image_desc_prompt = f"\n```{image_context_data[lang]}\n```"
 
         image_indication_options = {
-            "es": "Estas son las características de la parcela cuya imagen te paso. Tenlo en cuenta para tu descripción en español. Comprueba el siguiente prompt para ver si es necesario cambiar el idioma:",
-            "en": "These are the parcel's features whose image I am sending you. Take them into account for your description in English. Check next prompt for language change if needed:",
+            "es": "Estas son las características de la parcela cuya imagen te paso. Tenlo en cuenta para tu descripción en español:",
+            "en": "These are the parcel's features whose image I am sending you. Take them into account for your description in English:",
         }
         image_indication_prompt = str(
-            f"{desc_trigger}\n{image_indication_options[lang]}\n\n{json_data}"
+            f"{desc_trigger}\n{image_indication_options[lang]}\n"
         )
         # Open image from path
         image_path = TEMP_DIR / str(image_filename).split("?")[0]
-        image = Image.open(image_path)
-        if vlm_client is not None:
+
+        if isinstance(vlm_client, AIAgent):
+            logger.info(
+                "Analyzing image layout using Hermes Agent with satellite-image-analysis skill..."
+            )
+
+            # 1. Execute analyzer in native Python (Instant < 100ms)
+            analyzer = SatelliteImageAnalyzer(image_path)
+            metrics = analyzer.analyze_patterns()
+            logger.debug(
+                "Satellite image analysis metrics:\n%s", json.dumps(metrics, indent=2)
+            )
+
+            # 2. Build direct text prompt for Hermes (No tool-call loop required)
+            prompt = (
+                f"Synthesize the following satellite imagery metrics and land use data into an organic, 50-60 word visual description.\n\n"
+                f"Visual Analysis Metrics:\n{json.dumps(metrics, indent=2)}\n\n"
+                f"SIGPAC Land Use Data:\n{json.dumps(cleaned_land_uses, indent=2)}\n\n"
+                f"Instructions:\n"
+                f"- Classify the landscape naturally (e.g., agricultural field / bare soil parcel).\n"
+                f"- Mention the dominant color tones (e.g., warm light-ochre, earthy brown) and any subtle patchiness.\n"
+                f"- Connect the absence of green vegetation (<1%) with the SIGPAC overexploited/agricultural status.\n"
+                f"- Do not infer any crop types/names from SIGPAC land use identifiers, use them as.is.\n"
+                f"- Output ONLY the final 50-60 word narrative paragraph."
+            )
+
+            # 3. Call Hermes with pure text (Fast single-turn response)
+            response = vlm_client.run_conversation(user_message=prompt)
+            extracted_visual_description = response["final_response"]
+
+            logger.debug("VLM image description:\n%s", extracted_visual_description)
+
+        elif isinstance(vlm_client, GeminiGenAIClient):
             logger.info(
                 "Analyzing image layout using auxiliary Multi-modal Language Model engine..."
             )
             # Trigger your auxiliary vision model
+            image = Image.open(image_path)
             extracted_visual_description = get_aux_image_description(
                 image_obj=image, lang=lang
             )
 
-            # Reconstruct the text chain to model using the extracted description string
+        # Reconstruct the text chain to model using the extracted description string
+        if extracted_visual_description:
             model_payload = "\n".join(
                 [
-                    f"Visual Analysis Report of Parcel: {extracted_visual_description}",
                     image_indication_prompt,
+                    f"Visual Analysis Report of Parcel: {extracted_visual_description}",
                     image_desc_prompt,
                 ]
             )
         else:
-            model_payload = "\n".join([image_indication_prompt, image_desc_prompt])
+            logger.info(
+                "No auxiliary Multi-modal Language Model engine detected. Using only image context data for description generation..."
+            )
+            model_payload = f"{image_indication_prompt}\n{image_desc_prompt}"
 
         inputs = {
             "crop_metadata": json_data,
             "lang": lang,
             "messages": [HumanMessage(content=model_payload)],
+            "visual_description": extracted_visual_description,
+            # A new parcel invalidates the previous assessment: clear it so
+            # cap_application does not inject a stale report from another parcel.
+            "assessment_report": None,
         }
         config = {"configurable": {"thread_id": thread_id}}
         output_state = agent_graph.invoke(inputs, config=config)
@@ -213,7 +355,7 @@ def _get_parcel_description_sync(
         return response
     except Exception as e:
         logger.error(f"Error while getting parcel description:\t{e}")
-        raise e
+        raise
 
 
 async def get_parcel_description(
@@ -267,14 +409,7 @@ def _get_suggestion_for_chat_sync(chat_history: list[Content], lang: str):
             ("system", system_instruction),
             (
                 "human",
-                "\n".join(
-                    [
-                        "Summarised chat:",
-                        summarised_chat,
-                        "\nLast chat entry:",
-                        last_chat_output,
-                    ]
-                ),
+                f"Summarised chat:\n{summarised_chat}\nLast chat entry:\n{last_chat_output}",
             ),
         ]
         suggestion = client.invoke(msg)
@@ -282,7 +417,7 @@ def _get_suggestion_for_chat_sync(chat_history: list[Content], lang: str):
         return suggestion.text
     except Exception as e:
         logger.error(f"Error getting suggestion:\t{e}")
-        raise e
+        raise
 
 
 async def get_suggestion_for_chat(chat_history: list[Content], lang: str):
@@ -310,7 +445,7 @@ def get_summarised_chat(chat_history):
         return summarised_chat.text
     except Exception as e:
         logger.error(f"Error while summarising chat:\t{e}")
-        raise e
+        raise
 
 
 def get_role_and_content(chat_history):
