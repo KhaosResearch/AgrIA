@@ -1,12 +1,11 @@
 import asyncio
 import json
-import pdfplumber
-
 from pathlib import Path
+
+import pdfplumber
 
 from ..config.llm_client import client
 from ..models.cap_form_models import CAPFullApplicationSchema
-
 
 SYS_INS = """You are an expert system processing Spanish CAP (Solicitud Única) documents.
 Extract all relevant application details into the requested JSON structure according to the target schema.

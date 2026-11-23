@@ -239,7 +239,7 @@ export class ChatComponent {
     document.body.style.cursor = 'progress';
     const formData = new FormData();
     formData.append('lang', `${this.translateService.currentLang}`);
-    this.chatService.loadInputSuggestion(formData).subscribe({
+    this.chatService.loadInputSuggestion(formData, this.chatAssistant.threadId).subscribe({
       next: (response: string) => {
         this.notificationService.showNotification('chat.suggestion-success', '', 'success');
         this.userInput = response;
@@ -257,6 +257,53 @@ export class ChatComponent {
         document.body.style.cursor = 'default';
       },
     });
+  }
+
+  /**
+   * Sends a CAP workflow command (status, pause, cancel) to the assistant.
+   * Injects a routing tag (###CAP_*###) so the backend fast-path routes
+   * deterministically without an LLM classifier call. The tag is sent to
+   * the backend; the user sees a human-readable label in the bubble.
+   *
+   * @param command - One of 'status', 'pause', 'cancel'
+   */
+  public sendCapCommand(command: string): void {
+    if (this.isAssistantLoading()) {
+      console.warn('Cannot send CAP command: Assistant is loading a response.');
+      return;
+    }
+    const lang = this.translateService.currentLang;
+    const commands: Record<string, { tag: string; display: Record<string, string> }> = {
+      status: {
+        tag: '###CAP_STATUS###',
+        display: {
+          es: 'Muéstrame el estado de mi solicitud',
+          en: 'Show me the status of my application',
+        },
+      },
+      pause: {
+        tag: '###CAP_PAUSE###',
+        display: {
+          es: 'Pausa mi solicitud',
+          en: 'Pause my application',
+        },
+      },
+      cancel: {
+        tag: '###CAP_CANCEL###',
+        display: {
+          es: 'Cancela mi solicitud',
+          en: 'Cancel my application',
+        },
+      },
+    };
+    const cmd = commands[command];
+    if (!cmd) {
+      console.warn(`Unknown CAP command: ${command}`);
+      return;
+    }
+    const display = cmd.display[lang] ?? cmd.display['en'];
+    // Tag goes to the backend (fast-path routing); display goes to the bubble.
+    this.chatAssistant.addUserMessage(cmd.tag, null, false, display);
   }
 
   /**

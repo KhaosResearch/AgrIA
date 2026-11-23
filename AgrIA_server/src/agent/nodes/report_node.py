@@ -1,6 +1,6 @@
 import json
-import structlog
 
+import structlog
 from langchain_core.messages import AIMessage, RemoveMessage
 
 from ...config.constants import BASE_PROMPTS_PATH

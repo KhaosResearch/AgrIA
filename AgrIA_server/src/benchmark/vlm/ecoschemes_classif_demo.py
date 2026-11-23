@@ -1,13 +1,13 @@
-from datetime import datetime, timedelta
 import json
 import os
-import structlog
+from datetime import datetime, timedelta
 from decimal import Decimal
+
+import structlog
 
 from ...benchmark.vlm.constants import CLASSIFICATION_OUT_DIR
 from ...services.ecoscheme_payments.main import get_ecoscheme_payments_data
 from ...utils.parcel_finder_utils import reset_dir
-
 
 # Fixed constant for the pluriannuality bonus (€25.00/ha) as per instructions
 PLURIANNUALITY_BONUS_PER_HA = Decimal("25.00")

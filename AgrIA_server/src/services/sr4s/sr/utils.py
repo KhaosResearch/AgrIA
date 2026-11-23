@@ -1,10 +1,10 @@
-import cv2
 import math
-import numpy as np
-import torch
-import structlog
-
 from dataclasses import dataclass
+
+import cv2
+import numpy as np
+import structlog
+import torch
 from rasterio.transform import Affine
 
 from ....config.config import Config

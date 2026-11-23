@@ -1,12 +1,11 @@
-import chromadb
 import hashlib
-import structlog
+from pathlib import Path
 
+import chromadb
+import structlog
 from chromadb.utils import embedding_functions
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from pathlib import Path
-from typing import List
 
 from ..config.constants import BASE_CONTEXT_PATH, COLLECTION_NAME, VECTOR_DB_PATH
 
@@ -20,7 +19,7 @@ def get_embedding_function():
 
 def chunk_document(
     file_path: Path, chunk_size: int = 800, chunk_overlap: int = 150
-) -> List:
+) -> list:
     """
     Reads a PDF or Markdown document and yields smaller, overlapping text segments.
     """
@@ -47,7 +46,7 @@ def chunk_document(
     return chunks
 
 
-def add_documents_to_kb(collection, document_paths: List[Path]):
+def add_documents_to_kb(collection, document_paths: list[Path]):
     """
     Processes a list of document file paths, generates embeddings, and adds them to ChromaDB.
     """

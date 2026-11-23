@@ -1,13 +1,12 @@
 import base64
 import json
 import os
-import structlog
-
-from google.genai import Client as GeminiGenAIClient
 from io import BytesIO
+
+import structlog
+from google.genai import Client as GeminiGenAIClient
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
-from ..config.llm_client import vlm_client
 from ..config.constants import (
     BASE_CONTEXT_PATH,
     BASE_PROMPTS_PATH,
@@ -16,6 +15,7 @@ from ..config.constants import (
     VLM_DESC_PROMPT,
     WELCOME_MESSAGE,
 )
+from ..config.llm_client import vlm_client
 from ..services.llm_services import upload_context_document
 
 logger = structlog.get_logger()

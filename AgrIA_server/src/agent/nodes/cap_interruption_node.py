@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from langchain_core.messages import AIMessage
 
@@ -11,7 +11,7 @@ def cap_interruption_node(
     state: AgrIAState,
     client: Any,
     model_name: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Handle CAP interruptions without mixing them into form extraction."""
 
     alignment = state.get("cap_alignment") or {}

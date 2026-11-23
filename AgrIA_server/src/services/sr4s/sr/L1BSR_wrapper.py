@@ -1,17 +1,15 @@
-import numpy as np
 import os
+
+import numpy as np
 import torch
-
-from typing import Optional
-
 from safetensors.torch import load_file as load_safetensors
 
 from .RCAN_wrapper import RCAN
-from .utils import to_torch_4ch, from_torch_to_u16
+from .utils import from_torch_to_u16, to_torch_4ch
 
 
 class L1BSR:
-    def __init__(self, weights_path: str, device: Optional[str] = None):
+    def __init__(self, weights_path: str, device: str | None = None):
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
         self.device = torch.device(device)

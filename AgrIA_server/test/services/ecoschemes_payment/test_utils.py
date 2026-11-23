@@ -1,12 +1,12 @@
 from decimal import Decimal
 
-from src.services.ecoscheme_payments.utils import (
-    calculate_payments_for_rate_type,
-    is_valid_rate_for_coefficients,
-)
 from src.services.ecoscheme_payments.constants import (
     PLURIANNUALITY_BONUS_PER_HA,
     ROUNDING_PAYMENT,
+)
+from src.services.ecoscheme_payments.utils import (
+    calculate_payments_for_rate_type,
+    is_valid_rate_for_coefficients,
 )
 
 # --- Test Coefficient Validation ---

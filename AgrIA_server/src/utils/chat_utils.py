@@ -1,9 +1,8 @@
 import os
 import shutil
+
 import structlog
-
 from fastapi import UploadFile
-
 from src.config.constants import TEMP_DIR
 
 logger = structlog.get_logger(__file__)

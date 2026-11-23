@@ -1,13 +1,11 @@
 import json
-import structlog
-
 from inspect import isawaitable
-from langchain_core.messages import AIMessage
-from typing import Optional
-from fastapi import APIRouter, Form, UploadFile, File, HTTPException
 
-from src.config.constants import WELCOME_MESSAGE
+import structlog
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from langchain_core.messages import AIMessage
 from src.agent.graph import AGRIA_GRAPH as agent_graph
+from src.config.constants import WELCOME_MESSAGE
 from src.services.chat_service import (
     generate_user_response,
     get_parcel_description,
@@ -72,7 +70,7 @@ async def send_parcel_info_to_chat(
     imageDate: str = Form(...),
     landUses: str = Form(...),
     query: str = Form(...),
-    imageFilename: Optional[str] = Form(None),
+    imageFilename: str | None = Form(None),
     isDetailedDescription: str = Form("false"),
     lang: str = Form("es"),
 ):

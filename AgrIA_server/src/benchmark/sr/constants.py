@@ -1,5 +1,5 @@
-from pathlib import Path
 import os
+from pathlib import Path
 
 BM_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 BM_DATA_DIR = BM_DIR / "data"

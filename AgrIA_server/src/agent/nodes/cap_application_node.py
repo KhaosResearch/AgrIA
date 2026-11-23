@@ -1,25 +1,25 @@
 import json
-import structlog
-
-from langchain_core.messages import AIMessage
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
+
+import structlog
+from langchain_core.messages import AIMessage
 
 from ...benchmark.vlm.constants import OG_CLASSIFICATION_FILEPATH
 from ...config.constants import CAP_FORMS_PATH
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
-from .cap_slot_guard_node import guard_ack, topic_change_message
 from ...utils.cap_form_utils import (
-    load_cap_rates,
     build_form_mapping,
     estimated_amounts,
     first_missing_slot,
+    load_cap_rates,
     merge_slots,
     validate_application,
 )
 from ...utils.chat_utils import get_recent_history
 from ...utils.nodes_utils import load_prompt_asset, secondary_intent_block
+from .cap_slot_guard_node import guard_ack, topic_change_message
 
 logger = structlog.get_logger(__name__)
 
@@ -51,7 +51,7 @@ def _last_user_text(messages: list) -> str:
 
 def _apply_alignment(
     state: AgrIAState,
-) -> Tuple[dict, List[str]]:
+) -> tuple[dict, list[str]]:
     """Merge the guard's schema-gated slots into `cap_form_data`.
 
     This node is the only writer of `cap_form_data`, so every write path (PDF
@@ -68,7 +68,7 @@ def _apply_alignment(
     return merged, new_names
 
 
-def cap_application_node(state: AgrIAState, client, model_name: str) -> Dict[str, Any]:
+def cap_application_node(state: AgrIAState, client, model_name: str) -> dict[str, Any]:
     """LangGraph Node: advance the CAP application workflow.
 
     Order of operations is deliberate and deterministic:
@@ -108,7 +108,7 @@ def cap_application_node(state: AgrIAState, client, model_name: str) -> Dict[str
 
     # The alignment is consumed here; leaving it in state would re-merge it on
     # every later turn and mask a later correction.
-    update: Dict[str, Any] = {"cap_form_data": slots, "cap_alignment": None}
+    update: dict[str, Any] = {"cap_form_data": slots, "cap_alignment": None}
 
     if not report["valid"]:
         # Ask one question at a time; keep the workflow in collection mode.

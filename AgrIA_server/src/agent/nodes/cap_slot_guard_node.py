@@ -1,8 +1,8 @@
 import json
-import structlog
+from typing import Any
 
+import structlog
 from langchain_core.messages import HumanMessage
-from typing import Any, Dict, Optional
 
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
@@ -35,7 +35,7 @@ GUARD_MAX_ATTEMPTS = 2
 
 
 def _schema_block(
-    slots: Optional[dict], pending_action: Optional[str], lang: str
+    slots: dict | None, pending_action: str | None, lang: str
 ) -> str:
     """Bilingual schema + current-state block fed to the guard."""
     schema, _ = load_cap_slots()
@@ -59,7 +59,7 @@ def _schema_block(
     return "\n".join(lines)
 
 
-def _parse_verdict(text: str) -> Optional[dict]:
+def _parse_verdict(text: str) -> dict | None:
     """Extract the guard JSON from a model reply, tolerating code fences."""
     if not text:
         return None
@@ -78,7 +78,7 @@ def _parse_verdict(text: str) -> Optional[dict]:
     return parsed if isinstance(parsed, dict) else None
 
 
-def _fallback_alignment(state: AgrIAState, user_text: str) -> Dict[str, Any]:
+def _fallback_alignment(state: AgrIAState, user_text: str) -> dict[str, Any]:
     """Classify a reply deterministically when the guard returns no usable JSON.
 
     Only the slot named by ``pending_action`` is considered, and it still has to
@@ -110,7 +110,7 @@ def _fallback_alignment(state: AgrIAState, user_text: str) -> Dict[str, Any]:
 
 def cap_slot_guard_node(
     state: AgrIAState, client: Any, model_name: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """LangGraph Node: one cheap, tightly constrained LLM call that both
     classifies the user's reply and extracts any CAP slots it contains.
 
@@ -149,7 +149,7 @@ def cap_slot_guard_node(
         max_context_tokens=GUARD_CONTEXT_TOKENS,
     )
 
-    verdict: Optional[dict] = None
+    verdict: dict | None = None
     for attempt in range(GUARD_MAX_ATTEMPTS):
         try:
             response = chat.send_message(user_payload)
@@ -195,7 +195,7 @@ def cap_slot_guard_node(
     return {"cap_alignment": alignment}
 
 
-def pending_slot_name(pending_action: Optional[str]) -> Optional[str]:
+def pending_slot_name(pending_action: str | None) -> str | None:
     """Extract the slot name from an ``AWAITING_SLOT:<name>`` marker."""
     if not pending_action or not pending_action.startswith("AWAITING_SLOT:"):
         return None
@@ -203,7 +203,7 @@ def pending_slot_name(pending_action: Optional[str]) -> Optional[str]:
     return name or None
 
 
-def next_slot_prompt(pending_action: Optional[str], lang: str = "es") -> str:
+def next_slot_prompt(pending_action: str | None, lang: str = "es") -> str:
     """Bilingual question for the slot the graph is currently waiting on."""
     name = pending_slot_name(pending_action)
     if not name:
@@ -234,7 +234,7 @@ def acknowledgement_message(lang: str = "es") -> str:
     return "Entendido, he actualizado los siguientes campos de tu solicitud CAP: "
 
 
-def summarise_slots(slots: Optional[dict], names: list[str]) -> str:
+def summarise_slots(slots: dict | None, names: list[str]) -> str:
     """Human-readable confirmation of the slots that were just written."""
     parts = []
     for name in names:
@@ -245,7 +245,7 @@ def summarise_slots(slots: Optional[dict], names: list[str]) -> str:
     return "\n".join(parts) + ("\n" if parts else "")
 
 
-def guard_ack(slots: Optional[dict], names: list[str], lang: str = "es") -> str:
+def guard_ack(slots: dict | None, names: list[str], lang: str = "es") -> str:
     """Confirm the slot values just written, without inventing any figure."""
     if not names:
         return ""

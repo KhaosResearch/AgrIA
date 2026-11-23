@@ -1,6 +1,5 @@
 import structlog
-
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ..config.constants import BASE_PROMPTS_PATH
 from ..models.chat_models import LocalChat

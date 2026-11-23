@@ -1,16 +1,14 @@
-import re
 import json
+import re
+from decimal import ROUND_HALF_UP, Decimal
+
 import structlog
-from decimal import Decimal, ROUND_HALF_UP
-
-from .classification import get_ecoschemes_rates_and_totals, get_exclusivity_land_uses
-from .rules import get_ecoscheme_rules_data
-from .utils import calculate_payments_for_rate_type
-
-from .constants import ROUNDING_AREA, ROUNDING_PAYMENT
 
 from ...benchmark.vlm.constants import LANG, OG_CLASSIFICATION_FILEPATH
-
+from .classification import get_ecoschemes_rates_and_totals, get_exclusivity_land_uses
+from .constants import ROUNDING_AREA, ROUNDING_PAYMENT
+from .rules import get_ecoscheme_rules_data
+from .utils import calculate_payments_for_rate_type
 
 logger = structlog.get_logger()
 

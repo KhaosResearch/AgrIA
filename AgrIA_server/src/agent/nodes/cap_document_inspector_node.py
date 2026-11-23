@@ -1,8 +1,8 @@
 import json
-import structlog
+from typing import Any
 
+import structlog
 from langchain_core.messages import AIMessage, HumanMessage
-from typing import Any, Dict, Optional
 
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
@@ -15,7 +15,7 @@ logger = structlog.get_logger(__name__)
 INSPECTOR_CONTEXT_TOKENS = 25000
 
 
-def _pdf_path_from(content: Any) -> Optional[str]:
+def _pdf_path_from(content: Any) -> str | None:
     """Best-effort discovery of an uploaded PDF path in a multimodal message.
 
     Accepts a bare string path, a multimodal part list, or a dict carrying a
@@ -88,7 +88,7 @@ def _parse_slots(text: str) -> dict:
 
 def cap_document_inspector_node(
     state: AgrIAState, client, model_name: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """LangGraph Node: extract CAP slots from an uploaded PDF.
 
     Extracted values land in `cap_alignment["slots"]`, the same structure the

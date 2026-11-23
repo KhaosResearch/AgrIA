@@ -1,7 +1,7 @@
 import json
-import structlog
-
 from pathlib import Path
+
+import structlog
 
 logger = structlog.get_logger(__file__)
 

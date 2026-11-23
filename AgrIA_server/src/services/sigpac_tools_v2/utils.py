@@ -1,9 +1,8 @@
-import requests
-import structlog
-
 from collections import defaultdict
 
-from shapely.geometry import shape, mapping
+import requests
+import structlog
+from shapely.geometry import mapping, shape
 from shapely.ops import unary_union
 
 from ._globals import PROVINCES_BY_COMMUNITY

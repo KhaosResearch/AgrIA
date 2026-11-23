@@ -12,7 +12,8 @@ export class ChatAssistantService {
 
   constructor(private http: HttpClient) {}
 
-  public sendUserInput(request: FormData): Observable<string> {
+  public sendUserInput(request: FormData, threadId: string): Observable<string> {
+    request.append('thread_id', threadId);
     return this.http.post<{ response: string }>(`${this.apiUrl}/send-user-input`, request).pipe(map(res => res.response));
   }
 
@@ -20,9 +21,11 @@ export class ChatAssistantService {
     return this.http.post<{ response: string }>(`${this.apiUrl}/send-image`, request).pipe(map(res => res.response));
   }
 
-  public loadActiveChatHistory(): Observable<IChatMessage[]> {
+  public loadActiveChatHistory(threadId: string): Observable<IChatMessage[]> {
     return this.http
-      .get<{ response: IChatMessage[] }>(`${this.apiUrl}/load-active-chat-history`)
+      .get<{ response: IChatMessage[] }>(`${this.apiUrl}/load-active-chat-history`, {
+        params: { thread_id: threadId },
+      })
       .pipe(map(res => res.response));
   }
 }

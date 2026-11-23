@@ -2,8 +2,8 @@ from fastapi import APIRouter
 from run_agent import AIAgent
 from structlog import get_logger
 
-from ..config.constants import BASE_PROMPTS_PATH
 from ..config.config import LLM_API_KEY, LLM_BASE_URL, LLM_MODEL_NAME
+from ..config.constants import BASE_PROMPTS_PATH
 
 router = APIRouter()
 logger = get_logger(__name__)

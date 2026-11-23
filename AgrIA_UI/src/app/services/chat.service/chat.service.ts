@@ -18,7 +18,8 @@ export class ChatService {
       .pipe(map(res => res.response));
   }
 
-  public loadInputSuggestion(request: FormData): Observable<string> {
+  public loadInputSuggestion(request: FormData, threadId: string): Observable<string> {
+    request.append('thread_id', threadId);
     return this.http.post<{ response: string }>(`${this.apiUrl}/get-input-suggestion`, request).pipe(map(res => res.response));
   }
 }

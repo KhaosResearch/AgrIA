@@ -5,7 +5,6 @@ reproduction without any LLM involvement.
 """
 
 import pytest
-
 from src.utils.cap_form_utils import (
     build_form_mapping,
     coerce_value,

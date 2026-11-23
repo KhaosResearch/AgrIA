@@ -1,30 +1,28 @@
 import asyncio
 import io
 import os
+
 import pdfplumber
 import structlog
-
 from google.genai import Client as GeminiGenAIClient
-from PIL import Image
 from google.genai.types import Content
 from langchain_core.messages import HumanMessage
+from PIL import Image
 from run_agent import AIAgent
 
-from ..utils.nodes_utils import load_prompt_asset
-
-from .ecoscheme_payments.main import get_ecoscheme_payments_data
 from ..agent.graph import AGRIA_GRAPH as agent_graph
-from ..models.satellite_analyzer import SatelliteImageAnalyzer
-from ..config.llm_client import vlm_client
 from ..config.constants import (
     FULL_DESC_TRIGGER,
     PDF_CONTEXT_HEADER,
     SHORT_DESC_TRIGGER,
     TEMP_DIR,
 )
-from ..config.llm_client import client
+from ..config.llm_client import client, vlm_client
+from ..models.satellite_analyzer import SatelliteImageAnalyzer
 from ..utils.chat_utils import generate_image_context_data, save_image_and_get_path
 from ..utils.llm_utils import get_aux_image_description
+from ..utils.nodes_utils import load_prompt_asset
+from .ecoscheme_payments.main import get_ecoscheme_payments_data
 
 logger = structlog.getLogger()
 
@@ -225,7 +223,7 @@ def extract_structured_pdf_content(file, filename, lang) -> str:
 
     except Exception as e:
         logger.error(f"Error parsing structured PDF with pdfplumber: {e}")
-        return f"[PDF Parsing Error: Unable to parse document due to {str(e)}]"
+        return f"[PDF Parsing Error: Unable to parse document due to {e!s}]"
 
 
 def _get_parcel_description_sync(
