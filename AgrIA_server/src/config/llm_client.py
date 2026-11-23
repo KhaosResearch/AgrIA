@@ -1,6 +1,7 @@
 import structlog
 from google import genai
 from langchain_openai import ChatOpenAI
+
 from .config import (
     GEMINI_API_KEY,
     IS_VLM_TEXT_ONLY,

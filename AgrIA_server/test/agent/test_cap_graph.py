@@ -9,9 +9,8 @@ from unittest.mock import MagicMock
 
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage
-from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.runnables.config import RunnableConfig
-
+from langgraph.checkpoint.memory import MemorySaver
 from src.agent.graph import inspector_edge
 from src.agent.nodes.router_node import clear_cap_workflow, deterministic_router
 from src.models.state_models import AgrIAState

@@ -1,6 +1,7 @@
-import pytest
 import uuid
 from unittest.mock import MagicMock
+
+import pytest
 from langchain_core.messages import HumanMessage
 from src.models.state_models import AgrIAState
 

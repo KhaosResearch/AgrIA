@@ -1,10 +1,10 @@
 import io
 import os
-import structlog
-import requests
 import zipfile
-
 from contextlib import asynccontextmanager
+
+import requests
+import structlog
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,8 +14,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from .benchmark.sr.constants import BM_DATA_DIR, BM_RES_DIR
 from .config.constants import BASE_GEOJSON_PATH, KML_FILE_URL, KML_FILENAME, TEMP_DIR
 from .config.env_config import UI_URL
-from .endpoints.hermes_agent import router as hermes_router
 from .endpoints.chat import router as chat_router
+from .endpoints.hermes_agent import router as hermes_router
 from .endpoints.parcel_finder import router as parcel_finder_router
 from .utils.parcel_finder_utils import reset_dir
 

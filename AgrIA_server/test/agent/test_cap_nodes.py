@@ -9,7 +9,6 @@ from unittest.mock import MagicMock
 
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage
-
 from src.agent.nodes.cap_application_node import cap_application_node
 from src.agent.nodes.cap_document_inspector_node import (
     _parse_slots,

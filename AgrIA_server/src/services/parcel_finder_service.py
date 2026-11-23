@@ -1,20 +1,24 @@
 import asyncio
-from datetime import datetime, timedelta
 import json
-import time
 import os
+import time
+from datetime import datetime, timedelta
+
 import numpy as np
 import structlog
-
 from flask import abort
+from sen2sr_tools.constants import BANDS, GEOJSON_FILEPATH
+from sen2sr_tools.get_sr_image import get_sr_image
+from sigpac_tools.find import find_from_cadastral_registry
+from sigpac_tools.locate import get_geometry_and_metadata_coords
 
 from ..benchmark.sr.compare_sr_metrics import compare_sr_metrics
 from ..benchmark.sr.constants import BM_DATA_DIR, BM_RES_DIR
 from ..config.constants import (
     GET_SR_BENCHMARK,
+    RESOLUTION,
     SEN2SR_SR_DIR,
     SR_BANDS,
-    RESOLUTION,
     TEMP_DIR,
 )
 from ..utils.parcel_finder_utils import (
@@ -27,13 +31,7 @@ from ..utils.parcel_finder_utils import (
     reset_dir,
     shape,
 )
-
 from .sr4s.im.get_image_bands import request_date
-
-from sen2sr_tools.get_sr_image import get_sr_image
-from sen2sr_tools.constants import BANDS, GEOJSON_FILEPATH
-from sigpac_tools.find import find_from_cadastral_registry
-from sigpac_tools.locate import get_geometry_and_metadata_coords
 
 logger = structlog.get_logger()
 

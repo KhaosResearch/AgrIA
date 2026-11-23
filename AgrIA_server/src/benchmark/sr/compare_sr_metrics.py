@@ -1,21 +1,22 @@
-import rasterio
-import structlog
+import glob
+import os
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
-
+import rasterio
+import structlog
 from skimage.metrics import (
-    structural_similarity as ssim,
     peak_signal_noise_ratio as psnr,
 )
-from datetime import datetime
-import os
-import glob
+from skimage.metrics import (
+    structural_similarity as ssim,
+)
 
-from .constants import BM_DATA_DIR, BM_SR_DIR, BM_RES_DIR
+from .constants import BM_DATA_DIR, BM_RES_DIR, BM_SR_DIR
 from .utils import (
-    detect_and_normalize,
     EPS,
+    detect_and_normalize,
     ergas,
     extract_timestamp,
     find_closest_sr,

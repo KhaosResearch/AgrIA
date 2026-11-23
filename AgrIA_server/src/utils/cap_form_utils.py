@@ -7,10 +7,10 @@ values; every value that reaches `cap_form_data` passes through this module.
 
 import json
 import re
+from collections.abc import Iterable, Mapping
 from functools import lru_cache
 from types import MappingProxyType
-from collections.abc import Mapping
-from typing import Any, Iterable, Optional
+from typing import Any
 
 from ..config.constants import BASE_PROMPTS_PATH
 
@@ -65,7 +65,7 @@ def load_cap_rates() -> Mapping[str, float]:
     return _load_cap_rates()
 
 
-def slot_definition(name: str) -> Optional[dict]:
+def slot_definition(name: str) -> dict | None:
     """Return the schema definition for a slot, or None when unknown."""
     return load_cap_slots()[0].get(name)
 
@@ -109,7 +109,7 @@ def coerce_value(name: str, value: Any) -> Any:
     return text
 
 
-def _normalize_numeric_token(token: str) -> Optional[float]:
+def _normalize_numeric_token(token: str) -> float | None:
     """Turn a separator-laden numeric token into a float.
 
     Rules (applied in order, so ES and EN notation both work):
@@ -143,7 +143,7 @@ def _normalize_numeric_token(token: str) -> Optional[float]:
         return None
 
 
-def parse_number(value: Any) -> Optional[float]:
+def parse_number(value: Any) -> float | None:
     """Best-effort numeric parse across ES/EN thousands and decimal marks."""
     if isinstance(value, bool):
         return None
@@ -162,7 +162,7 @@ def parse_number(value: Any) -> Optional[float]:
     return _normalize_numeric_token(token_match.group(0))
 
 
-def normalise_slots(proposed: Optional[dict]) -> dict[str, Any]:
+def normalise_slots(proposed: dict | None) -> dict[str, Any]:
     """Filter an LLM-proposed slot dict down to known, coercible entries."""
     if not isinstance(proposed, dict):
         return {}
@@ -177,7 +177,7 @@ def normalise_slots(proposed: Optional[dict]) -> dict[str, Any]:
     return accepted
 
 
-def merge_slots(existing: Optional[dict], incoming: Optional[dict]) -> dict[str, Any]:
+def merge_slots(existing: dict | None, incoming: dict | None) -> dict[str, Any]:
     """Merge accepted slots over existing ones, dropping empty values."""
     merged = dict(existing or {})
     for name, value in (incoming or {}).items():
@@ -191,7 +191,7 @@ def _has_value(value: Any) -> bool:
     return value is not None and value != "" and value != []
 
 
-def missing_required_slots(slots: Optional[dict]) -> list[str]:
+def missing_required_slots(slots: dict | None) -> list[str]:
     """Names of required slots that have no usable value yet."""
     schema = load_cap_slots()[0]
     data = slots or {}
@@ -213,7 +213,7 @@ def missing_slot_descriptions(lang: str = "es") -> list[dict]:
     ]
 
 
-def first_missing_slot(slots: Optional[dict], lang: str = "es") -> Optional[dict]:
+def first_missing_slot(slots: dict | None, lang: str = "es") -> dict | None:
     """The single next slot to ask about, or None when collection is complete."""
     schema = load_cap_slots()[0]
     data = slots or {}
@@ -224,7 +224,7 @@ def first_missing_slot(slots: Optional[dict], lang: str = "es") -> Optional[dict
     return None
 
 
-def validate_application(slots: Optional[dict]) -> dict[str, Any]:
+def validate_application(slots: dict | None) -> dict[str, Any]:
     """Deterministic validation of a CAP application.
 
     Returns a report with `valid`, `missing_required`, `errors` and `warnings`.
@@ -268,7 +268,7 @@ def validate_application(slots: Optional[dict]) -> dict[str, Any]:
     }
 
 
-def build_form_mapping(slots: Optional[dict]) -> dict[str, Any]:
+def build_form_mapping(slots: dict | None) -> dict[str, Any]:
     """Project collected slots onto the versioned CAP application structure.
 
     Values are echoed verbatim; nothing is computed or invented here.
@@ -315,7 +315,7 @@ def build_form_mapping(slots: Optional[dict]) -> dict[str, Any]:
 
 
 def estimated_amounts(
-    slots: Optional[dict], rates: Optional[dict] = None
+    slots: dict | None, rates: dict | None = None
 ) -> dict[str, Any]:
     """Reproduce estimated amounts from a supplied rate table.
 
@@ -341,6 +341,6 @@ def estimated_amounts(
     return amounts
 
 
-def collect_field_names(slots: Optional[dict]) -> Iterable[str]:
+def collect_field_names(slots: dict | None) -> Iterable[str]:
     """Iterate the slot names carrying a value."""
     return (name for name, value in (slots or {}).items() if _has_value(value))

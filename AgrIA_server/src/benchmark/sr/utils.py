@@ -1,12 +1,13 @@
-import cv2
 import os
 import re
-import numpy as np
 import shutil
-import structlog
 import time
 
-from .constants import BM_SR_DIR, BM_DATA_DIR
+import cv2
+import numpy as np
+import structlog
+
+from .constants import BM_DATA_DIR, BM_SR_DIR
 
 EPS = 1e-10
 

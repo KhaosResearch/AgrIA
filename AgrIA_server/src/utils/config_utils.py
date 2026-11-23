@@ -1,8 +1,8 @@
 import shutil
+from pathlib import Path
+
 import structlog
 import yaml
-
-from pathlib import Path
 
 from ..config.constants import CUSTOM_SKILLS_DIR
 

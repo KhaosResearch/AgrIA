@@ -1,12 +1,11 @@
 import json
-import structlog
-
 from typing import Literal
 
+import structlog
 from langchain_core.messages import AIMessage
 
 from ...models.chat_models import LocalChat
-from ...models.state_models import AgrIAState, INTENT_REGISTRY
+from ...models.state_models import INTENT_REGISTRY, AgrIAState
 from ...utils.chat_utils import get_recent_history
 from ...utils.nodes_utils import load_prompt_asset
 

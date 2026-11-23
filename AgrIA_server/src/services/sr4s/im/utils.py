@@ -1,15 +1,15 @@
 import io
 import math
-import numpy as np
 import random
+
+import numpy as np
 import rasterio
 import structlog
-
 from PIL import Image
 from rasterio.transform import from_bounds
-from sentinelhub import BBox, CRS
+from sentinelhub import CRS, BBox
 
-from ..constants import LAT_MIN, LAT_MAX, LON_MIN, LON_MAX
+from ..constants import LAT_MAX, LAT_MIN, LON_MAX, LON_MIN
 
 logger = structlog.get_logger(__file__)
 

@@ -1,23 +1,21 @@
 import time
-import structlog
-
-import numpy as np
-
+from contextvars import ContextVar
 from datetime import datetime, timedelta
 
+import numpy as np
+import structlog
 from sentinelhub import (
-    SHConfig,
     DataCollection,
     MimeType,
     SentinelHubRequest,
+    SHConfig,
     bbox_to_dimensions,
 )
-from .sh_config import CONFIG_NAME
-from .utils import generate_evalscript, get_bbox_from_center, save_tiff
+
 from ....config.constants import BANDS_DIR
 from ..constants import DELTA_DAYS, RESOLUTION, SIZE
-
-from contextvars import ContextVar
+from .sh_config import CONFIG_NAME
+from .utils import generate_evalscript, get_bbox_from_center, save_tiff
 
 logger = structlog.get_logger(__file__)
 

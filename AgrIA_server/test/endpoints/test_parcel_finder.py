@@ -1,9 +1,8 @@
 import os
-import pytest
-
-from flask import make_response
 from unittest.mock import MagicMock, mock_open
 
+import pytest
+from flask import make_response
 from src.config.constants import TEMP_DIR
 from src.endpoints import parcel_finder
 

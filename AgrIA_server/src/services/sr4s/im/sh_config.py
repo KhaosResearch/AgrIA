@@ -1,7 +1,7 @@
-from sentinelhub import SHConfig
-from dotenv import load_dotenv
-
 import os
+
+from dotenv import load_dotenv
+from sentinelhub import SHConfig
 
 # Setup logging
 # logging.basicConfig(level=logging.DEBUG)

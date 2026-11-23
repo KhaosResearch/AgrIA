@@ -1,5 +1,6 @@
-import pytest
 from decimal import Decimal
+
+import pytest
 
 # --- Dummy Rules Data Fixture (Minimal set covering all assigned schemes) ---
 

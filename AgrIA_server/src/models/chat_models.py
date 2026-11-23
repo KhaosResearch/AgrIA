@@ -1,12 +1,12 @@
 import asyncio
 import base64
 import io
+from pathlib import Path
+
 import openai
 import structlog
-
 from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
-from pathlib import Path
 from PIL import Image
 
 logger = structlog.get_logger(__file__)

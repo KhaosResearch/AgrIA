@@ -1,23 +1,25 @@
 # Setup VLM
 import base64
-from collections import defaultdict
 import json
 import os
-import pandas as pd
-import structlog
 import time
-
+from collections import defaultdict
 from datetime import datetime, timedelta
-from langchain_core.messages import HumanMessage, SystemMessage
 from pathlib import Path
 
-from ..sr.utils import copy_file_to_dir
+import pandas as pd
+import structlog
+from langchain_core.messages import HumanMessage, SystemMessage
+from sen2sr_tools.constants import GEOJSON_FILEPATH
+from sigpac_tools.find import find_from_cadastral_registry
+
 from ...config.constants import SEN2SR_SR_DIR, TEMP_DIR
 from ...config.llm_client import client
+from ...services.ecoscheme_payments.main import get_ecoscheme_payments_data
 from ...services.parcel_finder_service import download_sen2sr_parcel_image
 from ...utils.chat_utils import generate_image_context_data
 from ...utils.parcel_finder_utils import reset_dir
-
+from ..sr.utils import copy_file_to_dir
 from .constants import (
     BM_JSON_DIR,
     BM_LLM_DIR,
@@ -26,15 +28,11 @@ from .constants import (
     DATES_PAPER,
     FULL_DESC_SYS_INSTR_EN,
     FULL_DESC_SYS_INSTR_ES,
-    USE_PAPER_DATA,
     LANG,
+    USE_PAPER_DATA,
 )
-from ...services.ecoscheme_payments.main import get_ecoscheme_payments_data
 from .llm_setup import generate_system_instructions
 from .utils import n_random_dates_between
-
-from sen2sr_tools.constants import GEOJSON_FILEPATH
-from sigpac_tools.find import find_from_cadastral_registry
 
 SLEEP_SECONDS = 60
 
@@ -164,7 +162,7 @@ def get_llm_full_desc(
     )
     prompt_es = f"Genera una descripción completa de la parcela en Español con la siguiente información. Combínala con la imagen para la descripción de 700 caracteres máximo:\n\n{json_data}"
     desc_es = "La imagen satélite muestra una parcela agrícola de **31.18 ha**, dominada por **tonos rojizos, marrones y secos**, indicativo de **poca cobertura vegetal** o terreno trabajado recientemente, típico de cultivos leñosos mediterráneos o de tierras de pastoreo extensivo. La evaluación visual se correlaciona direcatmente con el análisi digital del uso de la tierra. El área más grande, **Olivares (OV)**, abarca **30.72 ha** y ha sido asignaco al Ecorrégimen **P6/P7 (Cobertura Vegetal)**, debido a tener el importe pago/ha más alto. Un pequeña porción de **Pasto Arbustivo (PA)**, **0.36 ha**, ha sido asignada a **P1 (Pastoreo Extensivo)**. La baja señal de vegetación en general en la imagen is consistente con las prácticas agrícolas extensivas sugeridas en estos dos Ecorregímenes aplicables, particularmente, el área más grande de OV que se ha asignado a P6/P7 usando importes del Tramo 2."
-    prompt_es += f'\n\Este es un ejemplo de la la descripción de 700 caracteres máximo:\n"{desc_es}"'
+    prompt_es += f'\n\\Este es un ejemplo de la la descripción de 700 caracteres máximo:\n"{desc_es}"'
     prompt = f"Describe the parcels based on the following information and image:\n\n{parcel_desc}"
 
     prompt = prompt_en if lang == "en" else prompt_es if lang == "es" else prompt

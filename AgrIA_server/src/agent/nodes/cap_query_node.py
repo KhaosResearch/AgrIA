@@ -1,10 +1,10 @@
 from langchain_core.messages import AIMessage
 
-from ...utils.rag_utils import get_or_create_knowledge_base, query_knowledge_base
 from ...models.chat_models import LocalChat
 from ...models.state_models import AgrIAState
 from ...utils.chat_utils import get_recent_history
 from ...utils.nodes_utils import load_prompt_asset, secondary_intent_block
+from ...utils.rag_utils import get_or_create_knowledge_base, query_knowledge_base
 
 
 def cap_query_node(state: AgrIAState, client, model_name: str) -> dict:

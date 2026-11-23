@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
-from typing import Dict, List, Any
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -12,13 +13,13 @@ class ChatMemoryModel(BaseModel):
     """
 
     session_id: str = Field(..., description="Unique session identifier")
-    conversation_memory: Dict[str, Any] = Field(
+    conversation_memory: dict[str, Any] = Field(
         default_factory=dict,
         description="""Persistent memory store for the conversation
         Maintains context across sessions and interactions""",
     )
 
-    recent_conversations: List[Dict[str, Any]] = Field(
+    recent_conversations: list[dict[str, Any]] = Field(
         default_factory=list,
         description="""Last N conversations for quick recall
         Helps maintain context continuity""",
@@ -36,7 +37,7 @@ class ChatMemoryModel(BaseModel):
         """Get current session identifier"""
         return self.session_id
 
-    def apply_hermes_context(self, context_data: Dict[str, Any]) -> None:
+    def apply_hermes_context(self, context_data: dict[str, Any]) -> None:
         """Merge Hermes context into conversation memory
         This should be called when receiving context updates from Hermes"""
         self.conversation_memory.update(context_data)
@@ -76,7 +77,7 @@ class ChatMemoryModel(BaseModel):
 
         self.conversation_memory["messages"].append(message_data)
 
-    def get_recent_context(self, last_n: int = 5) -> List[Dict[str, Any]]:
+    def get_recent_context(self, last_n: int = 5) -> list[dict[str, Any]]:
         """Get recent conversation context"""
         if "messages" in self.conversation_memory:
             return self.conversation_memory["messages"][-last_n:]
@@ -111,7 +112,7 @@ class HermesChatHistoryAPI:
         self.history = ChatMemoryModel(session_id=session_id)
 
     @property
-    def messages(self) -> List[Dict[str, str]]:
+    def messages(self) -> list[dict[str, str]]:
         """Get conversation messages"""
         if "messages" in self.history.get_memory_history:
             return self.history.get_memory_history["messages"]
@@ -121,7 +122,7 @@ class HermesChatHistoryAPI:
         """Add message to conversation history"""
         self.history.add_new_message(role, content)
 
-    def get_conversation_context(self) -> Dict[str, Any]:
+    def get_conversation_context(self) -> dict[str, Any]:
         """Get complete conversation context"""
         return {
             "session_id": self.history.get_memory_session,
@@ -171,7 +172,7 @@ class HermesChatHistoryAPI:
 
         return "\n".join(summary_parts)
 
-    def save_session(self, session_data: Dict[str, Any]) -> None:
+    def save_session(self, session_data: dict[str, Any]) -> None:
         """Save session for later recall"""
         if "saved_sessions" not in self.history.get_memory_history:
             self.history.get_memory_history["saved_sessions"] = []

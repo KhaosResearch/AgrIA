@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from typing import Dict, Optional
 
 
 class SessionManager:
@@ -10,7 +9,7 @@ class SessionManager:
     """
 
     def __init__(self):
-        self.active_sessions: Dict[str, dict] = {}
+        self.active_sessions: dict[str, dict] = {}
 
     # Session expiration settings
     SESSION_EXPIRATION_HOURS = 24
@@ -24,7 +23,7 @@ class SessionManager:
         }
         return session_id
 
-    def get_session(self, session_id: str) -> Optional[dict]:
+    def get_session(self, session_id: str) -> dict | None:
         """Get session information"""
         if session_id in self.active_sessions:
             self._touch_session(session_id)

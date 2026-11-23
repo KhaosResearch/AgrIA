@@ -1,29 +1,28 @@
 import structlog
-
 from langchain_core.messages import AIMessage
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.graph import StateGraph, START, END
+from langgraph.graph import END, START, StateGraph
 
-from ..config.llm_client import client, LLM_MODEL_NAME
-from ..models.state_models import AgrIAState, INTENT_REGISTRY
-from .nodes.cap_query_node import cap_query_node
-from .nodes.cap_interruption_node import cap_interruption_node
-from .nodes.basic_chat_node import basic_chat_node
+from ..config.llm_client import LLM_MODEL_NAME, client
+from ..models.state_models import INTENT_REGISTRY, AgrIAState
 from .nodes.app_usage_node import app_usage_node
-from .nodes.fallback_node import fallback_rejection_node
+from .nodes.basic_chat_node import basic_chat_node
+from .nodes.cap_application_node import cap_application_node
+from .nodes.cap_document_inspector_node import cap_document_inspector_node
+from .nodes.cap_form_status_node import cap_form_status_node
+from .nodes.cap_interruption_node import cap_interruption_node
+from .nodes.cap_query_node import cap_query_node
+from .nodes.cap_slot_guard_node import cap_slot_guard_node
 from .nodes.ecoscheme_rates_node import ecoschemes_rates_node
+from .nodes.fallback_node import fallback_rejection_node
 from .nodes.report_node import generate_report_node
 from .nodes.router_node import (
-    cap_guard_edge,
-    deterministic_router,
-    clear_cap_workflow,
     _clarification_message,
+    cap_guard_edge,
+    clear_cap_workflow,
+    deterministic_router,
 )
-from .nodes.validation_node import validate_report_node, evaluation_router_edge
-from .nodes.cap_document_inspector_node import cap_document_inspector_node
-from .nodes.cap_slot_guard_node import cap_slot_guard_node
-from .nodes.cap_application_node import cap_application_node
-from .nodes.cap_form_status_node import cap_form_status_node
+from .nodes.validation_node import evaluation_router_edge, validate_report_node
 
 logger = structlog.get_logger(__file__)
 

@@ -1,7 +1,7 @@
-import structlog
-
-from langchain_core.messages import HumanMessage
 from typing import Literal
+
+import structlog
+from langchain_core.messages import HumanMessage
 
 from ...models.state_models import AgrIAState
 

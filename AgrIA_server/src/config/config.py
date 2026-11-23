@@ -1,7 +1,8 @@
 import os
-import structlog
 
+import structlog
 from dotenv import load_dotenv
+
 from .constants import SEN2SR_SR_DIR
 
 os.environ["SEN2SR_OUTPUT_DIR"] = str(

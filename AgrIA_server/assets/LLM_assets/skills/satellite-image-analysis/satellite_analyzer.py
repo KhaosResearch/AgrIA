@@ -1,5 +1,6 @@
-import sys
 import json
+import sys
+
 import numpy as np
 from PIL import Image
 

@@ -1,5 +1,6 @@
-import sys
 import json
+import sys
+
 import numpy as np
 from PIL import Image
 
@@ -51,7 +52,7 @@ class SatelliteImageAnalyzer:
         mean_r, mean_g, mean_b = np.mean(r), np.mean(g), np.mean(b)
 
         tones = []
-        if mean_r > mean_g and mean_g > mean_b:
+        if mean_r > mean_g > mean_b:
             if mean_r > 150:
                 tones.append("warm light-ochre / sandy soil")
             else:

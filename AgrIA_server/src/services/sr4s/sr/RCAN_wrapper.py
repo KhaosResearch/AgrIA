@@ -1,5 +1,6 @@
 import math
-import torch.nn as nn
+
+from torch import nn
 
 # ------------------------
 # Model (RCAN, 4-channel)
@@ -38,12 +39,12 @@ class Upsampler(nn.Sequential):
                 m.append(nn.PReLU(n_feats))
         else:
             raise NotImplementedError
-        super(Upsampler, self).__init__(*m)
+        super().__init__(*m)
 
 
 class CALayer(nn.Module):
     def __init__(self, channel, reduction=16):
-        super(CALayer, self).__init__()
+        super().__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.conv_du = nn.Sequential(
             nn.Conv2d(channel, channel // reduction, 1, padding=0, bias=True),
@@ -69,7 +70,7 @@ class RCAB(nn.Module):
         bn=False,
         act=nn.ReLU(True),
     ):
-        super(RCAB, self).__init__()
+        super().__init__()
         modules_body = []
         for i in range(2):
             modules_body.append(conv(n_feat, n_feat, kernel_size, bias=bias))
@@ -86,7 +87,7 @@ class RCAB(nn.Module):
 
 class ResidualGroup(nn.Module):
     def __init__(self, conv, n_feat, kernel_size, reduction, n_resblocks):
-        super(ResidualGroup, self).__init__()
+        super().__init__()
         modules_body = [
             RCAB(
                 conv,
@@ -108,7 +109,7 @@ class ResidualGroup(nn.Module):
 
 class RCAN(nn.Module):
     def __init__(self, n_colors, conv=default_conv):
-        super(RCAN, self).__init__()
+        super().__init__()
         n_resgroups, n_resblocks, n_feats, kernel_size, reduction, scale = (
             10,
             20,

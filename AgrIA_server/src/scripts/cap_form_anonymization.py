@@ -1,11 +1,11 @@
 import asyncio
 import json
 import os
+from pathlib import Path
+
 import pymupdf
 import pymupdf4llm
 import structlog
-
-from pathlib import Path
 
 from ..config.constants import CAP_FORMS_PATH, SENSITIVE_INFO_FORM_FIELD_NAMES
 from ..config.llm_client import client

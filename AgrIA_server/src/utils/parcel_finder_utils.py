@@ -1,49 +1,46 @@
 import math
-from pathlib import Path
+import os
 import re
 import shutil
-from flask import jsonify
-from pyproj import Transformer, CRS
-
-
-from ..services.sr4s.im.get_image_bands import download_from_sentinel_hub
-from ..services.sr4s.sr.get_sr_image import process_directory
-from ..services.sr4s.sr.utils import percentile_stretch, set_reflectance_scale
-from ..config.constants import (
-    ANDALUSIA_TILES,
-    SPAIN_ZONES,
-    TEMP_DIR,
-    SR_BANDS,
-    RESOLUTION,
-    BANDS_DIR,
-    MERGED_BANDS_DIR,
-    MASKS_DIR,
-    SR5M_DIR,
-)
-
-from ..config.minio_client import minioClient, bucket_name
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from dateutil.relativedelta import relativedelta
 from datetime import datetime
-from dotenv import load_dotenv
-from minio.error import S3Error
-from PIL import Image
-from shapely import Point, box, ops, unary_union
-from shapely.geometry import GeometryCollection, MultiPolygon, Polygon, shape, mapping
-from rasterio.mask import mask
-from rasterio.merge import merge
-from shapely.ops import transform as shapely_transform
-from rasterio.warp import calculate_default_transform, reproject, Resampling
+from pathlib import Path
 
 import cv2
 import geopandas as gpd
 import numpy as np
-import os
 import rasterio
 import structlog
-
+from dateutil.relativedelta import relativedelta
+from dotenv import load_dotenv
+from flask import jsonify
+from minio.error import S3Error
+from PIL import Image
+from pyproj import CRS, Transformer
+from rasterio.mask import mask
+from rasterio.merge import merge
+from rasterio.warp import Resampling, calculate_default_transform, reproject
+from shapely import Point, box, ops, unary_union
+from shapely.geometry import GeometryCollection, MultiPolygon, Polygon, mapping, shape
+from shapely.ops import transform as shapely_transform
 from sigpac_tools.generate import build_cadastral_reference
+
+from ..config.constants import (
+    ANDALUSIA_TILES,
+    BANDS_DIR,
+    MASKS_DIR,
+    MERGED_BANDS_DIR,
+    RESOLUTION,
+    SPAIN_ZONES,
+    SR5M_DIR,
+    SR_BANDS,
+    TEMP_DIR,
+)
+from ..config.minio_client import bucket_name, minioClient
+from ..services.sr4s.im.get_image_bands import download_from_sentinel_hub
+from ..services.sr4s.sr.get_sr_image import process_directory
+from ..services.sr4s.sr.utils import percentile_stretch, set_reflectance_scale
 
 logger = structlog.get_logger()
 
@@ -507,7 +504,7 @@ def save_raster(image, temp_file, src, transform, format):
         with rasterio.open(temp_file, "w", **out_meta) as dest:
             dest.write(image)
     except Exception as e:
-        raise Exception(f"Failed to save raster: {str(e)}")
+        raise Exception(f"Failed to save raster: {e!s}")
 
 
 def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
@@ -570,7 +567,7 @@ def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
         logger.error(str(e))
         raise e
     except Exception as e:
-        logger.error(f"An error occurred: {str(e)}")
+        logger.error(f"An error occurred: {e!s}")
         raise e
 
 

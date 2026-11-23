@@ -1,4 +1,4 @@
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
 
 from .constants import PLURIANNUALITY_BONUS_PER_HA, ROUNDING_PAYMENT, ROUNDING_RATE
 
@@ -64,7 +64,7 @@ def calculate_payments_for_rate_type(
             applied_tier = "Tier 2"
 
     # Payments
-    current_rate = current_rate if "/" not in str(current_rate) else Decimal(str("0"))
+    current_rate = current_rate if "/" not in str(current_rate) else Decimal(0)
     base_payment = area * current_rate
     payment_with_pluri = base_payment
 
