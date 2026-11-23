@@ -81,8 +81,10 @@ def init():
 
 
 def setup_ndates(
-    n_dates: int, to_date: datetime = datetime.today(), delta_days: int = 4 * 365
+    n_dates: int, to_date: datetime | None = None, delta_days: int = 4 * 365
 ):
+    if to_date is None:
+        to_date = datetime.now()
     # Get all parcel descriptions
     from_date = to_date - timedelta(days=delta_days)
     dates = n_random_dates_between(
@@ -455,8 +457,8 @@ def demo():
 
         run_vlm_benchmark(use_paper_data=True)
 
-    except Exception as e:
-        logger.exception(f"Error during VLM metrics collection:\nEXCEPTION:\t{e}")
+    except Exception:
+        logger.exception("Error during VLM metrics collection:\nEXCEPTION:\t")
     finally:
         logger.info(f"TIMES:\n{dict(times)}")
         times_filepath = BM_JSON_DIR / "times.json"

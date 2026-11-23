@@ -52,7 +52,7 @@ def _read_pdf_text(path: str) -> str:
         from ...scripts.schema_extraction import extract_pdf_text
 
         return extract_pdf_text(path)
-    except Exception as exc:  # unreadable/encrypted/scanned PDF
+    except Exception as exc:  # unreadable/encrypted/scanned PDF  # noqa: BLE001
         logger.warning("cap_pdf_text_extraction_failed", path=path, error=str(exc))
         return ""
 
@@ -160,7 +160,7 @@ def cap_document_inspector_node(
             verdict.get("slots") if isinstance(verdict.get("slots"), dict) else verdict
         )
         slots = normalise_slots(proposed)
-    except Exception as exc:  # defensive: transport/provider failure
+    except Exception as exc:  # defensive: transport/provider failure  # noqa: BLE001
         logger.warning("cap_pdf_extraction_failed", path=pdf_path, error=str(exc))
         return {"cap_alignment": None}
 

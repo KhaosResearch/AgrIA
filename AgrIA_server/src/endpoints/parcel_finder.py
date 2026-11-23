@@ -32,10 +32,10 @@ async def load_parcel_description(lang: str = Form("es")):
         content = "..."
 
         if os.path.exists(parcel_desc_file):
-            with open(parcel_desc_file, "r", encoding="utf-8") as file:
+            with open(parcel_desc_file, "r", encoding="utf-8") as file:  # noqa: ASYNC230
                 content = file.read()
         return {"response": content}
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -88,7 +88,7 @@ async def find_parcel(
                 "metadata": metadata,
             }
         }
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         logger.error(str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -97,7 +97,7 @@ async def find_parcel(
 async def is_coord_in_zone(lat: float = Form(...), lng: float = Form(...)):
     try:
         return {"response": is_coord_in_zones(lng, lat)}
-    except Exception:
+    except Exception:  # noqa: BLE001
         raise HTTPException(status_code=400, detail="Invalid or missing coordinates")
 
 

@@ -114,7 +114,7 @@ def _parse_llm_dict(content: str) -> dict:
         result = ast.literal_eval(content)
 
     if not isinstance(result, dict):
-        raise ValueError(f"Expected a dict, got {type(result).__name__}: {content!r}")
+        raise TypeError(f"Expected a dict, got {type(result).__name__}: {content!r}")
 
     return result
 
@@ -123,7 +123,7 @@ def redact_sensitive_data_from_pdf(
     in_file: str | Path,
     out_file: str | Path = "",
     field_names: list[str] = SENSITIVE_INFO_FORM_FIELD_NAMES,
-    terms_to_redact: list[str] = None,
+    terms_to_redact: list[str] | None = None,
 ) -> None:
     """
     PDF data redaction pipeline for sensitive and personal CAP form data fields (including address and bank details).

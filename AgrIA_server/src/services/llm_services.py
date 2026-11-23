@@ -19,7 +19,7 @@ def upload_context_document(context_file_path: str) -> str | None:
 
             # Simple placeholder text fallback for non-text files
             return f"[Local File Reference: {path.name}]"
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error(f"Error reading local document context: {e}")
             return None
     return None

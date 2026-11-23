@@ -30,11 +30,11 @@ def test_main_calculation_output(sample_input_data_str, mocker):
         total_pluri_payment,
     ) in ecoschemes_total_payments:
         # Check Detailed Payments for all ecoschemes
-        payment = [
+        payment = next(
             p
             for p in output["Estimated_Total_Payment"]
             if p["Ecoscheme_ID"] == ecoscheme_id
-        ][0]
+        )
 
         # Peninsular (Used for Summary)
         assert payment["Peninsular"]["Total_Base_Payment_EUR"] == total_base_payment

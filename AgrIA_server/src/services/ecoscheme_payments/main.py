@@ -74,9 +74,7 @@ def calculate_ecoscheme_payments(parsed_data, land_use_assignments):
 
     pluri_area = Decimal("0.0")
 
-    sorted_keys = sorted(
-        [k for k in final_scheme_results.keys() if k != "Non-Eligible"]
-    )
+    sorted_keys = sorted([k for k in final_scheme_results if k != "Non-Eligible"])
     if "Non-Eligible" in final_scheme_results:
         sorted_keys.append("Non-Eligible")
 
@@ -208,7 +206,7 @@ def get_ecoscheme_payments_data(
     # -------------------------------------------------------------
 
     final_results = {
-        "Applicable_Ecoschemes": sorted(list(set(applicable_ecoschemes))),
+        "Applicable_Ecoschemes": sorted(set(applicable_ecoschemes)),
         "Total_Aid_without_Pluriannuality_EUR": float(
             total_aid_no_pluriannuality.quantize(
                 ROUNDING_PAYMENT, rounding=ROUND_HALF_UP

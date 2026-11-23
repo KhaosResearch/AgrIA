@@ -9,6 +9,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage
+
 from src.agent.nodes.cap_application_node import cap_application_node
 from src.agent.nodes.cap_document_inspector_node import (
     _parse_slots,
@@ -294,7 +295,10 @@ class TestRouterPrecedence:
         assert result["cap_form_data"] is None
         assert result["cap_rates"] is None
         assert len(result["messages"]) == 1
-        assert "cancelada" in result["messages"][0].content or "cancelled" in result["messages"][0].content
+        assert (
+            "cancelada" in result["messages"][0].content
+            or "cancelled" in result["messages"][0].content
+        )
 
 
 class TestCapGuardEdge:

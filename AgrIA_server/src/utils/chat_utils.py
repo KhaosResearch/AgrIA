@@ -3,6 +3,7 @@ import shutil
 
 import structlog
 from fastapi import UploadFile
+
 from src.config.constants import TEMP_DIR
 
 logger = structlog.get_logger(__file__)
@@ -90,7 +91,7 @@ def generate_image_context_data(image_date, land_uses, query) -> str:
                 file.write(results[lang])
 
         return results
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         logger.error(f"Error while getting image context data: {e}")
 
 

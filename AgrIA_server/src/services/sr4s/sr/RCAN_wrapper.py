@@ -19,7 +19,7 @@ class Upsampler(nn.Sequential):
     def __init__(self, conv, scale, n_feats, bn=False, act=False, bias=True):
         m = []
         if (scale & (scale - 1)) == 0:
-            for _ in range(int(math.log(scale, 2))):
+            for _ in range(int(math.log2(scale))):
                 m.append(conv(n_feats, 4 * n_feats, 3, bias))
                 m.append(nn.PixelShuffle(2))
                 if bn:
@@ -68,7 +68,7 @@ class RCAB(nn.Module):
         reduction,
         bias=True,
         bn=False,
-        act=nn.ReLU(True),
+        act=nn.ReLU(True),  # noqa: B008
     ):
         super().__init__()
         modules_body = []

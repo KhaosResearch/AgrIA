@@ -189,7 +189,7 @@ def deterministic_router(state: AgrIAState, client, model_name: str) -> str:
         state["secondary_intent"] = secondary
         return primary
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         # Distinguish a crash from a low-confidence verdict in the logs.
         logger.warning("router_classifier_failed", error=str(e))
         _log_routing("llm_error", "basic_chat", None, error=str(e))

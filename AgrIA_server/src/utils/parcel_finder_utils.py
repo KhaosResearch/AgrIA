@@ -77,7 +77,7 @@ def get_tiles_polygons(geojson):
 
     interseccion = gpd.overlay(base_geojson, geojson, how="intersection")
 
-    tiles_zones_list = set(list(interseccion["Name"]))
+    tiles_zones_list = set(interseccion["Name"])
 
     return tiles_zones_list
 
@@ -103,7 +103,7 @@ def download_tile_bands(utm_zones, year, month, bands, geometry):
             parcel_center.y, parcel_center.x, f"{year}_{month}"
         )
         for path in band_files_list:
-            for band in downloaded_files:
+            for band in list(downloaded_files):
                 if band in path:
                     downloaded_files[band].append(path)
 
@@ -277,7 +277,7 @@ def reproject_tiles(input_dir):
 
         reprojected_files = []
 
-        for crs, group_files in crs_groups.items():
+        for group_files in crs_groups.values():
             for f in group_files:
                 with rasterio.open(f) as src:
                     transform, width, height = calculate_default_transform(
@@ -504,7 +504,7 @@ def save_raster(image, temp_file, src, transform, format):
         with rasterio.open(temp_file, "w", **out_meta) as dest:
             dest.write(image)
     except Exception as e:
-        raise Exception(f"Failed to save raster: {e!s}")
+        raise RuntimeError(f"Failed to save raster: {e!s}") from e
 
 
 def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
@@ -531,12 +531,11 @@ def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
             SR_BANDS[-1] in path for path in image_paths
         )
 
-        if get_sr_image:
-            if geometry:
-                geometry = bbox_from_polygon(geometry)
-            # TODO:
-            # else:
-            #     geometry = get_bbox_from_center(lat, lon, min_size, min_size, RESOLUTION).geojson
+        if get_sr_image and geometry:
+            geometry = bbox_from_polygon(geometry)
+        # TODO:
+        # else:
+        #     geometry = get_bbox_from_center(lat, lon, min_size, min_size, RESOLUTION).geojson
 
         # Sanity check
         if isinstance(geometry, dict):
@@ -565,10 +564,10 @@ def cut_from_geometry(gdf_parcel, format, image_paths, geometry_id):
 
     except FileNotFoundError as e:
         logger.error(str(e))
-        raise e
+        raise
     except Exception as e:
         logger.error(f"An error occurred: {e!s}")
-        raise e
+        raise
 
 
 def crop_raster_to_geometry(
@@ -805,7 +804,7 @@ def merge_and_convert_to_geometry(feature_collection: dict) -> dict:
     return mapping(merged)
 
 
-def reset_dir(dir: str | Path, keep_extensions: list[str] = None):
+def reset_dir(dir: str | Path, keep_extensions: list[str] | None = None):
     """
     Removes ALL subdirectories and files inside `dir`, except files in the top-level
     directory with an allowed extension (e.g., ['png']).
@@ -825,9 +824,8 @@ def reset_dir(dir: str | Path, keep_extensions: list[str] = None):
             except FileNotFoundError:
                 pass
             continue
-        if item.is_file():
-            if item.suffix.lower().lstrip(".") not in keep_extensions:
-                item.unlink(missing_ok=True)
+        if item.is_file() and item.suffix.lower().lstrip(".") not in keep_extensions:
+            item.unlink(missing_ok=True)
 
 
 def check_cadastral_data(
@@ -1028,7 +1026,7 @@ def is_coord_in_zones(lon: float, lat: float, zones_json: dict = SPAIN_ZONES) ->
                 # Check if the point is within the polygon
                 if poly.contains(point):
                     is_in_zone = True
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 # Log the warning but continue checking other zones
                 logger.warning(
                     f"Warning: Zone '{zone_id}' has an invalid Polygon geometry. Skipping zone: {e}"

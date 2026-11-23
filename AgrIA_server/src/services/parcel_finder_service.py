@@ -40,9 +40,9 @@ def _get_parcel_image_sync(
     cadastral_reference: str,
     date: str,
     is_from_cadastral_reference: bool = True,
-    parcel_geometry: str = None,
-    parcel_metadata: str = None,
-    coordinates: list[float] = None,
+    parcel_geometry: str | None = None,
+    parcel_metadata: str | None = None,
+    coordinates: list[float] | None = None,
     get_sr_image: bool = True,
 ) -> tuple:
     """
@@ -83,7 +83,7 @@ def _get_parcel_image_sync(
                 geometry, metadata = get_geometry_and_metadata_coords(
                     "parcela", lat, lng
                 )
-            except (ValueError, Exception) as e:
+            except Exception as e:  # noqa: BLE001
                 logger.error(f"Error finding parcel (probably URBAN) with error: {e}")
                 logger.debug("Attempting to use coordinates only...")
                 geometry, metadata = get_geometry_and_metadata_coords(
@@ -142,7 +142,7 @@ def _get_parcel_image_sync(
         )
         msg2 = f"\nTIME TAKEN (SEN2SR): {datetime.now() - init2}"
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         # --- FAILOVER/BACKUP DOWNLOAD (Sentinel Hub / MinIO) ---
         logger.error(
             f"SEN2SR download failed: {e}. Falling back to backup method (SR4S)..."
@@ -165,9 +165,9 @@ async def get_parcel_image(
     cadastral_reference: str,
     date: str,
     is_from_cadastral_reference: bool = True,
-    parcel_geometry: str = None,
-    parcel_metadata: str = None,
-    coordinates: list[float] = None,
+    parcel_geometry: str | None = None,
+    parcel_metadata: str | None = None,
+    coordinates: list[float] | None = None,
     get_sr_image: bool = True,
 ) -> tuple:
     return await asyncio.to_thread(
@@ -291,11 +291,11 @@ def get_rgb_parcel_image(cadastral_reference, geojson_data, rgb_images_path):
     """
     try:
         unique_formats = list(
-            set(
+            {
                 f.split(".")[-1].lower()
                 for f in rgb_images_path
                 if isinstance(f, str) and "." in f
-            )
+            }
         )
         if len(unique_formats) > 1:
             raise ValueError(

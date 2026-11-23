@@ -4,7 +4,10 @@ These cover parsing, schema gating, merging, completeness and amount
 reproduction without any LLM involvement.
 """
 
+from typing import ClassVar
+
 import pytest
+
 from src.utils.cap_form_utils import (
     build_form_mapping,
     coerce_value,
@@ -247,7 +250,7 @@ class TestFormMapping:
 # Amount reproduction
 # --------------------------------------------------------------------------- #
 class TestEstimatedAmounts:
-    RATES = {"unit_rate_eur_ha": "120,50", "practice_rate_eur_ha": 80}
+    RATES: ClassVar[dict] = {"unit_rate_eur_ha": "120,50", "practice_rate_eur_ha": 80}
 
     # 4.2 ha x 120.50 EUR/ha = 506.10 EUR base; 2.0 ha x 80 EUR/ha = 160.00 EUR eco.
 

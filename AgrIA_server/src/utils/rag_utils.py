@@ -71,10 +71,12 @@ def add_documents_to_kb(collection, document_paths: list[Path]):
             raw_texts.append(content)
 
             meta = {"source_file": file_path.name, "chunk_index": idx}
-            if hasattr(chunk, "metadata") and chunk.metadata:
-                # Merge page numbers if extracted by PyPDFLoader
-                if "page" in chunk.metadata:
-                    meta["page_number"] = chunk.metadata["page"]
+            if (
+                hasattr(chunk, "metadata")
+                and chunk.metadata
+                and "page" in chunk.metadata
+            ):
+                meta["page_number"] = chunk.metadata["page"]
 
             metadatas.append(meta)
             ids.append(chunk_id)
@@ -104,8 +106,8 @@ def get_or_create_knowledge_base(
         try:
             chroma_client.delete_collection(name=collection_name)
             logger.info("🗑️ Existing collection reset requested and purged.")
-        except Exception:
-            pass
+        except Exception:  # noqa: BLE001
+            logger.debug("Collection did not exist, nothing to delete.")
 
     collection = chroma_client.get_or_create_collection(
         name=collection_name, embedding_function=embedding_fn

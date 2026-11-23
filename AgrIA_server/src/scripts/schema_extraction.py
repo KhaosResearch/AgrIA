@@ -55,7 +55,7 @@ def process_cap_document(
         # Fallback for objects with __dict__ or arbitrary responses
         try:
             output_data = json.dumps(response.__dict__, indent=4)
-        except Exception:
+        except Exception:  # noqa: BLE001
             output_data = json.dumps(
                 {
                     "error": "Could not serialize response",

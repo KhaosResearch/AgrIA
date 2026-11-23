@@ -4,6 +4,7 @@ from inspect import isawaitable
 import structlog
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from langchain_core.messages import AIMessage
+
 from src.agent.graph import AGRIA_GRAPH as agent_graph
 from src.config.constants import WELCOME_MESSAGE
 from src.services.chat_service import (
@@ -32,7 +33,7 @@ async def hello_world():
 @router.post("/send-user-input")
 async def send_user_input(
     userMessage: str = Form(...),
-    image: UploadFile | str | None = File(None),
+    image: UploadFile | str | None = File(None),  # noqa: B008
     isDetailedDescription: str = Form("false"),
     lang: str = Form("en"),
     thread_id: str = Form("default_session"),
@@ -61,7 +62,7 @@ async def send_user_input(
             ve = ValueError(msg)
             logger.error(str(ve))
             raise HTTPException(status_code=400, detail=msg)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -93,7 +94,7 @@ async def send_parcel_info_to_chat(
         return {"response": response}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         import traceback
 
         tb = traceback.extract_tb(e.__traceback__)

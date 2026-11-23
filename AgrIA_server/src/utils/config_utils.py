@@ -23,8 +23,7 @@ def load_system_instructions(filepath):
     except FileNotFoundError:
         logger.error(f"Error: System instruction file not found at {filepath}")
         content = ""
-    finally:
-        return content
+    return content
 
 
 def ensure_hermes_skill_registered(custom_skills_dir: str = str(CUSTOM_SKILLS_DIR)):

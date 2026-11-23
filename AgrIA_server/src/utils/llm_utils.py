@@ -176,8 +176,8 @@ def set_initial_history(
 
     try:
         doc_paths_list = load_documents_from_json(documents_json_path)
-    except Exception as e:
-        logger.exception(f"Error loading documents from JSON: {e}")
+    except Exception:
+        logger.exception("Error loading documents from JSON: ")
 
     if doc_paths_list:
         # 1. Gather CAP Guideline Docs (Files 0 to 2)
@@ -235,8 +235,8 @@ def upload_context_files(doc_paths_list) -> str:
                 logger.warning(
                     f"Skipping unsupported non-text context file: {filename}"
                 )
-        except Exception as e:
-            logger.exception(f"Error packing file data {doc_path}: {e}")
+        except Exception:
+            logger.exception(f"Error packing file data {doc_path}: ")
 
     return compiled_text
 
@@ -277,7 +277,7 @@ def get_aux_image_description(image_obj, lang=None):
         logger.debug(f"Local Response Received! {response}")
         return response.content
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         import traceback
 
         tb = traceback.extract_tb(e.__traceback__)

@@ -32,7 +32,7 @@ def _generate_user_response_sync(
     is_detailed_description: bool,
     lang: str,
     file=None,
-    filename: str = None,
+    filename: str | None = None,
     thread_id: str = "default_session",
 ) -> str:
     """
@@ -60,7 +60,7 @@ def _generate_user_response_sync(
                 )
             elif ext == ".pdf":
                 pdf_payload = extract_structured_pdf_content(file, filename, lang)
-                final_input = str("\n---\n".join([user_input, pdf_payload]))
+                final_input = f"{user_input}\n---\n{pdf_payload}"
 
         inputs = {
             "lang": lang,
@@ -88,7 +88,7 @@ def _generate_user_response_sync(
             function=frame.name,
         )
 
-        raise e
+        raise
 
 
 async def generate_user_response(
@@ -96,7 +96,7 @@ async def generate_user_response(
     is_detailed_description: bool,
     lang: str,
     file=None,
-    filename: str = None,
+    filename: str | None = None,
     thread_id: str = "default_session",
 ) -> str:
     return await asyncio.to_thread(
@@ -221,7 +221,7 @@ def extract_structured_pdf_content(file, filename, lang) -> str:
 
         return pdf_payload
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         logger.error(f"Error parsing structured PDF with pdfplumber: {e}")
         return f"[PDF Parsing Error: Unable to parse document due to {e!s}]"
 
@@ -332,7 +332,7 @@ def _get_parcel_description_sync(
             logger.info(
                 "No auxiliary Multi-modal Language Model engine detected. Using only image context data for description generation..."
             )
-            model_payload = "\n".join([image_indication_prompt, image_desc_prompt])
+            model_payload = f"{image_indication_prompt}\n{image_desc_prompt}"
 
         inputs = {
             "crop_metadata": json_data,
@@ -355,7 +355,7 @@ def _get_parcel_description_sync(
         return response
     except Exception as e:
         logger.error(f"Error while getting parcel description:\t{e}")
-        raise e
+        raise
 
 
 async def get_parcel_description(
@@ -409,14 +409,7 @@ def _get_suggestion_for_chat_sync(chat_history: list[Content], lang: str):
             ("system", system_instruction),
             (
                 "human",
-                "\n".join(
-                    [
-                        "Summarised chat:",
-                        summarised_chat,
-                        "\nLast chat entry:",
-                        last_chat_output,
-                    ]
-                ),
+                f"Summarised chat:\n{summarised_chat}\nLast chat entry:\n{last_chat_output}",
             ),
         ]
         suggestion = client.invoke(msg)
@@ -424,7 +417,7 @@ def _get_suggestion_for_chat_sync(chat_history: list[Content], lang: str):
         return suggestion.text
     except Exception as e:
         logger.error(f"Error getting suggestion:\t{e}")
-        raise e
+        raise
 
 
 async def get_suggestion_for_chat(chat_history: list[Content], lang: str):
@@ -452,7 +445,7 @@ def get_summarised_chat(chat_history):
         return summarised_chat.text
     except Exception as e:
         logger.error(f"Error while summarising chat:\t{e}")
-        raise e
+        raise
 
 
 def get_role_and_content(chat_history):

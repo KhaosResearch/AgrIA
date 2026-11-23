@@ -20,6 +20,7 @@ import sys
 from pathlib import Path
 
 import pytest
+
 from src.agent.nodes.router_node import deterministic_router
 from src.models.state_models import AgrIAState
 

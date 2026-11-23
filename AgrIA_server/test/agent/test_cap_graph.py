@@ -11,6 +11,7 @@ import pytest
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.checkpoint.memory import MemorySaver
+
 from src.agent.graph import inspector_edge
 from src.agent.nodes.router_node import clear_cap_workflow, deterministic_router
 from src.models.state_models import AgrIAState
@@ -135,7 +136,10 @@ class TestRouterDrivesCapChain:
         assert result["cap_form_data"] is None
         assert result["cap_rates"] is None
         assert len(result["messages"]) == 1
-        assert "cancelada" in result["messages"][0].content or "cancelled" in result["messages"][0].content
+        assert (
+            "cancelada" in result["messages"][0].content
+            or "cancelled" in result["messages"][0].content
+        )
 
 
 class TestCapTurnBoundaries:

@@ -18,7 +18,9 @@ class AgrIAState(TypedDict):
     cap_rates: dict | None  # Explicit EUR/ha rate table used to reproduce amounts
     visual_description: str | None
     correction_feedback: str | None
-    report_retry_count: int | None  # Bounded retry counter for the report validation loop
+    report_retry_count: (
+        int | None
+    )  # Bounded retry counter for the report validation loop
     secondary_intent: str | None  # A second intent the router detected; the primary
     # node is asked to also address it in its reply (multi-intent, no topology change)
 

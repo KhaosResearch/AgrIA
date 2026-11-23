@@ -314,9 +314,7 @@ def build_form_mapping(slots: dict | None) -> dict[str, Any]:
     }
 
 
-def estimated_amounts(
-    slots: dict | None, rates: dict | None = None
-) -> dict[str, Any]:
+def estimated_amounts(slots: dict | None, rates: dict | None = None) -> dict[str, Any]:
     """Reproduce estimated amounts from a supplied rate table.
 
     The rate table is passed in (never guessed) so that any figure the agent

@@ -68,7 +68,7 @@ def download_sentinel_image(lat, lon, size, filename, evalscript):
     """
     bbox = get_bbox_from_center(lat, lon, size[0], size[-1], RESOLUTION)
     width, height = bbox_to_dimensions(bbox, resolution=RESOLUTION)
-    date_info, band_ext = filename.split("-")
+    date_info, _ = filename.split("-")
     year, month = date_info.split("_")
     # Get a range of dates to ensure cloud-free scenes
     date = datetime(
@@ -165,7 +165,9 @@ def get_cloudless_image(
     raise RuntimeError("❌ No valid Sentinel-2 image found after all attempts.")
 
 
-def download_image_bands(lat, lon, size, filename=None, bands=["B02", "B03", "B04"]):
+def download_image_bands(lat, lon, size, filename=None, bands=None):
+    if bands is None:
+        bands = ["B02", "B03", "B04"]
     """
     Downloads separate Sentinel image bandsfor the given latitude and longitude.
 

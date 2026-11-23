@@ -1,4 +1,3 @@
-
 from pydantic import BaseModel, Field
 
 
@@ -54,9 +53,7 @@ class LivestockDeclaration(BaseModel):
     rega_code: str = Field(description="Código de explotación REGA")
     species: str = Field(description="Especie (e.g., Bovino, Ovino, Caprino)")
     num_heads: int = Field(description="Número de cabezas de ganado")
-    ugm_total: float | None = Field(
-        None, description="Unidades de Gran Ganado (UGM)"
-    )
+    ugm_total: float | None = Field(None, description="Unidades de Gran Ganado (UGM)")
 
 
 class CAPFullApplicationSchema(BaseModel):

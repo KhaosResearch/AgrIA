@@ -89,7 +89,7 @@ class LocalChat:
             else:
                 summary_response = self.client.invoke(msg)
             return summary_response.content
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error(f"Failed to auto-summarize history: {e}")
             return "System Note: Earlier history truncated due to context limit constraints."
 
@@ -239,4 +239,4 @@ class LocalChat:
                 self.summarize_history()
                 return self.send_message(content_input, False)
 
-            raise e
+            raise

@@ -9,8 +9,8 @@ from .llm_client import client
 def create_chat(
     llm_client=client,
     model_name: str = LLM_MODEL_NAME,
-    system_instruction: str = None,
-    chat_history: list[BaseMessage] = None,
+    system_instruction: str | None = None,
+    chat_history: list[BaseMessage] | None = None,
 ):
     sys_instruction = (
         generate_system_instructions()

@@ -28,7 +28,7 @@ async def lifespan(app: FastAPI):
     # Fetch Sentinel2 Grid KML file
     try:
         if not os.path.exists(str(BASE_GEOJSON_PATH / str(KML_FILENAME + ".kml"))):
-            response = requests.get(KML_FILE_URL, stream=True)
+            response = requests.get(KML_FILE_URL, stream=True)  # noqa: ASYNC210
             response.raise_for_status()
             z = zipfile.ZipFile(io.BytesIO(response.content))
             z.extractall(BASE_GEOJSON_PATH)

@@ -34,9 +34,7 @@ GUARD_CONTEXT_TOKENS = 4000
 GUARD_MAX_ATTEMPTS = 2
 
 
-def _schema_block(
-    slots: dict | None, pending_action: str | None, lang: str
-) -> str:
+def _schema_block(slots: dict | None, pending_action: str | None, lang: str) -> str:
     """Bilingual schema + current-state block fed to the guard."""
     schema, _ = load_cap_slots()
     question_key = "question_en" if lang == "en" else "question_es"
@@ -155,7 +153,7 @@ def cap_slot_guard_node(
             response = chat.send_message(user_payload)
             raw = getattr(response, "text", str(response))
             verdict = _parse_verdict(raw)
-        except Exception as exc:  # defensive: transport/provider failure
+        except Exception as exc:  # defensive: transport/provider failure  # noqa: BLE001
             logger.warning("cap_slot_guard_failed", error=str(exc))
             return {"cap_alignment": None}
 

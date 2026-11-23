@@ -258,8 +258,8 @@ def demo():
     for lang in languages:
         # Get ecoschemes classification
         data_dict = cad_ref_dict[lang.lower()]
-        for key in data_dict.keys():
-            output_dict = get_ecoscheme_payments_data(data_dict[key], lang)
+        for key, value in data_dict.items():
+            output_dict = get_ecoscheme_payments_data(value, lang)
             out_path = CLASSIFICATION_OUT_DIR / f"{key}_example_{lang}.json"
             with open(out_path, "w") as file:
                 json.dump(output_dict, file, indent=4)
