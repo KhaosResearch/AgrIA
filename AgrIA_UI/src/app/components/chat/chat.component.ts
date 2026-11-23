@@ -239,7 +239,7 @@ export class ChatComponent {
     document.body.style.cursor = 'progress';
     const formData = new FormData();
     formData.append('lang', `${this.translateService.currentLang}`);
-    this.chatService.loadInputSuggestion(formData).subscribe({
+    this.chatService.loadInputSuggestion(formData, this.chatAssistant.threadId).subscribe({
       next: (response: string) => {
         this.notificationService.showNotification('chat.suggestion-success', '', 'success');
         this.userInput = response;

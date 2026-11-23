@@ -218,7 +218,7 @@ def test_send_parcel_info_to_chat_scenarios(
         pytest.param(
             "Success: Got suggestion",
             "A list of past messages in the chat.",
-            {"lang": "en"},
+            {"lang": "en", "thread_id": "test_thread_123"},
             200,
             "A mock suggestion from the LLM.",
             id="Success_GotSuggestion",
@@ -226,7 +226,7 @@ def test_send_parcel_info_to_chat_scenarios(
         pytest.param(
             "Failure: No valid history provided",
             None,
-            {"lang": "en"},
+            {"lang": "en", "thread_id": "test_thread_123"},
             400,
             "No valid history provided.",
             id="Failure_NoHistory",
