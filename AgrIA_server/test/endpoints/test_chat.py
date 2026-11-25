@@ -335,6 +335,46 @@ def test_get_input_suggestion_scenarios(
         assert response.json()["response"] == expected_response
 
 
+def test_get_input_suggestion_propagates_thread_id(client, monkeypatch):
+    """Verify that thread_id from FormData is forwarded to get_state.
+
+    Regression test: thread_id was declared as a plain str instead of Form(),
+    so FastAPI ignored the FormData field and always used 'default_session'.
+    This caused 'No valid history' when the frontend sent a persistent threadId.
+    """
+    # --- ARRANGE --- #
+    captured_config = {}
+
+    # Use a simple object that only has get_state (no get_history),
+    # forcing the endpoint to use the get_state(config) branch.
+    class MockGraph:
+        def get_state(self, config):
+            captured_config.update(config)
+
+            class MockState:
+                def __init__(self):
+                    self.values = {"messages": [AIMessage(content="test")]}
+
+            return MockState()
+
+    mock_graph = MockGraph()
+    monkeypatch.setattr(chat, "chat", mock_graph)
+
+    def mock_get_suggestion_for_chat(chat_history, lang):
+        return "mock suggestion"
+
+    monkeypatch.setattr(chat, "get_suggestion_for_chat", mock_get_suggestion_for_chat)
+
+    data = {"lang": "es", "thread_id": "session_abc123"}
+
+    # --- ACT --- #
+    response = client.post("/get-input-suggestion", data=data)
+
+    # --- ASSERT --- #
+    assert response.status_code == 200
+    assert captured_config.get("configurable", {}).get("thread_id") == "session_abc123"
+
+
 @pytest.mark.parametrize(
     "test_name, history_data, expected_status, expected_response",
     [

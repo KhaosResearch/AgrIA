@@ -116,7 +116,7 @@ async def send_parcel_info_to_chat(
 @router.post("/get-input-suggestion")
 async def get_input_suggestion(
     lang: str = Form("es"),
-    thread_id: str = "default_session",
+    thread_id: str = Form("default_session"),
 ):
     try:
         if hasattr(chat, "get_history"):
