@@ -87,25 +87,25 @@ export class ChatAssistantComponent {
         const parts = msg.content.split('\n```');
 
         if (parts.length > 1) {
-          // Join everything after the first split point back together (in case there are multiple code blocks)
-          // and prepend the 3 backticks we stripped during the split action
+          // Keep everything after the first split point (the code block content),
+          // re-prepend the opening backticks and ensure a single closing fence.
+          // The last split fragment is the trailing "```" from the closing fence,
+          // so we drop it and append exactly one closing fence.
+          const codeBlockContent = parts.slice(1, -1).join('\n```');
           return {
             ...msg,
-            content: '```' + parts.slice(1).join('\n```')
+            content: '```' + codeBlockContent + '\n```'
           };
         }
       }
       if (msg.content.includes('```markdown\n')) {
-        let parts = msg.content.split('```markdown\n');
-        console.log("parts", parts)
+        const parts = msg.content.split('```markdown\n');
         if (parts.length > 1) {
-          // parts = parts.slice(0, -1);
           return {
             ...msg,
             content: parts[0]
           };
         }
-        
       }
       return msg;
     });

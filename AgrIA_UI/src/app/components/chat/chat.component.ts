@@ -116,7 +116,7 @@ export class ChatComponent {
     formData.append('lang', String(this.translateService.currentLang));
 
     this.chatService
-      .loadParcelDataToChat(formData)
+      .loadParcelDataToChat(formData, this.chatAssistant.threadId)
       .pipe(take(1))
       .subscribe({
         next: (response: IChatParcelResponse) => {
