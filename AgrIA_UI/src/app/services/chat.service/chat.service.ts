@@ -12,7 +12,8 @@ export class ChatService {
 
   constructor(private http: HttpClient) {}
 
-  public loadParcelDataToChat(request: FormData): Observable<IChatParcelResponse> {
+  public loadParcelDataToChat(request: FormData, threadId: string): Observable<IChatParcelResponse> {
+    request.append('thread_id', threadId);
     return this.http
       .post<{ response: IChatParcelResponse }>(`${this.apiUrl}/load-parcel-data-to-chat`, request)
       .pipe(map(res => res.response));

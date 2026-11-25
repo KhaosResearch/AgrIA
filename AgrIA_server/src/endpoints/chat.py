@@ -74,6 +74,7 @@ async def send_parcel_info_to_chat(
     imageFilename: str | None = Form(None),
     isDetailedDescription: str = Form("false"),
     lang: str = Form("es"),
+    thread_id: str = Form("default_session"),
 ):
     try:
         image_date = imageDate.split("/")[-1]
@@ -89,6 +90,7 @@ async def send_parcel_info_to_chat(
                 imageFilename,
                 is_detailed_description,
                 lang,
+                thread_id=thread_id,
             )
         )
         return {"response": response}

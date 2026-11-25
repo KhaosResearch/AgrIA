@@ -196,7 +196,9 @@ def test_send_parcel_info_to_chat_scenarios(
     """Tests various scenarios for the /load-parcel-data-to-chat endpoint."""
 
     # --- ARRANGE --- #
-    monkeypatch.setattr(chat, "get_parcel_description", lambda *args: expected_response)
+    monkeypatch.setattr(
+        chat, "get_parcel_description", lambda *args, **kwargs: expected_response
+    )
 
     # --- ACT --- #
     response = client.post("/load-parcel-data-to-chat", data=input_data)
@@ -209,6 +211,65 @@ def test_send_parcel_info_to_chat_scenarios(
         assert response_json["response"] == expected_response
     else:
         assert response_json["error"] == expected_response
+
+
+def test_load_parcel_data_to_chat_propagates_thread_id(client, monkeypatch):
+    """Verify that the thread_id form field is forwarded to get_parcel_description.
+
+    Regression test: the parcel description / report was being saved to the
+    default session instead of the frontend's persistent thread, so the report
+    and the (tagged) user message never appeared in the loaded chat history.
+    """
+    # --- ARRANGE --- #
+    captured = {}
+
+    def mock_get_parcel_description(*args, **kwargs):
+        captured.update(kwargs)
+        return {"text": "mock report", "imageDesc": {"es": "ctx"}}
+
+    monkeypatch.setattr(chat, "get_parcel_description", mock_get_parcel_description)
+
+    data = {
+        "imageDate": "01/01/2024",
+        "landUses": '["olive"]',
+        "query": '{"type": "eco_regimen"}',
+        "imageFilename": "test.png",
+        "isDetailedDescription": "false",
+        "lang": "es",
+        "thread_id": "session_abc123",
+    }
+
+    # --- ACT --- #
+    response = client.post("/load-parcel-data-to-chat", data=data)
+
+    # --- ASSERT --- #
+    assert response.status_code == 200
+    assert captured.get("thread_id") == "session_abc123"
+
+
+def test_load_parcel_data_to_chat_defaults_thread_id(client, monkeypatch):
+    """When no thread_id is sent, the endpoint falls back to 'default_session'."""
+    captured = {}
+
+    def mock_get_parcel_description(*args, **kwargs):
+        captured.update(kwargs)
+        return {"text": "mock report", "imageDesc": {"es": "ctx"}}
+
+    monkeypatch.setattr(chat, "get_parcel_description", mock_get_parcel_description)
+
+    data = {
+        "imageDate": "01/01/2024",
+        "landUses": '["olive"]',
+        "query": '{"type": "eco_regimen"}',
+        "imageFilename": "test.png",
+        "isDetailedDescription": "false",
+        "lang": "es",
+    }
+
+    response = client.post("/load-parcel-data-to-chat", data=data)
+
+    assert response.status_code == 200
+    assert captured.get("thread_id") == "default_session"
 
 
 @pytest.mark.parametrize(
